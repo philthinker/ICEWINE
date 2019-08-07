@@ -14,7 +14,7 @@ function [SO3,p] = threeMarkerPos(obj,queryMarkers,originMarkers)
 
 if nargin < 3
     % Compute the absolute position and orientation of the query markers
-    originMarkers = repmat([0,0,0],[3,1]);
+    originMarkers = [1,0,0; 0,0,0; 0,1,0];
 end
 
 %%%%--------------------------------------------------%%%%
@@ -27,6 +27,10 @@ queryOri = (queryMarkers(1,:) + queryMarkers(3,:))/2 - query;
 
 SO3 = eye(3);
 p = query - origin;
+
+% Unitizing
+originOri = originOri/norm(originOri);
+queryOri = queryOri/norm(queryOri);
 
 end
 
