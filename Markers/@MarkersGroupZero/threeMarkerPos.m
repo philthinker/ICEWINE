@@ -21,16 +21,37 @@ end
 % Modify the following codes if you want other origin defination
 origin = originMarkers(2,:);
 originOri = (originMarkers(1,:) + originMarkers(3,:))/2 - origin;
+originOriLeft = originMarkers(1,:) - origin;
+originOriRight = originMarkers(3,:) - origin;
 query = queryMarkers(2,:);
 queryOri = (queryMarkers(1,:) + queryMarkers(3,:))/2 - query;
+queryOriLeft = queryMarkers(1,:) - query;
+queryOriRight = queryMarkers(3,:) - query;
 %%%%--------------------------------------------------%%%%
 
-SO3 = eye(3);
-p = query - origin;
 
 % Unitizing
 originOri = originOri/norm(originOri);
 queryOri = queryOri/norm(queryOri);
+
+% We define the orientation vector as z-axis, and the vector perpendicular
+% to the surface defined by marker 1 to 3 as y-axis.
+% Then axis-x = axis-y x axis-z.
+% You can modify these codes for your convenience.
+originZ = originOri;
+originY = cross(originOriRight,originOriLeft); originY = originY/norm(originY);
+originX = cross(originY,originZ);
+Ro = [originX, originY, originZ];
+queryZ = queryOri;
+queryY = cross(queryOriRight,queryOriLeft); queryY = queryY/norm(queryY);
+queryX = cross(queryY, queryZ);
+Rq = [queryX, queryY, queryZ];
+Roq = Rq/Ro;
+
+tmpP = query - origin;
+
+p = [dot(tmpP,originX),dot(tmpP,originY),dot(tmpP,originZ)];
+SO3 = Roq;
 
 end
 
