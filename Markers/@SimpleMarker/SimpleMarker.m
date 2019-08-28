@@ -3,6 +3,7 @@ classdef SimpleMarker
     %   
     %   Haopeng Hu
     %   2019.06.24
+    %   All rights reserved
     
     properties (Access = public)
         XYZ;    % positions of the marker

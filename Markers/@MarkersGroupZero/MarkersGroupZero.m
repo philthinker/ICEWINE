@@ -18,9 +18,9 @@ classdef MarkersGroupZero
     end
     
     properties (Access = protected)
-        M;          % The num. of Markers
-        N;          % The num. of Markers' frame
-        Time;       % The time series of the Markers
+        M;          % Num. of Markers
+        N;          % Num. of Markers' frame
+        Time;       % Time series of the Markers
     end
     
     methods

@@ -46,12 +46,12 @@ queryZ = queryOri;
 queryY = cross(queryOriRight,queryOriLeft); queryY = queryY/norm(queryY);
 queryX = cross(queryY, queryZ);
 Rq = [queryX, queryY, queryZ];
-Roq = Rq/Ro;
+Rqo = Rq/Ro;
 
 tmpP = query - origin;
 
 p = [dot(tmpP,originX),dot(tmpP,originY),dot(tmpP,originZ)];
-SO3 = Roq;
+SO3 = Rqo;
 
 end
 
