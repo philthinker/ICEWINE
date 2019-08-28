@@ -8,6 +8,7 @@ function [SO3,p] = threeMarkerPos(obj,queryMarkers,originMarkers)
 %   %%%%------------------------------------------------------%%%%
 %   queryMarkers: 3 x 3, xyz of the query markers
 %   originMarkers: 3 x 3, xyz of the origin markers (optional)
+%   Note that the arguments above are covectors.
 %   SO3: 3 x 3, SO(3) rotation matrix
 %   p: 3 x 1, position vector
 %   @MarkersGroupZero
@@ -17,41 +18,39 @@ if nargin < 3
     originMarkers = [1,0,0; 0,0,0; 0,1,0];
 end
 
-%%%%--------------------------------------------------%%%%
-% Modify the following codes if you want other origin defination
+% Definition
+
 origin = originMarkers(2,:);
-originOri = (originMarkers(1,:) + originMarkers(3,:))/2 - origin;
-originOriLeft = originMarkers(1,:) - origin;
-originOriRight = originMarkers(3,:) - origin;
+originRightOri = originMarkers(1,:) - origin;
+originLeftOri = originMarkers(3,:) - origin;
+
 query = queryMarkers(2,:);
-queryOri = (queryMarkers(1,:) + queryMarkers(3,:))/2 - query;
-queryOriLeft = queryMarkers(1,:) - query;
-queryOriRight = queryMarkers(3,:) - query;
-%%%%--------------------------------------------------%%%%
+queryRightOri = queryMarkers(1,:) - query;
+queryLeftOri = queryMarkers(3,:) - query;
 
+% Z-axis (Right-handed)
 
-% Unitizing
-originOri = originOri/norm(originOri);
-queryOri = queryOri/norm(queryOri);
+originUpOri = cross(originRightOri,originLeftOri);
+queryUpOri = cross(queryRightOri,queryLeftOri);
 
-% We define the orientation vector as z-axis, and the vector perpendicular
-% to the surface defined by marker 1 to 3 as y-axis.
-% Then axis-x = axis-y x axis-z.
-% You can modify these codes for your convenience.
-originZ = originOri;
-originY = cross(originOriRight,originOriLeft); originY = originY/norm(originY);
-originX = cross(originY,originZ);
-Ro = [originX, originY, originZ];
-queryZ = queryOri;
-queryY = cross(queryOriRight,queryOriLeft); queryY = queryY/norm(queryY);
-queryX = cross(queryY, queryZ);
-Rq = [queryX, queryY, queryZ];
-Rqo = Rq/Ro;
+% Frames (Unitized)
 
-tmpP = query - origin;
+originZ = originUpOri/norm(originUpOri);
+originX = originRightOri/norm(originRightOri);
+originY = cross(originZ,originX);
+queryZ = queryUpOri/norm(queryUpOri);
+queryX = queryRightOri/norm(queryRightOri);
+queryY = cross(queryZ,queryX);
 
-p = [dot(tmpP,originX),dot(tmpP,originY),dot(tmpP,originZ)];
-SO3 = Rqo;
+% Position
+
+p = query - origin;
+
+% Orientation
+
+rOrigin = [originX',originY',originZ'];
+rQuery = [queryX',queryY',queryZ'];
+SO3 = rQuery/rOrigin;
 
 end
 

@@ -18,6 +18,15 @@
 
 % % MarkersGroupZero
 % % Init. a markers group by three markers
-% % load('Data\20190622AssemblyData\Demo1Raw.mat');
+% % load('Data\20190622AssemblyData\DemoMarkers.mat');
 
 % demo01markgp01 = MarkersGroupZero([demo01mark01 demo01mark02 demo01mark03]);
+
+%% Figure
+
+% % Plot the markers by plot3
+% % load('Data\20190622AssemblyData\DemoMarkersGroups.mat');
+
+% demo01markgp01.plot3Markers();
+% demo01markgp01.plot3MarkersGroup();
+

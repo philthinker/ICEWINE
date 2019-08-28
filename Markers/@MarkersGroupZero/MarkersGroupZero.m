@@ -12,9 +12,10 @@ classdef MarkersGroupZero
     
     properties (Access = public)
         Markers;    % The array of Marker
-        Positions;  % The positions of the markergroup
-        SO3;        % The rotation matrices of the markergroup
-        SE3;        % The homogeneous matrices of the markergroup
+        Positions;  % Positions of the markersgroup
+        SO3;        % Rotation matrices of the markersgroup
+        SE3;        % Homogeneous matrices of the markersgroup
+        Quaterion;  % Quaterion of the markersgroup
     end
     
     properties (Access = protected)
@@ -34,12 +35,12 @@ classdef MarkersGroupZero
             obj.Positions = obj.centerCompute();
             if obj.M >= 3
                 % There are at least 3 Markers
-                obj.SO3 = obj.rotCompute();
-                obj.SE3 = obj.tformCompute();
+                [obj.SO3, obj.SE3] = obj.tformCompute();
             else
-                obj.SO3 = zeros(obj.N,1);
-                obj.SE3 = zeros(obj.N,1);
+                obj.SO3 = repmat(eye(3),[1,1,obj.N]);
+                obj.SE3 = repmat(eye(4),[1,1,obj.N]);
             end
+            obj.Quaterion = rotm2quat(obj.SO3);
         end
     end
     
@@ -74,14 +75,17 @@ classdef MarkersGroupZero
             xlabel('x'); ylabel('y'); zlabel('z');
             grid on; axis equal;
         end
+        % Access
+        function Time = getTime(obj)
+            Time = obj.Time;
+        end
     end
     
     methods (Access = protected)
         XYZ = centerCompute(obj);
         [] = plotXYCircle(obj,center,radius,color);
         [SO3,p] = threeMarkerPos(obj,queryMarkers,originMarkers);
-        SO3 = rotCompute(obj);
-        SE3 = tformCompute(obj);
+        [SO3,SE3] = tformCompute(obj);
     end
 end
 

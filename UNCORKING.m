@@ -6,6 +6,7 @@
 %% Recommended
 
 addpath('WINE');
+addpath('DECANTER');
 
 %% Optical Markers project
 
