@@ -27,6 +27,6 @@
 % % Plot the markers by plot3
 % % load('Data\20190622AssemblyData\DemoMarkersGroups.mat');
 
-% demo01markgp01.plot3Markers();
-% demo01markgp01.plot3MarkersGroup();
+% demo01Markgp01.plot3Markers();
+% demo01Markgp01.plot3MarkersGroup();
 

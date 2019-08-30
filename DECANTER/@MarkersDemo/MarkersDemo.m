@@ -33,7 +33,11 @@ classdef MarkersDemo
     end
     
     methods (Access = public)
-        % Figure
+        function obj = singleArmMap(obj)
+            %singleArmMap Map the componentFlying to its relative
+            %coordinates.
+            %   Note that the componentFixed will be set to the 'origin'
+        end
         function obj = decay(obj,N)
             %decay Transform the time series to its decay representation
             %   N: Num. of decayed frames (optional). Note that once an N
