@@ -65,7 +65,7 @@ classdef PandaZero
             end
         end
         
-        function [] = plotJointDemo(obj,exe)
+        function [] = plotJointDemo(obj)
             %plotJointDemo Plot the demos in joint space
             %   exe: boolean, true for plot the exeJoint along with demos
             %   (reserved)
@@ -85,6 +85,7 @@ classdef PandaZero
                     t = linspace(0,1,size(obj.demoJoint{j},1));
                     plot(t,obj.demoJoint{j}(:,i));
                     hold on;
+                    ylabel(strcat('Joint ',int2str(i)));
                 end
                 grid on;
             end
