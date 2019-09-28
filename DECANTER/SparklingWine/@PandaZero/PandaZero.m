@@ -10,6 +10,7 @@ classdef PandaZero
     properties (Access = public)
         exeJoint;       % N x 7, joint space trajectory
         exeCartesian;   % 4 x 4 x N, Cartesian space trajectory
+        exeTime;        % N x 1, time series
     end
     
     properties (Access = public)
@@ -28,6 +29,7 @@ classdef PandaZero
             obj.demoCartesian = cell([1,1]);
             obj.exeJoint = zeros(1,7);
             obj.exeCartesian = eye(4,4);
+            obj.exeTime = 0;
         end
         
         function obj = addJointDemo(obj,demo)
@@ -67,17 +69,7 @@ classdef PandaZero
         
         function [] = plotJointDemo(obj)
             %plotJointDemo Plot the demos in joint space
-            %   exe: boolean, true for plot the exeJoint along with demos
-            %   (reserved)
-%             if nargin < 2
-%                 exe = false;
-%             end
             M = obj.NJointDemo;
-%             if exe
-%                 % Add the exeJoint to the end of the joint demos
-%                 M = obj.NJointDemo + 1;
-%                 obj.demoJoint{M} = obj.exeJoint;
-%             end
             figure;
             for i = 1:7
                 subplot(7,1,i);
@@ -88,6 +80,25 @@ classdef PandaZero
                     ylabel(strcat('Joint ',int2str(i)));
                 end
                 grid on;
+            end
+        end
+        
+        function [] = plotJointDemoPlus(obj,dt,exeJointPlus)
+            %plotJointDemoPlus Plot the exeJointPlus together with demos
+            %   dt: the time step
+            %   exeJointPlus: N x 8, the joint traj. to be plotted, note
+            %   that its very left column is the time series
+            demoJointPlus = obj.demoJointChron(dt); % There is no time stamps in demoJoint
+            figure;
+            for i = 1:7
+                subplot(7,1,i);
+                for j = 1:obj.NJointDemo
+                    plot(demoJointPlus{j}(:,1),demoJointPlus{j}(:,i+1),'Color',[0.36,0.36,0.36]);
+                    hold on;
+                end
+                plot(exeJointPlus(:,1),exeJointPlus(:,i+1),'Color',[0,1,0]);  % It's green
+                grid on; ylabel(strcat('Joint ',int2str(i))); 
+                axis([exeJointPlus(1,1),exeJointPlus(end,1),-inf,inf]);
             end
         end
         
@@ -130,17 +141,20 @@ classdef PandaZero
             legend(LEGEND);
         end
         
-        % Data sparsification (Is the repetitive data useful?)
-        function obj = demoJointSparse(obj,carte)
-            %demoJointSparse Sparsify the joint demos
-            %   carte: boolean, true for sparsify the Cartesian demos
-            %   simultaneously based on the joint features
-        end
-        
-        function obj = demoCarteSparse(obj,joint)
-            %demoCarteSparse Sparsify the Cartesian demos
-            %   joint: boolean, true for sparsigy the Joint demos
-            %   simultaneously based on the Cartesian features
+        % Data read
+        function [demoJointPlus] = demoJointChron(obj,dt)
+            %demoJointChron Add a time series to the very left of demoJoint
+            %   dt: scalar, the time step
+            %   demoJointPlus: 1 x NJointDemo, the demos in joint space
+            %   with N x 8 joint positions whose very left column is the
+            %   time series.
+            %   timeSeris: N x 1, the time series used to plot a figure or
+            %   regression retrivel.
+            demoJointPlus = cell(1,obj.NJointDemo);
+            for i = 1:obj.NJointDemo
+                N = size(obj.demoJoint{i},1);
+                demoJointPlus{i} = [(1:N)'*dt,obj.demoJoint{i}];
+            end
         end
     end
     

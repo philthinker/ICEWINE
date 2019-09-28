@@ -79,7 +79,11 @@ classdef GMMZero
     methods (Access = public)
         % Figures
         h = plotGMM2SC(obj, color, valAlpha);
+        h = plotGMM2SCPro(obj, Mu, Sigma, color, valAlpha);
         h = plotGMM2GMR(obj,data,sigma,color,valAlpha);
+        [] = plotGMMPerDimension(obj,demos,color,valAlpha);
+        % Others
+        obj = sortMu(obj,index);
     end
     
     methods (Access = protected)

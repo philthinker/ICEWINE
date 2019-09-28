@@ -33,7 +33,33 @@
 %     panda.plotCarte(i);
 % end
 % panda.plotCarteDemo();
-panda.plotJointDemo();
+% panda.plotJointDemo();
 
+%% GMM init
 
+% % addpath('GaussianMixtureModel');
+% gmm = GMMZero(10,8); dt = 0.001;    % Note that the very left column must be time series
+% demoJointPlus = panda.demoJointChron(dt);
+% gmm = gmm.initGMMKMeans(demoJointPlus);
+% gmm = gmm.learnGMM(demoJointPlus);
 
+%% GMM show
+
+% panda.plotJointDemo();
+% gmm = gmm.sortMu(1);
+% gmm.plotGMMPerDimension(demoJointPlus,[1,0,0],0.5);
+
+%% Find the critical positions
+
+keys = gmm.Mu;  % Never forget that the first column is the time series
+vars = gmm.Sigma;
+
+% Get ride of the 
+
+%% Contrast
+
+% % GMM + GMR
+
+% [gmrJoint, gmrJointSigma] = gmm.GMR(demoJointPlus{1}(:,1));
+% panda.plotJointDemoPlus(dt,[demoJointPlus{1}(:,1), gmrJoint]);
+% totxt(gmrJoint,5,4,'gmrJoint');
