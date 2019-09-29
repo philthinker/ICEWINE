@@ -51,10 +51,44 @@
 
 %% Find the critical positions
 
-keys = gmm.Mu;  % Never forget that the first column is the time series
-vars = gmm.Sigma;
+% keys = gmm.Mu;  % Never forget that the first column is the time series
+% vars = zeros(size(keys));   
 
-% Get ride of the 
+% % Get ride of the keys whose vars are large in each dimensiton
+% tmpIndex = ones(size(keys,1),1);
+% for i = 1:size(keys,1)
+%     vars(i,:) = 2*sqrt((diag(gmm.Sigma(:,:,i)))');
+%     tmpMean = mean(vars(i,[2,3,5,6,7,8]));
+%     if tmpMean >= 0.2
+%         tmpIndex(i) = 0;
+%     end
+% end
+% tmpMean = zeros(panda.NJointDemo,7);    tmpMean2 = tmpMean;
+% for i = 1:panda.NJointDemo
+%     tmpMean(i,:) = panda.demoJoint{i}(1,:);
+%     tmpMean2(i,:) = panda.demoJoint{i}(end,:);
+% end
+% keys = [[0,mean(tmpMean,1)]; keys(tmpIndex==1,:); [1,mean(tmpMean2,1)]];
+% keys = keys(tmpIndex == 1,:);
+% clear tmpMean tmpMean2 tmpIndex i
+
+%% Motion Plan
+
+% % Peter Corke's robotics toolbox
+% exeJoint = panda.jtraj(keys(:,2:8),24); % Never forget the time series in the first column
+% panda.exeJoint = exeJoint;
+% panda.plotJoint(0);
+% totxt(exeJoint,5,4,'exeJoint1');
+
+% Sparse the GMR results
+exeJoint = panda.jSparse(demoJoint0929,0.0025);
+panda.exeJoint = exeJoint;
+panda.plotJoint(0);
+totxt(exeJoint,5,4,'exeJoint2');
+
+%% COACH
+
+
 
 %% Contrast
 

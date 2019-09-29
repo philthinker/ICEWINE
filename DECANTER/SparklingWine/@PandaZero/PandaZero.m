@@ -20,6 +20,10 @@ classdef PandaZero
         demoCartesian;  % 1 x NDemo cell, Demos in Cartesian space
     end
     
+    properties (Access = protected)
+        InterFreq = 1000;   % 1000 Hz
+    end
+    
     methods
         function obj = PandaZero()
             %PandaZero Init. the Panda with the num. of demo.
@@ -155,6 +159,44 @@ classdef PandaZero
                 N = size(obj.demoJoint{i},1);
                 demoJointPlus{i} = [(1:N)'*dt,obj.demoJoint{i}];
             end
+        end
+        
+        % Trajectory Generation
+        function exeJoint = jtraj(obj,routes,dT)
+            %jtraj Trajectory generation by Peter Corke's jtraj function
+            %   routes: K x 8, the route points with time series in the
+            %   first column
+            %   dT: scalar, seconds per radian
+            K = size(routes,1);
+            tmpJTrajSeg = cell(1,K-1);  tmpdt = zeros(K-1,1);
+            for i = 2:K
+                tmpdt(i-1) = ceil(max(abs(routes(i,:)-routes(i-1,:))) * dT * obj.InterFreq);
+                [tmpJTrajSeg{i-1},~,~] = jtraj(routes(i-1,:),routes(i,:),tmpdt(i-1));
+            end
+            exeJoint = zeros(sum(tmpdt),7);
+            tmpIndex = 1;
+            for i = 1:K-1
+                exeJoint(tmpIndex:tmpIndex+tmpdt(i)-1,:) = tmpJTrajSeg{i};
+                tmpIndex = tmpIndex + tmpdt(i);
+            end
+        end
+        
+        function exeJoint = jSparse(obj,exeJointIn,THD)
+            %jSparse Trajectory generation for picking up some points
+            %   exeJoint: N x 7, trajectory in joint space
+            %   THD: scalar, the threshold (optional)
+            if nargin < 3
+                THD = 0.01;
+            end
+            N = size(exeJointIn,1);
+            tmpIndex = ones(N,1);
+            for i = 2:N-1
+                tmpVariance = max(abs(exeJointIn(i,:) - exeJointIn(i-1,:)));
+                if tmpVariance < THD
+                    tmpIndex(i) = 0;
+                end
+            end
+            exeJoint = exeJointIn(tmpIndex == 1,:);
         end
     end
     
