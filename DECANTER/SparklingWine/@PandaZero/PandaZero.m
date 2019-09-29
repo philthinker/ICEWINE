@@ -189,11 +189,15 @@ classdef PandaZero
                 THD = 0.01;
             end
             N = size(exeJointIn,1);
-            tmpIndex = ones(N,1);
-            for i = 2:N-1
-                tmpVariance = max(abs(exeJointIn(i,:) - exeJointIn(i-1,:)));
+            tmpIndex = ones(N,1);   cutRef = exeJointIn(1,:); cutIndex = 1;
+            for i = 2:N-2
+                tmpVariance = max(abs(exeJointIn(i,:) - cutRef));
                 if tmpVariance < THD
-                    tmpIndex(i) = 0;
+                    if i > cutIndex
+                        tmpIndex(i) = 0;
+                        cutRef = exeJointIn(i+2,:);
+                        cutIndex = i+2;
+                    end
                 end
             end
             exeJoint = exeJointIn(tmpIndex == 1,:);
