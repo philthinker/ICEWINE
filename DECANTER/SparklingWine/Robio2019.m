@@ -15,12 +15,14 @@
 % dj2 = dj(4:6);
 % dj3 = dj(7:9);
 
+%% Init. correction data
+
+
+
 %% Load demonstration data
 % % If the data is raw, please run Robio2019Data in advance.
 
-% load('fruits\robio2019-2.mat');
-% % or
-% load('fruits\robio2019-3.mat');
+% load('fruits\robio2019-5.mat');
 
 %% Temporal alignment
 
@@ -73,27 +75,27 @@
 % gmm = gmm.initGMMKMeans(demoJointPlus);
 % gmm = gmm.learnGMM(demoJointPlus);
 
-% dt = 0.001;
-% gmm1 = GMMZero(10,8);
-% demoJointPlus1 = panda1.demoJointChron(dt);
-% gmm1 = gmm1.initGMMKMeans(demoJointPlus1);
-% gmm1 = gmm1.learnGMM(demoJointPlus1);
-% gmm1 = gmm1.sortMu(1);
-% gmm1.plotGMMPerDimension(demoJointPlus1,[1,0,0],0.5);
-% 
-% gmm2 = GMMZero(10,8);
-% demoJointPlus2 = panda2.demoJointChron(dt);
-% gmm2 = gmm2.initGMMKMeans(demoJointPlus2);
-% gmm2 = gmm2.learnGMM(demoJointPlus2);
-% gmm2 = gmm2.sortMu(1);
-% gmm2.plotGMMPerDimension(demoJointPlus2,[1,0,0],0.5);
-% 
-% gmm3 = GMMZero(10,8);
-% demoJointPlus3 = panda3.demoJointChron(dt);
-% gmm3 = gmm3.initGMMKMeans(demoJointPlus3);
-% gmm3 = gmm3.learnGMM(demoJointPlus3);
-% gmm3 = gmm3.sortMu(1);
-% gmm3.plotGMMPerDimension(demoJointPlus3,[1,0,0],0.5);
+% % dt = 0.001;
+% % gmm1 = GMMZero(10,8);
+% % demoJointPlus1 = panda1.demoJointChron(dt);
+% % gmm1 = gmm1.initGMMKMeans(demoJointPlus1);
+% % gmm1 = gmm1.learnGMM(demoJointPlus1);
+% % gmm1 = gmm1.sortMu(1);
+% % gmm1.plotGMMPerDimension(demoJointPlus1,[1,0,0],0.5);
+% % 
+% % gmm2 = GMMZero(10,8);
+% % demoJointPlus2 = panda2.demoJointChron(dt);
+% % gmm2 = gmm2.initGMMKMeans(demoJointPlus2);
+% % gmm2 = gmm2.learnGMM(demoJointPlus2);
+% % gmm2 = gmm2.sortMu(1);
+% % gmm2.plotGMMPerDimension(demoJointPlus2,[1,0,0],0.5);
+% % 
+% % gmm3 = GMMZero(10,8);
+% % demoJointPlus3 = panda3.demoJointChron(dt);
+% % gmm3 = gmm3.initGMMKMeans(demoJointPlus3);
+% % gmm3 = gmm3.learnGMM(demoJointPlus3);
+% % gmm3 = gmm3.sortMu(1);
+% % gmm3.plotGMMPerDimension(demoJointPlus3,[1,0,0],0.5);
 
 %% GMM show
 
@@ -140,7 +142,18 @@
 
 %% COACH
 
+time = demoJointPlus{1}(:,1);
+% gmmCorr = GMMRobio2019(gmm);
 
+% [gmmCorr,~] = gmmCorr.addJCorrection(correJ1Index, [demoJointPlus{1}(:,1), gmrJoint], correJ1);
+% gmrJoint5 = gmmCorr.plotComparison();
+% totxt(gmrJoint5,5,4,'gmrJoint5');
+
+% gmmCorr = gmmCorr.addJCorrection(correJ2Index,[time,gmrJoint5],correJ2);
+% gmrJoint6 = gmmCorr.plotComparison();
+% totxt(gmrJoint6,5,4,'gmrJoint6');
+
+% panda.plotJointDemoPlus(dt,[demoJointPlus{1}(:,1),gmrJoint5]);
 
 %% Contrast
 
@@ -150,14 +163,14 @@
 % panda.plotJointDemoPlus(dt,[demoJointPlus{1}(:,1), gmrJoint]);
 % totxt(gmrJoint,5,4,'gmrJoint3');
 
-% gmrJoint1 = gmm1.GMR(demoJointPlus1{1}(:,1));
-% panda1.plotJointDemoPlus(dt,[demoJointPlus1{1}(:,1), gmrJoint1]);
-% totxt(gmrJoint1,5,4,'gmrJoint4-1');
-% 
-% gmrJoint2 = gmm1.GMR(demoJointPlus2{1}(:,1));
-% panda2.plotJointDemoPlus(dt,[demoJointPlus2{1}(:,1), gmrJoint2]);
-% totxt(gmrJoint2,5,4,'gmrJoint4-2');
-% 
-% gmrJoint3 = gmm1.GMR(demoJointPlus3{1}(:,1));
-% panda3.plotJointDemoPlus(dt,[demoJointPlus3{1}(:,1), gmrJoint3]);
-% totxt(gmrJoint3,5,4,'gmrJoint4-3');
+% % gmrJoint1 = gmm1.GMR(demoJointPlus1{1}(:,1));
+% % panda1.plotJointDemoPlus(dt,[demoJointPlus1{1}(:,1), gmrJoint1]);
+% % totxt(gmrJoint1,5,4,'gmrJoint4-1');
+% % 
+% % gmrJoint2 = gmm1.GMR(demoJointPlus2{1}(:,1));
+% % panda2.plotJointDemoPlus(dt,[demoJointPlus2{1}(:,1), gmrJoint2]);
+% % totxt(gmrJoint2,5,4,'gmrJoint4-2');
+% % 
+% % gmrJoint3 = gmm1.GMR(demoJointPlus3{1}(:,1));
+% % panda3.plotJointDemoPlus(dt,[demoJointPlus3{1}(:,1), gmrJoint3]);
+% % totxt(gmrJoint3,5,4,'gmrJoint4-3');
