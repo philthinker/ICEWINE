@@ -36,7 +36,8 @@ classdef GMMRobio2019 < GMMZero
             %   column is the time series.
             %   correcJoint: 1 x 8, the correction Mu
             correcJfina = correcJoint(end,:);
-            addSigma = eye(obj.nVar).*1e-2;
+            addSigma = eye(obj.nVar).*1e-5;
+            addSigma(1,1) = 0.0005;
             
             % Find the corresponded query value (Minimal distance)
             query = exeJointPlus(queryIndex,1);
@@ -51,14 +52,14 @@ classdef GMMRobio2019 < GMMZero
             % Regulate Priors 
             if query >= obj.Mu(obj.nKernel,1)
                 % Latter than the last one
-                addPrior = obj.Prior(obj.nKernel) * 2;
+                addPrior = obj.Prior(obj.nKernel) * 1.8;
             elseif query <= obj.Mu(1,1)
                 % Former than the first one
-                addPrior = obj.Prior(1) * 2;
+                addPrior = obj.Prior(1) * 1.8;
             else
                 for i = 1:obj.nKernel-1
                     if query >= obj.Mu(i,1) && query <= obj.Mu(i+1,1)
-                        addPrior = max([obj.Prior(i),obj.Prior(i+1)]) * 2;
+                        addPrior = max([obj.Prior(i),obj.Prior(i+1)]) * 1.8;
                         break;
                     end
                 end
@@ -86,6 +87,7 @@ classdef GMMRobio2019 < GMMZero
                 end
                 plot(t,gmrJoint(:,i),'Color',[0,1,0]);
                 grid on;
+                axis([t(1),t(end),-inf,inf]);
             end
         end
         

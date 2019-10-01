@@ -142,18 +142,23 @@
 
 %% COACH
 
-time = demoJointPlus{1}(:,1);
+% time = demoJointPlus{1}(:,1);
 % gmmCorr = GMMRobio2019(gmm);
-
+% 
 % [gmmCorr,~] = gmmCorr.addJCorrection(correJ1Index, [demoJointPlus{1}(:,1), gmrJoint], correJ1);
 % gmrJoint5 = gmmCorr.plotComparison();
 % totxt(gmrJoint5,5,4,'gmrJoint5');
-
+% 
 % gmmCorr = gmmCorr.addJCorrection(correJ2Index,[time,gmrJoint5],correJ2);
 % gmrJoint6 = gmmCorr.plotComparison();
 % totxt(gmrJoint6,5,4,'gmrJoint6');
 
-% panda.plotJointDemoPlus(dt,[demoJointPlus{1}(:,1),gmrJoint5]);
+gmmCorr = gmmCorr.addJCorrection(correJ3Index,[time,gmrJoint6],correJ3);
+gmrJoint7 = gmmCorr.plotComparison();
+totxt(gmrJoint7,5,4,'gmrJoint7');
+
+% panda.plotJointDemoPlus(dt,[demoJointPlus{1}(:,1),gmrJoint6]);
+gmmCorr.plotGMMPerDimension(demoJointPlus,[1,0,0],0.5);
 
 %% Contrast
 
