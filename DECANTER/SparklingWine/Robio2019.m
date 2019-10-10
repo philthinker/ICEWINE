@@ -45,7 +45,7 @@
 
 %% Init panda by PandaZero
 
-% panda = PandaZero();
+% panda = PandaZero(true);
 
 % panda1 = PandaZero();
 % panda2 = PandaZero();
@@ -55,7 +55,7 @@
 
 % for i = 1:9
 %     panda = panda.addJointDemo(demoJointDTW{i});
-%     panda = panda.addCartesianDemo(demoPose{i});
+% %     panda = panda.addCartesianDemo(demoPose{i});
 % end
 
 %% Demonstration data show
@@ -122,18 +122,24 @@
 %% COACH
 
 % time = demoJointPlus{1}(:,1);
-% gmmCorr = GMMRobio2019(gmm);
-% 
-% [gmmCorr,~] = gmmCorr.addJCorrection(correJ1Index, [demoJointPlus{1}(:,1), gmrJoint], correJ1);
-% gmrJoint5 = gmmCorr.plotComparison();
-% gmmCorr.plotGMMPerDimension(demoJointPlus,[1,0,0],0.5);
-% gmmCorr.plotAddedModel(demoJointPlus);
+gmmCorr = GMMRobio2019(gmm);
+
+[gmmCorr,~] = gmmCorr.addJCorrection(correJ1Index, [demoJointPlus{1}(:,1), gmrJoint], correJ1);
+gmrJoint5 = gmmCorr.plotComparison();
+gmmCorr.plotGMMPerDimension(demoJointPlus,[1,0,0],0.5);
+gmmCorr.plotAddedModel(demoJointPlus);
 % totxt(gmrJoint5,5,4,'gmrJoint5');
 % 
 % gmmCorr = gmmCorr.addJCorrection(correJ2Index,[time,gmrJoint5],correJ2);
 % gmrJoint6 = gmmCorr.plotComparison();
 % gmmCorr.plotAddedModel(demoJointPlus);
 % totxt(gmrJoint6,5,4,'gmrJoint6');
+
+% % Plot the corrections in Cartesian space
+% gmrPose = gmmCorrPanda.Panda.fkine(gmrJoint);
+% gmrPose5 = gmmCorrPanda.Panda.fkine(gmrJoint5);
+% gmrPose6 = gmmCorrPanda.Panda.fkine(gmrJoint6);
+% gmmCorrPanda.plotGMRwithDemos({gmrPose(:,:,(280:838)),gmrPose5(:,:,(280:838))},gmrPose6(:,:,(280:838)));
 
 % gmmCorr = gmmCorr.addJCorrection(correJ3Index,[time,gmrJoint6],correJ3);
 % gmrJoint7 = gmmCorr.plotComparison();
@@ -166,4 +172,12 @@
 % end
 
 % % Plot3 GMR
-panda.plotCarteDemo();
+% gmmCorrPanda = gmmCorr.addPanda(panda);
+% dpfkine = cell(size(dj));
+% for i = 1:size(dj,2)
+%     dpfkine{i} = gmmCorrPanda.Panda.fkine(dj{i});
+%     gmmCorrPanda.Panda = gmmCorrPanda.Panda.addCartesianDemo(dpfkine{i},true);
+% end
+% gmmCorrPanda.Panda.exeCartesian = gmmCorrPanda.Panda.fkine(gmrJoint);
+% gmmCorrPanda.Panda.plotCarteDemo(true);
+% gmmCorrPanda.plotGMRwithDemos(dpfkine,gmmCorrPanda.Panda.exeCartesian);

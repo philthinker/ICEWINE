@@ -9,6 +9,7 @@ classdef GMMRobio2019 < GMMZero
     properties (Access = public)
         corrections;
         exeJointPlus;
+        Panda;
     end
     
     properties (Access = public)
@@ -26,6 +27,7 @@ classdef GMMRobio2019 < GMMZero
             obj.corrections = [];
             obj.exeJointPlus = cell(1,15);
             obj.NExeJointPlus = 0;
+            obj.Panda = NaN;
         end
         
         function [obj,query] = addJCorrection(obj,queryIndex,exeJointPlus,correcJoint)
@@ -74,6 +76,12 @@ classdef GMMRobio2019 < GMMZero
             obj.exeJointPlus{obj.NExeJointPlus} = exeJointPlus;
         end
         
+        function obj = addPanda(obj,panda)
+            %addPanda Add a panda robot 
+            %   panda: 1 x 1 PandaZero object
+            obj.Panda = panda;
+        end
+        
         function gmrJoint = plotComparison(obj)
             %plotComparison Plot the original and new trajectories
             t = obj.exeJointPlus{1}(:,1);
@@ -116,6 +124,23 @@ classdef GMMRobio2019 < GMMZero
                 grid on;
                 axis([demos{1}(1,1), demos{1}(end,1), -inf,inf]);
             end
+        end
+        
+        function [] = plotGMRwithDemos(obj,demos,gmr)
+            %plotGMRwithDemos Plot the 
+            figure;
+            M = size(demos,2);
+            for i = 1:M
+                traj = permute(demos{i}(1:3,4,:),[3,1,2]);   % 3 x 1 x N to N x 3
+                plot3(traj(:,1),traj(:,2),traj(:,3),'Color',[0.44,0.44,0.44]);
+                hold on;
+            end
+            legend('Demonstration');
+            traj = permute(gmr(1:3,4,:),[3,1,2]);
+            plot3(traj(:,1),traj(:,2),traj(:,3),'LineWidth',1.5,'Color',[0.63,0.13,0.94]);
+%             legend({'Demonstration','Generation by GMR'});
+            grid on; axis equal;
+            xlabel('x');ylabel('y');zlabel('z');
         end
     end
 end

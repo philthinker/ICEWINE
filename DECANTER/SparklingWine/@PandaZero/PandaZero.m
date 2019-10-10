@@ -11,6 +11,7 @@ classdef PandaZero
         exeJoint;       % N x 7, joint space trajectory
         exeCartesian;   % 4 x 4 x N, Cartesian space trajectory
         exeTime;        % N x 1, time series
+        kModelEnable;   % boolean, is the kModel enabled?
     end
     
     properties (Access = public)
@@ -22,11 +23,15 @@ classdef PandaZero
     
     properties (Access = protected)
         InterFreq = 1000;   % 1000 Hz
+        kModel;             % Kinematic model (P. Corke's Robotics Toolbox is required)
     end
     
     methods
-        function obj = PandaZero()
+        function obj = PandaZero(kModelEnable)
             %PandaZero Init. the Panda with the num. of demo.
+            %   kModelNeeded: boolean, true for the property kModel needed.
+            %   Maker sure P. Corke's Robotics toolbox is required if
+            %   kModelNeeded is set true
             obj.NJointDemo = 0;
             obj.NCartesianDemo = 0;
             obj.demoJoint = cell([1,1]);
@@ -34,6 +39,23 @@ classdef PandaZero
             obj.exeJoint = zeros(1,7);
             obj.exeCartesian = eye(4,4);
             obj.exeTime = 0;
+            if nargin > 0
+                obj.kModelEnable = kModelEnable;
+                if kModelEnable
+                    % DH parameters
+                    SL1=Link([0       0.333       0         0        0     ],'modified');
+                    SL2=Link([0       0           0         -pi/2    0     ],'modified');
+                    SL3=Link([0       0.316       0         pi/2     0     ],'modified');
+                    SL4=Link([0       0           0.0825    pi/2     0     ],'modified');
+                    SL5=Link([0       0.384       -0.0825   -pi/2    0     ],'modified');
+                    SL6=Link([0       0           0         pi/2     0     ],'modified');
+                    SL7=Link([0       0.2104          0.088     pi/2     0     ],'modified');
+                    obj.kModel=SerialLink([SL1 SL2 SL3 SL4 SL5 SL6 SL7],'name','Panda');
+                end
+            else
+                obj.kModelEnable = false;
+                obj.kModel = NaN;
+            end
         end
         
         function obj = addJointDemo(obj,demo)
@@ -46,11 +68,18 @@ classdef PandaZero
             end
         end
         
-        function obj = addCartesianDemo(obj,demo)
+        function obj = addCartesianDemo(obj,demo,legal)
             %addJointDemo Add demo in Cartesian space
             %   demo: N x 16, Cartesian demo
-            legal = true;   % Reserved for future use
+            %   legal: boolean, true if demos are in SE3 form while false
+            %   if demos are in 1 x 16 form. (Default: false)
+            if nargin < 3
+                legal = false;
+            end
             if legal
+                obj.NCartesianDemo = obj.NCartesianDemo + 1;
+                obj.demoCartesian{obj.NCartesianDemo} = demo;
+            else
                 obj.NCartesianDemo = obj.NCartesianDemo + 1;
                 obj.demoCartesian{obj.NCartesianDemo} = obj.demo2SE3(demo);
             end
@@ -201,6 +230,20 @@ classdef PandaZero
                 end
             end
             exeJoint = exeJointIn(tmpIndex == 1,:);
+        end
+        
+        % Kinematics
+        function T = fkine(obj,joints)
+            %fkine Forward kinematics
+            %   joints: N x 7, the joint positions
+            %   T: 4 x 4 x N, the homogeneous transformations
+            N = size(joints,1);
+            T = repmat(eye(4),[1,1,N]);
+            if obj.kModelEnable
+                for i = 1:N
+                    T(:,:,i) = obj.kModel.fkine(joints(i,(1:7)));
+                end
+            end
         end
     end
     
