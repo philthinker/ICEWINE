@@ -11,7 +11,7 @@ classdef GMMRobio2019 < GMMZero
         exeJointPlus;
     end
     
-    properties (Access = protected)
+    properties (Access = public)
         NExeJointPlus;
     end
     
@@ -37,7 +37,7 @@ classdef GMMRobio2019 < GMMZero
             %   correcJoint: 1 x 8, the correction Mu
             correcJfina = correcJoint(end,:);
             addSigma = eye(obj.nVar).*1e-5;
-            addSigma(1,1) = 0.0005;
+            addSigma(1,1) = 0.0016;
             
             % Find the corresponded query value (Minimal distance)
             query = exeJointPlus(queryIndex,1);
@@ -67,7 +67,7 @@ classdef GMMRobio2019 < GMMZero
             obj.Prior = probNormalize([obj.Prior;addPrior]);
             
             obj.nKernel = obj.nKernel + 1;
-            obj = obj.sortMu(1);
+%             obj = obj.sortMu(1);
             
             % The exeJointPlus is stored in the object
             obj.NExeJointPlus = obj.NExeJointPlus + 1;
@@ -85,12 +85,38 @@ classdef GMMRobio2019 < GMMZero
                     plot(t,obj.exeJointPlus{j}(:,i+1),'Color',[0.5,0.5,0.5]);
                     hold on;
                 end
-                plot(t,gmrJoint(:,i),'Color',[0,1,0]);
-                grid on;
+                plot(t,gmrJoint(:,i),'Color',[0.63,0.13,0.94]); % It's purple
+                grid on;    ylabel(strcat('Joint',int2str(i)));
                 axis([t(1),t(end),-inf,inf]);
             end
         end
         
+        function [] = plotAddedModel(obj,demos)
+            %plotAddedModel
+            figure;
+            M = length(demos);
+            D = size(demos{1},2)-1; % The very left column is the time series
+            
+            for i = 1:D
+                subplot(D,1,i);
+                for j = 1:M
+                    % Plot the demos
+                    plot(demos{j}(:,1),demos{j}(:,i+1),'Color',[0.45,0.45,0.45]);
+                    hold on;
+                end
+                tmpSigma = obj.Sigma([1,i+1],[1,i+1],:);
+                % Transparency
+                valAlpha = 0.5;
+                color1 = [1,0,0];
+                tmpIndex = (1:obj.nKernel-obj.NExeJointPlus);
+                obj.plotGMM2SCPro(obj.Mu(tmpIndex,[1 i+1]),tmpSigma(:,:,tmpIndex),color1,valAlpha);
+                color2 = [0.63,0.13,0.94];
+                tmpIndex = (obj.nKernel-obj.NExeJointPlus+1:obj.nKernel);
+                obj.plotGMM2SCPro(obj.Mu(tmpIndex,[1 i+1]),tmpSigma(:,:,tmpIndex),color2,valAlpha);
+                grid on;
+                axis([demos{1}(1,1), demos{1}(end,1), -inf,inf]);
+            end
+        end
     end
 end
 

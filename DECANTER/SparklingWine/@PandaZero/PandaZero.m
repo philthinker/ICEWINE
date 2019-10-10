@@ -100,7 +100,7 @@ classdef PandaZero
                     plot(demoJointPlus{j}(:,1),demoJointPlus{j}(:,i+1),'Color',[0.36,0.36,0.36]);
                     hold on;
                 end
-                plot(exeJointPlus(:,1),exeJointPlus(:,i+1),'Color',[0,1,0]);  % It's green
+                plot(exeJointPlus(:,1),exeJointPlus(:,i+1),'Color',[0.63,0.13,0.94]);  % It's purple
                 grid on; ylabel(strcat('Joint ',int2str(i))); 
                 axis([exeJointPlus(1,1),exeJointPlus(end,1),-inf,inf]);
             end

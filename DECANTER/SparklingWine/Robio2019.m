@@ -28,9 +28,20 @@
 
 % demoJointDTW = iceDTW(dj,100);
 
-% demoJointDTW1 = iceDTW(dj1,100);
-% demoJointDTW2 = iceDTW(dj2,100);
-% demoJointDTW3 = iceDTW(dj3,100);
+% % Draw the DTW diagram
+% figure;
+% for i = 1:7
+%     subplot(7,1,i);
+%     for j = 1:panda.NJointDemo
+%         t = linspace(0,1,size(dj{j},1));
+%         plot(t,dj{j}(:,i),'Color',[0.5,0.5,0.5]);
+%         hold on;
+%         t = linspace(0,1,size(panda.demoJoint{j},1));
+%         plot(t,panda.demoJoint{j}(:,i),'Color',[0.63,0.13,0.94]);
+%         ylabel(strcat('Joint ',int2str(i)));
+%     end
+%     grid on;
+% end
 
 %% Init panda by PandaZero
 
@@ -47,15 +58,6 @@
 %     panda = panda.addCartesianDemo(demoPose{i});
 % end
 
-% for i = 1:3
-%     panda1 = panda1.addJointDemo(demoJointDTW1{i});
-%     panda2 = panda2.addJointDemo(demoJointDTW2{i});
-%     panda3 = panda3.addJointDemo(demoJointDTW3{i});
-% end
-% panda1.plotJointDemo();
-% panda2.plotJointDemo();
-% panda3.plotJointDemo();
-
 %% Demonstration data show
 
 % for i = 1:6
@@ -64,7 +66,6 @@
 % for i = 1:6
 %     panda.plotCarte(i);
 % end
-% panda.plotCarteDemo();
 % panda.plotJointDemo();
 
 %% GMM init
@@ -74,28 +75,6 @@
 % demoJointPlus = panda.demoJointChron(dt);
 % gmm = gmm.initGMMKMeans(demoJointPlus);
 % gmm = gmm.learnGMM(demoJointPlus);
-
-% % dt = 0.001;
-% % gmm1 = GMMZero(10,8);
-% % demoJointPlus1 = panda1.demoJointChron(dt);
-% % gmm1 = gmm1.initGMMKMeans(demoJointPlus1);
-% % gmm1 = gmm1.learnGMM(demoJointPlus1);
-% % gmm1 = gmm1.sortMu(1);
-% % gmm1.plotGMMPerDimension(demoJointPlus1,[1,0,0],0.5);
-% % 
-% % gmm2 = GMMZero(10,8);
-% % demoJointPlus2 = panda2.demoJointChron(dt);
-% % gmm2 = gmm2.initGMMKMeans(demoJointPlus2);
-% % gmm2 = gmm2.learnGMM(demoJointPlus2);
-% % gmm2 = gmm2.sortMu(1);
-% % gmm2.plotGMMPerDimension(demoJointPlus2,[1,0,0],0.5);
-% % 
-% % gmm3 = GMMZero(10,8);
-% % demoJointPlus3 = panda3.demoJointChron(dt);
-% % gmm3 = gmm3.initGMMKMeans(demoJointPlus3);
-% % gmm3 = gmm3.learnGMM(demoJointPlus3);
-% % gmm3 = gmm3.sortMu(1);
-% % gmm3.plotGMMPerDimension(demoJointPlus3,[1,0,0],0.5);
 
 %% GMM show
 
@@ -147,18 +126,21 @@
 % 
 % [gmmCorr,~] = gmmCorr.addJCorrection(correJ1Index, [demoJointPlus{1}(:,1), gmrJoint], correJ1);
 % gmrJoint5 = gmmCorr.plotComparison();
+% gmmCorr.plotGMMPerDimension(demoJointPlus,[1,0,0],0.5);
+% gmmCorr.plotAddedModel(demoJointPlus);
 % totxt(gmrJoint5,5,4,'gmrJoint5');
 % 
 % gmmCorr = gmmCorr.addJCorrection(correJ2Index,[time,gmrJoint5],correJ2);
 % gmrJoint6 = gmmCorr.plotComparison();
+% gmmCorr.plotAddedModel(demoJointPlus);
 % totxt(gmrJoint6,5,4,'gmrJoint6');
 
-gmmCorr = gmmCorr.addJCorrection(correJ3Index,[time,gmrJoint6],correJ3);
-gmrJoint7 = gmmCorr.plotComparison();
-totxt(gmrJoint7,5,4,'gmrJoint7');
+% gmmCorr = gmmCorr.addJCorrection(correJ3Index,[time,gmrJoint6],correJ3);
+% gmrJoint7 = gmmCorr.plotComparison();
+% totxt(gmrJoint7,5,4,'gmrJoint7');
 
 % panda.plotJointDemoPlus(dt,[demoJointPlus{1}(:,1),gmrJoint6]);
-gmmCorr.plotGMMPerDimension(demoJointPlus,[1,0,0],0.5);
+% gmmCorr.plotGMMPerDimension(demoJointPlus,[1,0,0],0.5);
 
 %% Contrast
 
@@ -168,14 +150,20 @@ gmmCorr.plotGMMPerDimension(demoJointPlus,[1,0,0],0.5);
 % panda.plotJointDemoPlus(dt,[demoJointPlus{1}(:,1), gmrJoint]);
 % totxt(gmrJoint,5,4,'gmrJoint3');
 
-% % gmrJoint1 = gmm1.GMR(demoJointPlus1{1}(:,1));
-% % panda1.plotJointDemoPlus(dt,[demoJointPlus1{1}(:,1), gmrJoint1]);
-% % totxt(gmrJoint1,5,4,'gmrJoint4-1');
-% % 
-% % gmrJoint2 = gmm1.GMR(demoJointPlus2{1}(:,1));
-% % panda2.plotJointDemoPlus(dt,[demoJointPlus2{1}(:,1), gmrJoint2]);
-% % totxt(gmrJoint2,5,4,'gmrJoint4-2');
-% % 
-% % gmrJoint3 = gmm1.GMR(demoJointPlus3{1}(:,1));
-% % panda3.plotJointDemoPlus(dt,[demoJointPlus3{1}(:,1), gmrJoint3]);
-% % totxt(gmrJoint3,5,4,'gmrJoint4-3');
+% % Plot GMR
+% figure;
+% gmrJointPlus = [demoJointPlus{1}(:,1),gmrJoint];
+% for i = 1:7
+%     subplot(7,1,i);
+%     for j = 1:panda.NJointDemo
+%         plot(demoJointPlus{j}(:,1),demoJointPlus{j}(:,i+1),'Color',[0.36,0.36,0.36]);
+%         gmm.plotGMM2GMR(gmrJointPlus(:,[1,i+1]), gmrJointSigma([1,i+1],[1,i+1],:), [0 .8 0], .03);
+%         hold on;
+%     end
+%     plot(gmrJointPlus(:,1),gmrJointPlus(:,i+1),'Color',[0,1,0]);  % It's green
+%     grid on; ylabel(strcat('Joint ',int2str(i)));
+%     axis([gmrJointPlus(1,1),gmrJointPlus(end,1),-inf,inf]);
+% end
+
+% % Plot3 GMR
+panda.plotCarteDemo();
