@@ -8,5 +8,7 @@ Haopeng Hu
 
 - BOTTLES： Personal collectors.
 - DECANTER: Tasting wine.
+- WINE: Necessary source, maybe.
+- WINEGLASS: The hardwares.
 
 *Coding and drinking with peach blossom!*

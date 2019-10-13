@@ -20,5 +20,5 @@ addpath('DECANTER');
 
 %% Dali 2019 project
 
-addpath('DECANTER\SparklingWine');  % Dali 2019
-addpath('GaussianMixtureModel');
+% addpath('DECANTER\SparklingWine');  % Dali 2019
+% addpath('GaussianMixtureModel');
