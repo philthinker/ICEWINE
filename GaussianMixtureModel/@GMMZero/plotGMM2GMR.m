@@ -1,5 +1,5 @@
 function [h] = plotGMM2GMR(obj,data,sigma,color,valAlpha)
-%plotGMM2SC This function displays the parameters of a Gaussian Mixture Model (GMM).
+%plotGMM2GMR Displays the data and its covariance by plot.
 %   data:         N x 2, x,y
 %   sigma:        2 x 2 x N, covariances
 %   color:        3 x 1 array representing the RGB color to use for the display.

@@ -81,6 +81,8 @@ classdef GMMZero
         h = plotGMM2SC(obj, color, valAlpha);
         h = plotGMM2SCPro(obj, Mu, Sigma, color, valAlpha);
         h = plotGMM2GMR(obj,data,sigma,color,valAlpha);
+        h = plotGMM3SC(obj,color,valAlpha, dispOut);
+        h = plotGMM3GMR(obj,data,sigma,color,valAlpha);
         [] = plotGMMPerDimension(obj,demos,color,valAlpha);
         % Others
         obj = sortMu(obj,index);
