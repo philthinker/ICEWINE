@@ -1,6 +1,6 @@
 function [obj,GAMMA2,LL] = EMGMMZero(obj,Data)
 %EMGMMZero Expectation Maximization for GMMZero
-%   Data: 1 x D cells, demonstration data. We assume that those
+%   Data: N x D, demonstration data.
 %   GAMMA2:regulized gamma
 %   LL:the log-likelihood
 %   @GMMZero

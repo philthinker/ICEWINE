@@ -22,7 +22,7 @@ end
 
 %% GMM initialization
 
-gmm = GMMZero(7,dData+1,dt);
+gmm = GMMZero(7,dData+1,dt);    % Never forget the 1st column is time.
 
 %% Parameters estimation
 
