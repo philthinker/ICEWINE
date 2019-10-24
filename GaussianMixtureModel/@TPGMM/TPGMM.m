@@ -9,6 +9,11 @@ classdef TPGMM < GMMZero
     %       F: nFrame, num. of coordinate frames
     %       N: num. of data in each demo
     %       M: num. of demos
+    %       TP-Demo struct:
+    %           A: D x D x F, orientation matrix
+    %           b: D x F, position
+    %           data: N x D, original data in world frame
+    %           TPData: D x F x N, data in each frame
     
     %   Haopeng Hu
     %   2019.10.23
@@ -34,7 +39,7 @@ classdef TPGMM < GMMZero
             obj.nFrame = floor(nFrame);
             obj.A = repmat(eye(nVar),[1,1,obj.nFrame]);
             obj.b = zeros(nVar,obj.nFrame);    % Note that they are column vectors
-            obj.Mus = repmat(zeros(nVar,nFrame),[1,nKernel]);
+            obj.Mus = zeros(obj.nVar,obj.nFrame,obj.nKernel);
             obj.Sigmas = repmat(zeros(nVar),[1,1,nFrame,nKernel]);
             obj.Pix = [];
         end
@@ -44,8 +49,7 @@ classdef TPGMM < GMMZero
             %   Demos: 1 x M cell, TPDemo struct
             diagRegularizationFactor = 1E-4;    %Optional regularization term
             Data = obj.tpDataRegulate(Demos,true);
-            [idList,Mu] = obj.kMeans(Data');    % K-Means clustering
-            Mu = Mu';                           % For S. Calinon's habit
+            [idList,Mu] = obj.kMeans(Data);    % K-Means clustering
             Sigma = zeros(obj.nVar*obj.nFrame, obj.nVar*obj.nFrame, obj.nKernel);
             for i = 1:obj.nKernel
                 idtmp = find(idList == i);
@@ -65,8 +69,33 @@ classdef TPGMM < GMMZero
         function obj = learnGMM(obj,Demos)
             %learnGMM Learn the TPGMM by EM algorithm
             %   Demos: 1 x M cell, TPDemo struct
-            Data = obj.tpDataRegulate(Demos);
+            [Data, obj.A, obj.b] = obj.tpDataRegulate(Demos);
             obj = obj.EMTPGMM(Data);
+        end
+        
+        function [Mu,Sigma] = productTPGMM(obj,Demo)
+            %productTPGMM Compute the product of Gaussians for a task-parametrized model
+            %   Demo: TP-Demo struct
+            %   Mu: D x K
+            %   Sigma: D x D x K
+            Mu = zeros(obj.nVar,obj.nKernel);
+            Sigma = zeros(obj.nVar,obj.nVar,obj.nKernel);
+            for i=1:obj.nKernel
+                % Reallocating
+                SigmaTmp = zeros(obj.nVar);
+                MuTmp = zeros(obj.nVar,1);
+                % Product of Gaussians
+                for m=1:obj.nFrame
+                    tmpA = Demo.A(:,:,m);
+                    tmpb = Demo.b(:,m);
+                    MuP = tmpA * obj.Mus(:,m,i) + tmpb;
+                    SigmaP = tmpA * obj.Sigmas(:,:,m,i) * tmpA';
+                    SigmaTmp = SigmaTmp + inv(SigmaP);
+                    MuTmp = MuTmp + SigmaP\MuP;
+                end
+                Sigma(:,:,i) = inv(SigmaTmp);
+                Mu(:,i) = Sigma(:,:,i) * MuTmp;
+            end
         end
     end
     
@@ -84,12 +113,11 @@ classdef TPGMM < GMMZero
             end
             demo = demo';
         end
-        demo = dataReconstruct(obj,A,b,data0);
+        [demo,TPData] = dataReconstruct(obj,A,b,data0);
+        [Data,A,b] = tpDataRegulate(obj,Demos,kMeans);
     end
     
     methods (Access = protected)
-        Data = tpDataRegulate(obj,Demos,kMeans);
-        Data = dataRegulate(obj,Demos);
         [Lik, GAMMA, GAMMA0] = computeTPGamma(obj,Data);
         [obj, GAMMA0, GAMMA2] = EMTPGMM(obj,Data);
         [idList, Mu] = kMeans(obj,Data);

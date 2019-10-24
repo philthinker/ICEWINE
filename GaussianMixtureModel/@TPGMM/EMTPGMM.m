@@ -21,13 +21,11 @@ obj.params_maxDiffLL = 1E-5;
 maxDiffLL = obj.params_maxDiffLL; %Likelihood increase threshold to stop the algorithm
 nData = size(Data,3);
 
-diagRegularizationFactor = 1E-9;  %Optional regularization term
-
-nbMaxSteps = 3;
+diagRegularizationFactor = 1E-8;  %Optional regularization term
 
 for nbIter=1:nbMaxSteps
 	fprintf('.');
-	disp(nbIter)
+    
 	%E-step
     [L, GAMMA, GAMMA0] = obj.computeTPGamma(Data);
 	GAMMA2 = GAMMA ./ repmat(sum(GAMMA,2),1,nData);
@@ -45,12 +43,10 @@ for nbIter=1:nbMaxSteps
 
 			%Update Mu
 			obj.Mus(:,m,i) = DataMat * GAMMA2(i,:)';
-			disp(obj.Mus)
+
 			%Update Sigma (regularization term is optional)
 			DataTmp = DataMat - repmat(obj.Mus(:,m,i),1,nData);
-%             disp(DataTmp) % NaN
 			obj.Sigmas(:,:,m,i) = DataTmp * diag(GAMMA2(i,:)) * DataTmp' + eye(size(DataTmp,1)) * diagRegularizationFactor;
-%             disp(obj.Sigmas(:,:,m,i)) % NaN
 		end
 	end
 	

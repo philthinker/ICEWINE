@@ -1,4 +1,4 @@
-function [demo] = dataReconstruct(obj,A,b,data0)
+function [demo,TPData] = dataReconstruct(obj,A,b,data0)
 %dataReconstruct Reconstruct the demo for TP-GMM
 %   A: D x D x F, rotation matrix
 %   b: D x F, position
@@ -15,6 +15,7 @@ demo.TPData = zeros(D,F,N);
 for i = 1:F
     demo.TPData(:,i,:) = permute(A(:,:,i)\(data0'-b(:,i)),[1,3,2]);
 end
+TPData = demo.TPData;
 
 end
 

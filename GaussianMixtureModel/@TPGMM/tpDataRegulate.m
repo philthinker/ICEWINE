@@ -1,8 +1,10 @@
-function [Data] = tpDataRegulate(obj,Demos,kMeans)
+function [Data,A,b] = tpDataRegulate(obj,Demos,kMeans)
 %tpDataRegulate Regulate the Demos data into compact form
-%   Demos: struct, TPDemo (A, b ,data, TPData)
+%   Demos: TP-Demo struct (A, b ,data, TPData)
 %   kMeans: boolean, true for k-Means usage (default:false)
 %   Data: (D x F) x N (kMeans == true) or D x F x N (kMeans == false)
+%   A: D x D x F, orientation matrices
+%   b: D x F, positions
 %   @TPGMM
 
 if nargin < 3
@@ -33,6 +35,9 @@ else
         tmpIndex = tmpIndex + tmpN;
     end
 end
+
+A = Demos{1}.A;
+b = Demos{1}.b;
 
 end
 
