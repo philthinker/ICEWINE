@@ -19,9 +19,9 @@
 
 %% TP-GMM learn
 
-% gmm = TPGMM(3,2,2); % 3 Gaussians, 2d data and 2 frames
-% gmm = gmm.initGMMKMeans(Demos);
-% gmm = gmm.learnGMM(Demos);
+gmm = TPGMM(3,2,2); % 3 Gaussians, 2d data and 2 frames
+gmm = gmm.initGMMKMeans(Demos);
+gmm = gmm.learnGMM(Demos);
 
 %% Figure
 
@@ -53,7 +53,7 @@ for n=1:size(TPDemo,2)
     plot(TPDemo{n}.data(1,1), TPDemo{n}.data(2,1),'.','markersize',15,'color',clrmap(n,:));
     plot(TPDemo{n}.data(1,:), TPDemo{n}.data(2,:),'-','linewidth',1.5,'color',clrmap(n,:));
 	%Plot Gaussians
-	plotGMM(TPDemo{n}.Mu, TPDemo{n}.Sigma, [.5 .5 .5],.8);
+	plotGMM2SC(TPDemo{n}.Mu, TPDemo{n}.Sigma, [.5 .5 .5],.8);
 end
 axis(limAxes); axis square; set(gca,'xtick',[],'ytick',[]);
 
@@ -67,6 +67,6 @@ for m=1:gmm.nFrame
 		plot(squeeze(demoData(1,m,(n-1)*TPDemo{1}.nData+1:n*TPDemo{1}.nData)), ...
 			squeeze(demoData(2,m,(n-1)*TPDemo{1}.nData+1:n*TPDemo{1}.nData)), '-','linewidth',1.5,'color',clrmap(n,:));
 	end
-	plotGMM(squeeze(gmm.Mus(:,m,:)), squeeze(gmm.Sigmas(:,:,m,:)), [.5 .5 .5],.8);
+	plotGMM2SC(squeeze(gmm.Mus(:,m,:)), squeeze(gmm.Sigmas(:,:,m,:)), [.5 .5 .5],.8);
 	axis square; set(gca,'xtick',[0],'ytick',[0]);
 end

@@ -1,4 +1,4 @@
-function [Data,A,b] = tpDataRegulate(obj,Demos,kMeans)
+function [Data] = tpDataRegulate(obj,Demos,kMeans)
 %tpDataRegulate Regulate the Demos data into compact form
 %   Demos: TP-Demo struct (A, b ,data, TPData)
 %   kMeans: boolean, true for k-Means usage (default:false)
@@ -36,8 +36,6 @@ else
     end
 end
 
-A = Demos{1}.A;
-b = Demos{1}.b;
 
 end
 
