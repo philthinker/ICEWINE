@@ -43,7 +43,7 @@ classdef GMMZero
         end
         
         function obj = initGMMKMeans(obj,Demos)
-            %initGMM Initialize the GMM before EM
+            %initGMM Initialize the GMM before EM by K-Means algorithm
             %   Demos: 1 x D cells, demonstration data.
             diagRegularizationFactor = 1E-2; %Optional regularization term
             Data = obj.dataRegulate(Demos);
@@ -57,6 +57,26 @@ classdef GMMZero
                 obj.Sigma(:,:,i) = obj.Sigma(:,:,i) + eye(obj.nVar)*diagRegularizationFactor;
             end
             obj.Prior = obj.Prior/sum(obj.Prior);
+        end
+        
+        function obj = initGMMTimeBased(obj,Demos)
+            %initGMMTimeBased Initialize the GMM before EM based on time
+            %   Demos: 1 x D cells, demonstration data.
+            diagRegularizationFactor = 1E-8; %Optional regularization term
+            Data = obj.dataRegulate(Demos);
+            Data = Data';   % For S. Calinon's habit
+            TimingSep = linspace(min(Data(1,:)), max(Data(1,:)), obj.nKernel+1);
+            TmpMu = zeros(obj.nVar,obj.nKernel);
+            for i=1:obj.nKernel
+                idtmp = find( Data(1,:)>=TimingSep(i) & Data(1,:)<TimingSep(i+1));
+                obj.Prior(i) = length(idtmp);
+                TmpMu(:,i) = mean(Data(:,idtmp),2);
+                obj.Sigma(:,:,i) = cov(Data(:,idtmp)');
+                %Optional regularization term to avoid numerical instability
+                obj.Sigma(:,:,i) = obj.Sigma(:,:,i) + eye(nbVar)*diagRegularizationFactor;
+            end
+            obj.Prior = obj.Prior / sum(obj.Prior);
+            obj.Mu = TmpMu';    % For S. Calinon's habit
         end
         
         function obj = learnGMM(obj,Demos)

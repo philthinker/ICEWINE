@@ -4,7 +4,7 @@ classdef TPGMM < GMMZero
     %   You must assign num. of kernels initially. Demonstration data must
     %   be aligned to vectors in cells.
     %   Notations:
-    %       D: nVar, dimension of data without time/decay term
+    %       D: nVar, dimension of data with/without time/decay term
     %       K: nKernel, num. of Gaussians
     %       F: nFrame, num. of coordinate frames
     %       N: num. of data in each demo

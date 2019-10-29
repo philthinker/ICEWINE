@@ -2,6 +2,7 @@ function [Data] = dataRegulate(obj,Demos)
 %dataRegulate Regulate the demos data into one matrix
 %   Demos: 1 x D cells, we assume that the vectors in each cell share the
 %   same num. of columns equaling to obj.nVar.
+%   Data: N x obj.nVar
 %   @GMMZero
 
 nSample = length(Demos);
