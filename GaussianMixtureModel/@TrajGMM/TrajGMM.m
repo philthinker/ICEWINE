@@ -15,12 +15,12 @@ classdef TrajGMM < GMMOne
     properties
         nDeriv;     % Num. of dynamic features (2 or 3). 
         nVarPos;    % Dimension of the position data
+        nSample;    % Num. of demos available
+        nData;      % Num. of data in one trajectory
         dt;         % Time step
     end
     
     properties (Access = protected)
-        nSample;    % Num. of demos available
-        nData;      % Num. of data in one trajectory
         Phi;        % The large sparse matrix \Phi
         Phi1;       % The large sparse matrix \Phi1
     end
@@ -43,7 +43,7 @@ classdef TrajGMM < GMMOne
             [obj.Phi,obj.Phi1] = obj.constructPhi();
         end
        
-        function [Data,zeta,x] = dynamicDataGeneration(obj,Demos)
+        function [Data,x,zeta] = dynamicDataGeneration(obj,Demos)
             %dynamicDataGeneration Generate the data and its derivatives
             %   Demos: 1 x M cell, the demos
             %   Data: DD x (M * N), the arranged data with its derivatives
@@ -58,33 +58,65 @@ classdef TrajGMM < GMMOne
             Data = reshape(zeta, (obj.nVarPos)*(obj.nDeriv), (obj.nData)*(obj.nSample));    % Include derivatives in Data
         end
         
-        function [obj] = initGMMKMeans(obj,Data)
-            %initGMMKMeans Initialize the GMM by K-Means algorithm
-            %   Data: DD x N, the demo data
-            diagRegularizationFactor = 1E-2; %Optional regularization term
-            Data = Data';   % For S. Calinon's habit
-            [idList,Mu] = obj.kMeans(Data);  % K-Means clustering
-            obj.Mu = Mu';
-            for i = 1:obj.nKernel
-                idtmp = find(idList == i);
-                obj.Prior(i) = length(idtmp);
-                obj.Sigma(:,:,i) = cov([Data(idtmp,:);Data(idtmp,:)]);
-                % Optional regularization term to avoid numerical
-                % instability
-                obj.Sigma(:,:,i) = obj.Sigma(:,:,i) + eye(obj.nVar)*diagRegularizationFactor;
+        function [expData,expSigma] = reproductTrajGMM(obj,query,LSMode)
+            %reproductTrajGMM Reproduct the trajectory with trajectory-GMM
+            %   query: 1 x N, the query state sequence
+            %   LSMode: integer, the computation method of LS
+            %   |   0: Using MATLAB func. lscov (Default)
+            %   |   1: Most readable but not optimized method
+            %   |   2: Using Cholesky and QR decompositions
+            
+            if nargin < 3
+                LSMode = 0;
             end
-            obj.Prior = obj.Prior/sum(obj.Prior);
+            
+            %Create single Gaussian N(MuQ,SigmaQ) based on query sequence q
+            MuQ = reshape(obj.Mu(:,query), (obj.nVar)*(obj.nData), 1);
+            SigmaQ = zeros((obj.nVar)*(obj.nData));
+            for t=1:obj.nData
+                id = ((t-1)*(obj.nVar)+1:t*(obj.nVar));
+                SigmaQ(id,id) = obj.Sigma(:,:,query(t));
+            end
+            if LSMode == 1
+                % Most readable but not optimized method
+                PHIinvSigmaQ = obj.Phi1' / SigmaQ;
+                Rq = PHIinvSigmaQ * (obj.Phi1);
+                rq = PHIinvSigmaQ * MuQ;
+                zeta = Rq \ rq;             % Can also be computed with c = lscov(Rq, rq)
+                expData = reshape(zeta, model.nbVarPos, nbData);  % Reshape data for plotting
+                %Covariance Matrix computation of ordinary least squares estimate
+                mse =  (MuQ'*SigmaQ\MuQ - rq'*Rq\rq) ./ ((obj.nVar-obj.nVarPos)*(obj.nData));
+                S = Rq\mse;
+            elseif LSMode == 2
+                % Using Cholesky and QR decompositions
+                T = chol(SigmaQ)'; %SigmaQ=T*T'
+                TA = T \ PHI1;
+                TMuQ = T \ MuQ;
+                [Q, R, perm] = qr(TA,0); %obj.Phi1(:,perm)=Q*R
+                z = Q' * TMuQ;
+                zeta = zeros(obj.nData * obj.nVarPos,1);
+                zeta(perm,:) = R \ z; %zeta=(TA'*TA)\(TA'*TMuQ)
+                expData = reshape(zeta, obj.nVarPos, obj.nbData); %Reshape data for plotting
+                %Covariance Matrix computation of ordinary least squares estimate
+                err = TMuQ - Q*z;
+                mse = err'*err ./ ((obj.nVar) * (obj.nData) - (obj.nVarPos) * (obj.nData));
+                Rinv = R \ eye((obj.nVarPos) * (obj.nData));
+                S(perm,perm) = Rinv*Rinv' .* mse;
+            else
+                % Using MATLAB func. lscov (Default)
+                [zeta,~,mse,S] = lscov(obj.Phi1, MuQ, SigmaQ, 'chol'); %Retrieval of data with weighted least squares solution
+                expData = reshape(zeta, obj.nVarPos, obj.nData); %Reshape data for plotting
+            end
+            % Rebuild covariance by reshaping S
+            expSigma = zeros(obj.nVarPos,obj.nVarPos,obj.nData);
+            for t=1:obj.nData
+                id = ((t-1) * (obj.nVarPos)+1 : t * (obj.nVarPos));
+                expSigma(:,:,t) = S(id,id) * obj.nData;
+            end
         end
-        
-        function [obj] = learnGMM(obj,Data)
-            %learnGMM Learn the GMM by EM algorithm
-            %   Data: DD x N, the demo data
-            obj = obj.EMGMMZero(Data);
-        end
-        
     end
     
-    methods (Access = protected)
+    methods (Access = public)
         function [Data] = dataRegulate(obj,Demos)
             %dataRegulate Regulate the demos data into one matrix
             %   Demos: 1 x M cell, the demos
@@ -100,6 +132,16 @@ classdef TrajGMM < GMMOne
                 nTemp = nTemp + TmpN(i);
             end
         end
+        
+        function [query] = deriveQuery(obj,GAMMA)
+            %deriveQuery Derive the query sequence from GAMMA
+            %   GAMMA: D x N, the likelihood in E-Step
+            %   query: 1 x N, the qeury sequence
+            [~,query] = max(GAMMA,[],1);
+        end
+    end
+    
+    methods (Access = protected)
         
         [Phi,Phi1,Phi0] = constructPhi(obj,nData,nSample);
         

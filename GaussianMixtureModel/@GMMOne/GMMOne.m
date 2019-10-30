@@ -55,7 +55,7 @@ classdef GMMOne
             for i = 1:obj.nKernel
                 idtmp = find(idList == i);
                 obj.Prior(i) = length(idtmp);
-                obj.Sigma(:,:,i) = cov([Data(:,idtmp);Data(:,idtmp)]);
+                obj.Sigma(:,:,i) = cov([Data(:,idtmp) Data(:,idtmp)]');
                 % Optional regularization term to avoid numerical instability
                 obj.Sigma(:,:,i) = obj.Sigma(:,:,i) + eye(obj.nVar)*obj.params_diagRegFact_KMeans;
             end
@@ -113,6 +113,7 @@ classdef GMMOne
                 obj.Dataout = dataout;
             end
         end
+        
         function [Data] = dataRegulate(obj,Demos)
             %dataRegulate Regulate the data in Demos into one matrix
             %   Demos: 1 x M cell, the demos. Each cell contains one
@@ -130,6 +131,31 @@ classdef GMMOne
                 end
                 tmpIndex = tmpIndex + tmpN(i);
             end
+        end
+        
+        function [obj] = initGMMTimeBased_TmpTime(obj,Data,N)
+            %initGMMTimeBased_TmpTime Init. param. of the GMM based on
+            %temporary time sequence
+            %   Data: D x (N * M): demo data
+            %   N: integer, the num. of data in one demo. If the num. of
+            %   data are not identical in each demo, you must resampling
+            %   the demos.
+            M = floor(size(Data,2)/N);
+            Data = [repmat((1:N),[1,M]);Data];
+            TimingSep = linspace(min(Data(1,:)), max(Data(1,:)), obj.nKernel+1); % Note that the first row is time series
+            TmpMu = zeros((obj.nVar)+1,obj.nKernel);
+            TmpSigma = zeros((obj.nVar)+1,(obj.nVar)+1,obj.nKernel);
+            for i=1:obj.nKernel
+                idtmp = find( Data(1,:)>=TimingSep(i) & Data(1,:)<TimingSep(i+1));
+                obj.Prior(i) = length(idtmp);
+                TmpMu(:,i) = mean(Data(:,idtmp),2);
+                TmpSigma(:,:,i) = cov(Data(:,idtmp)');
+                %Optional regularization term to avoid numerical instability
+                TmpSigma(:,:,i) = TmpSigma(:,:,i) + eye((obj.nVar)+1)*obj.params_diagRegFact_Cluster;
+            end
+            obj.Prior = obj.Prior / sum(obj.Prior);
+            obj.Mu = TmpMu(2:end,:);
+            obj.Sigma = TmpSigma(2:end,2:end,:);
         end
     end
 end
