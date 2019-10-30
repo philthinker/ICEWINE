@@ -2,10 +2,12 @@ classdef GMMOne
     %GMMOne The most simple Gaussian Mixture Model class
     %   You must assign num. of kernels initially.
     %   Notations:
-    %   |   D: dimension of data
-    %   |   K: num. of Gaussians
-    %   |   M: num. of demos
-    %   |   N: num. of data
+    %   |   D:      dimension of data
+    %   |   Din:    dimension of Datain in GMR
+    %   |   Dout:   dimension of Dataout in GMR
+    %   |   K:      num. of Gaussians
+    %   |   M:      num. of demos
+    %   |   N:      num. of data
     
     %   Haopeng Hu
     %   2019.10.29
@@ -27,6 +29,9 @@ classdef GMMOne
         params_diagRegFact_KMeans = 1E-2;   %Regularization term for K-Means is optional
         params_diagRegFact_Cluster = 1E-8;  %Regularization term for clustering is optional
         params_updateComp = ones(3,1);      %pi,Mu,Sigma
+        
+        Datain;                             %Indices of the query data in GMR
+        Dataout;                            %Indices of the regression data in GMR
     end
     
     methods (Access = public)
@@ -39,6 +44,8 @@ classdef GMMOne
             obj.Mu = zeros(nVar,nKernel);
             obj.Sigma = zeros(nVar,nVar,nKernel);
             obj.Prior = zeros(1,nKernel);
+            obj.Datain = 1;
+            obj.Dataout = (2:obj.nVar)';
         end
         
         function obj = initGMMKMeans(obj,Data)
@@ -72,15 +79,58 @@ classdef GMMOne
             obj.Mu = TmpMu;
         end
         
-        function obj = learnGMM(obj,Data)
+        function [obj,GAMMA2] = learnGMM(obj,Data)
             %learnGMM Learn the GMM by EM algorithm
-            [obj.Mu,obj.Sigma,obj.Prior] = EMGMMOne(obj,Data);
+            [obj,GAMMA2] = EMGMMOne(obj,Data);
+        end
+        
+        function [expData, expSigma] = GMR(obj,query)
+            %GMR Gaussian Mixture Regression
+            %   query: 1 x N, the query series (time/decay term)
+            [expData,expSigma] = obj.GMROne(query,obj.Datain,obj.Dataout);
         end
     end
     
     methods (Access = protected)
         [idList, Mu] = kMeans(obj,Data);
-        [Mu,Sigma,Prior,GAMMA2,LL] = EMGMMOne(obj,Data)
+        [obj,GAMMA2,LL] = EMGMMOne(obj,Data);
+        [expData,expSigma] = GMROne(obj,query,in,out);
+        [prob] = GaussPDF(obj,Data, Mu, Sigma);
+    end
+    
+    methods (Access = public)
+        function [obj] = setGMRInOut(obj,datain,dataout)
+            %setGMRInOut Set the Datain and Dataout property of the GMM
+            %which are used in GMR
+            %   datain: Din x 1, Datain
+            %   dataout: Dout x 1, Dataout (optional)
+            if nargin < 3
+                tmpIndex = (1:obj.nVar)';
+                dataout = setdiff(tmpIndex,datain);
+            end
+            if size(datain,1) + size(dataout,1) == obj.nVar
+                obj.Datain = datain;
+                obj.Dataout = dataout;
+            end
+        end
+        function [Data] = dataRegulate(obj,Demos)
+            %dataRegulate Regulate the data in Demos into one matrix
+            %   Demos: 1 x M cell, the demos. Each cell contains one
+            %   demonstration of D x N data
+            M = size(Demos,2);
+            tmpN = zeros(1,M);
+            tmpIndex = 0;
+            for i = 1:M
+                tmpN(i) = size(Demos{i},2);
+            end
+            Data = zeros(obj.nVar,sum(tmpN));
+            for i = 1:M
+                for j = 1:tmpN(i)
+                    Data(:,tmpIndex + j) = Demos{i}(1:obj.nVar,j);
+                end
+                tmpIndex = tmpIndex + tmpN(i);
+            end
+        end
     end
 end
 

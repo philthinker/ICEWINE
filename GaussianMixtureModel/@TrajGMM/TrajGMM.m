@@ -1,4 +1,4 @@
-classdef TrajGMM < GMMZero
+classdef TrajGMM < GMMOne
     %TrajGMM Gaussian Mixture Model with dynamic features
     %   It can also be extended to its task-parameterized version.
     %   Notations:
@@ -15,6 +15,7 @@ classdef TrajGMM < GMMZero
     properties
         nDeriv;     % Num. of dynamic features (2 or 3). 
         nVarPos;    % Dimension of the position data
+        dt;         % Time step
     end
     
     properties (Access = protected)
@@ -33,7 +34,8 @@ classdef TrajGMM < GMMZero
             %   for [x dx ddx]')
             %   dt: float, time step
             nVar = nVarPos * nDeriv;
-            obj = obj@GMMZero(nKernel,nVar,dt);
+            obj = obj@GMMOne(nKernel,nVar);
+            obj.dt = dt;
             obj.nDeriv = nDeriv;
             obj.nVarPos = nVarPos;
             obj.nSample = nSample;
