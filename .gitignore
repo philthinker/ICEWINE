@@ -1,3 +1,5 @@
 *_test.*
 *.asv
 Documents
+pbdlib\*
+Demos\m_fcts\*

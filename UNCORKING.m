@@ -9,13 +9,19 @@ addpath('WINE');
 addpath('WINEGLASS');
 addpath('DECANTER');
 
+addpath('DECANTER\PlumWine');
+
 %% Gaussian Mixture Model related project
 
 addpath('GaussianMixtureModel');
-addpath('GaussianMixtureModel\Demos')
-addpath('GaussianMixtureModel\m_fcts')
+% addpath('GaussianMixtureModel\Demos')
 
 %% Optical Markers project
 
 % addpath('Markers');
+
+%% Hidden Markov Process related project
+
+addpath('HiddenMarkovModel');
+
 

@@ -16,13 +16,13 @@ Demos = cell(1,nSample);
 for n=1:nSample
 	Demos{n} = spline(1:size(demos{n}.pos,2), demos{n}.pos, linspace(1,size(demos{n}.pos,2),nData)); %Resampling
 end
-[Data1,x1,zeta1] = gmm.dynamicDataGeneration(Demos);
+[Data,x1,zeta1] = gmm.dynamicDataGeneration(Demos);
 
 %% Learn GMM param.
 
 % gmm = gmm.initGMMKMeans(Data1);
-gmm = gmm.initGMMTimeBased_TmpTime(Data1,nData);
-[gmm,GAMMA] = gmm.learnGMM(Data1);
+gmm = gmm.initGMMTimeBased_TmpTime(Data,nData);
+[gmm,GAMMA] = gmm.learnGMM(Data);
 
 %% Reproduction by trajectory-GMM
 
@@ -54,7 +54,7 @@ for m=1:gmm.nVarPos
 				msh=[];
 			end
 		end
-		msh = [1:nData, nData:-1:1; expData(m,:)-squeeze(r(n).expSigma(m,m,:).^.5)'*1, fliplr(expData(m,:)+squeeze(r(n).expSigma(m,m,:).^.5)'*1)];
+		msh = [1:nData, nData:-1:1; expData(m,:)-squeeze(expSigma(m,m,:).^.5)'*1, fliplr(expData(m,:)+squeeze(expSigma(m,m,:).^.5)'*1)];
 		patch(msh(1,:), msh(2,:), [1 .4 .4],'edgecolor',[1 .2 .2],'edgealpha',.8,'facealpha',.5);
 	end
 	for n=1:nSample
