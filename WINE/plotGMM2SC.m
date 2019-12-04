@@ -2,7 +2,7 @@ function [h] = plotGMM2SC(Mu, Sigma, color, valAlpha)
 %plotGMM2SC Displays the parameters of a Gaussian Mixture Model (GMM) by plot.
 %	Mu:           D x K array representing the centers of K Gaussians.
 %	Sigma:        D x D x K array representing the covariance matrices of K Gaussians.
-%	color:        3 x 1 array representing the RGB color to use for the display.
+%	color:        1 x 3 array representing the RGB color to use for the display.
 %	valAlpha:     transparency factor (optional).
 %
 % Copyright (c) 2015 Idiap Research Institute, http://idiap.ch/

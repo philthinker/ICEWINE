@@ -25,7 +25,7 @@ classdef HMMZero
     
     properties (Access = protected)
         params_nbMinSteps = 5;              % Minimum number of iterations allowed
-        params_nbMaxSteps = 50;             % Maximum number of iterations allowed
+        params_nbMaxSteps = 88;             % Maximum number of iterations allowed
         params_maxDiffLL = 1E-4;            % Likelihood increase threshold to stop the algorithm
         params_diagRegFact = 1E-8;          % Regularization term is optional
         params_updateComp = ones(4,1);      % Mu,Sigma,Prior,A
@@ -60,6 +60,26 @@ classdef HMMZero
                 obj.Sigma(:,:,i) = obj.Sigma(:,:,i) + eye(obj.nVar)*obj.params_diagRegFact_KMeans;
             end
             obj.Prior = obj.Prior/sum(obj.Prior);
+        end
+        
+        function obj = initHMMKbins(obj,Demos)
+            %initHMMKbins Init. the param. of HMM by Kbins clustering
+            %   Demos: 1 x M cell, demos
+            [Data,M] = obj.dataRegulate(Demos);
+            N = size(Demos{1},2);   %Delimit the cluster bins for the first demonstration
+            tSep = round(linspace(0, N, obj.nKernel+1));
+            
+            %Compute statistics for each bin
+            for i=1:obj.nKernel
+                id=[];
+                for n=1:M
+                    id = [id (n-1)*N+[tSep(i)+1:tSep(i+1)]];
+                end
+                obj.Prior(i) = length(id);
+                obj.Mu(:,i) = mean(Data(:,id),2);
+                obj.Sigma(:,:,i) = cov(Data(:,id)') + eye(size(Data,1)) * obj.params_diagRegFact;
+            end
+            obj.Prior = obj.Prior / sum(obj.Prior);
         end
         
         function [obj,Trans,StatePrior] = initTrans(obj,mode,N)
