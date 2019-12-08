@@ -69,7 +69,7 @@ classdef PandaZero
         end
         
         function obj = addCartesianDemo(obj,demo,legal)
-            %addJointDemo Add demo in Cartesian space
+            %addCartesianDemo Add demo in Cartesian space
             %   demo: N x 16, Cartesian demo
             %   legal: boolean, true if demos are in SE3 form while false
             %   if demos are in 1 x 16 form. (Default: false)
