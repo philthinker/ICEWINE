@@ -33,6 +33,9 @@
 
 %% Robot init.
 
+%{ 
+% % Init. a pure PandaZero object
+
 % panda = PandaZero(true);
 % 
 % % Add demos
@@ -47,9 +50,22 @@
 % panda.plotJointDemo();
 % panda.plotCarteDemo();
 
-%% Aligner init.
+%}
+
+% panda = PandaSake();
+% for i = 1:length(DemosJ)
+%     panda = panda.addJointDemo(DemosJ{i});
+%     panda = panda.addCartesianDemo(DemosP{i});
+% end
+% panda = panda.initDemoFK();
+% panda.plotJointDemo();
+% panda.plotCarteDemo();
+
+%% Try GMM
 
 %{
+% % GMM without time variable
+% % Failed! You cannot ignore the influence to time variable.
 
 % Learn a GMM as the aligner
 
@@ -66,3 +82,41 @@ xlabel('x_1'); ylabel('x_2'); zlabel('x_3');
 grid on;
 
 %}
+
+%{
+% Try DTW in joint space and GMM + GMR in Cartesian space
+% GMMPandaDTW1219-10g.fig (10 GMs)
+% GMMPandaDTW1219-15g.fig (15 GMs)
+% GMMPandaDTW1219-15g-GMM.fig (15 GMs together with GMM)
+% panda1204demo1219-15g,mat
+
+panda.plotCarteDemo();
+panda.plotJointDemo();
+
+DemosJdtw = iceDTW(DemosJ,100);
+pandaDTW = PandaSake();
+for i = 1:length(DemosJdtw)
+    pandaDTW = pandaDTW.addJointDemo(DemosJdtw{i});
+    pandaDTW = pandaDTW.addCartesianDemo(DemosP{i});    % It does not matter
+end
+pandaDTW = pandaDTW.initDemoFK();   % Time consuming
+
+pandaDTW.plotJoint();
+pandaDTW.plotCarte();
+
+gmm = GMMOne(15,4); % t,x,y,z
+
+% Init. GMM w.r.t. time
+Data = pandaDTW.get_demoFK_position(1e-3);
+gmm = gmm.initGMMTimeBased(Data);
+
+gmm = gmm.learnGMM(Data);
+
+[expData,expSigma] = gmm.GMR((0:730)*1e-3);
+
+pandaDTW = pandaDTW.set_exeCartesian(expData);
+
+pandaDTW.plotCarteDemo(true);
+% plotGMM3SC(gmm.Mu(2:end,:),gmm.Sigma(2:end,2:end,:),[0.8,0,0],0.3);   % Time consuming
+%}
+

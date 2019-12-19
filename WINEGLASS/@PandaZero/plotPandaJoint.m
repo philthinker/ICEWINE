@@ -2,7 +2,7 @@ function [] = plotPandaJoint(obj,trajJoint, T)
 %plotPandaJoint Plot the joints of Panda robot
 %   trajJoint: N x 7, joint traj.
 %   T: scalar, the end of time series (default: 1)
-%   @plotPandaJoint
+%   @PandaZero
 
 if nargin<3
     T = 1;

@@ -73,7 +73,7 @@ classdef GMMOne
                 TmpMu(:,i) = mean(Data(:,idtmp),2);
                 obj.Sigma(:,:,i) = cov(Data(:,idtmp)');
                 %Optional regularization term to avoid numerical instability
-                obj.Sigma(:,:,i) = obj.Sigma(:,:,i) + eye(nbVar)*obj.params_diagRegFact_Cluster;
+                obj.Sigma(:,:,i) = obj.Sigma(:,:,i) + eye(obj.nVar)*obj.params_diagRegFact_Cluster;
             end
             obj.Prior = obj.Prior / sum(obj.Prior);
             obj.Mu = TmpMu;

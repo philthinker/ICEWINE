@@ -3,6 +3,6 @@
 % Haopeng Hu
 % 2019.12.07
 
-%% Gaussian Mixture Model
-
 addpath('GaussianMixtureModel');
+addpath('MovementPrimitive');
+addpath('GaussianProcess');
