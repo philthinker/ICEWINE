@@ -66,6 +66,37 @@ classdef PandaSake < PandaZero
             end
         end
         
+        function Data = get_demoFK_joint(obj,dt)
+            %get_demoFK_joint Get the joints of obj.demoFK
+            %   dt: scalar, assign it once you need a time series (e.g. GMR
+            %   applications)
+            tmpN = 0;
+            M = length(obj.demoFK);
+            Ns = zeros(1,M);
+            for i = 1:M
+                Ns(i) = size(obj.demoFK(i).joint,2);
+                tmpN = tmpN + Ns(i);
+            end
+            if nargin < 2
+                % No dt specified
+                Data = zeros(7,tmpN);
+                tmpIndex = 1;
+                for i = 1:M
+                    Data(:,tmpIndex:tmpIndex+Ns(i)-1) = obj.demoFK(i).joint;
+                    tmpIndex = tmpIndex + Ns(i);
+                end
+            else
+                % dt is specified
+                Data = zeros(8,tmpN);
+                tmpIndex = 1;
+                for i = 1:M
+                    Data(2:end,tmpIndex:tmpIndex+Ns(i)-1) = obj.demoFK(i).joint;
+                    Data(1,tmpIndex:tmpIndex+Ns(i)-1) = (0:Ns(i)-1)*dt;
+                    tmpIndex = tmpIndex + Ns(i);
+                end
+            end
+        end
+        
         function obj = set_exeCartesian(obj,trajCarte)
             %set_exeCartesian Set obj.exeCartesian as trajCarte
             %   trajCarte: 3 x N or 4 x 4 x N, robot trajectory in Cartesian space.
@@ -81,6 +112,38 @@ classdef PandaSake < PandaZero
                 % trajCarte is a SE3 trajectory
                 obj.exeCartesian = trajCarte;
             end
+        end
+        
+        function obj = set_exeJoint(obj,trajJoint)
+            %set_exeJoint Set obj.exeJoint as trajCarte
+            %   trajJoint: 7 x N or N x 7, trajectory in joint space
+            if size(trajJoint,2) == 7
+                if size(trajJoint,1) == 7
+                    % We assume that trajJoint is 7 x N
+                    obj.exeJoint = trajJoint;
+                else
+                    obj.exeJoint = trajJoint';
+                end
+            elseif size(trajJoint,1) == 7
+                obj.exeJoint = trajJoint;
+            end
+        end
+        
+        function [Demo,obj] = sparse_demoFK(obj,mode)
+            %sparse_demoFK_joint Sparse the data in obj.demoFK
+            %   mode: integer, the sparse mode (default: 0)
+            if nargin < 2
+                mode = 0;
+            end
+            if mode == 0
+                % Sparese w.r.t. by down sampling
+                W = 2;  % Only keep the first element each W elements
+                for i = 1:length(obj.demoFK)
+                    obj.demoFK(i).joint = obj.dataThrow(obj.demoFK(i).joint, W);
+                    obj.demoFK(i).pose = obj.dataThrow(obj.demoFK(i).pose, W);
+                end
+            end
+            Demo = obj.demoFK;
         end
     end
     
@@ -123,6 +186,41 @@ classdef PandaSake < PandaZero
                 for i = 1:M
                     obj.plotPandaJoint(traj(i).joint);
                 end
+            end
+        end
+        function [] = plotJointDemo(obj,exe)
+            %plotJointDemo Plot the joint trajectories with exeJoint
+            %   exe: boolean, true for plot obj.exeJoint together
+            %   (default:false)
+            if nargin < 2
+                exe = false;
+            end
+            M = obj.NJointDemo;
+            if exe
+                M = M + 1;
+                obj.demoJoint{M} = obj.exeJoint';
+            end
+            
+            figure;
+            for i = 1:7
+                subplot(7,1,i);
+                for j = 1:M
+                    t = linspace(0,1,size(obj.demoJoint{j},1));
+                    if exe
+                        % Plot obj.exeJoint together
+                        if j > obj.NJointDemo
+                            plot(t,obj.demoJoint{j}(:,i),'b');
+                        else
+                            plot(t,obj.demoJoint{j}(:,i),'Color',[0.5,0.5,0.5]);
+                        end
+                    else
+                        % Just plot obj.demoJoint
+                        plot(t,obj.demoJoint{j}(:,i));
+                    end
+                    hold on;
+                end
+                ylabel(strcat('Joint ',int2str(i)));
+                grid on;
             end
         end
         function [] = plotCarte(obj,trajs)
@@ -189,6 +287,7 @@ classdef PandaSake < PandaZero
     
     methods (Access = protected)
         [] = plotPandaJoint(obj,trajJoint,T,dt);
+        Data = dataThrow(obj,DataIn,W);
     end
     
 end

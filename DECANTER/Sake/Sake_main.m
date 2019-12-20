@@ -85,6 +85,7 @@ grid on;
 
 %{
 % Try DTW in joint space and GMM + GMR in Cartesian space
+%
 % GMMPandaDTW1219-10g.fig (10 GMs)
 % GMMPandaDTW1219-15g.fig (15 GMs)
 % GMMPandaDTW1219-15g-GMM.fig (15 GMs together with GMM)
@@ -120,3 +121,31 @@ pandaDTW.plotCarteDemo(true);
 % plotGMM3SC(gmm.Mu(2:end,:),gmm.Sigma(2:end,2:end,:),[0.8,0,0],0.3);   % Time consuming
 %}
 
+%{
+% Try DTW in joint space and GMM + GMR in joint space
+% Note that there are too much data and curse of dimension
+% Nothing better than GMM + GMR in Cartesian space
+% GMMPandaDTW1219-15g-J.fig (15 GMs)
+% GMMPandaDTW1219-15g-J-joint.fig (15 GMs)
+% GMMPandaDTW1219-15g-micro-J.fig (15 GMs together with GMM)
+% panda1204demo1219-15g-J.mat
+
+gmm = GMMOne(15,8); % t, q1 to q7
+
+[demos,pandaDTWJ] = pandaDTW.sparse_demoFK();
+Data = pandaDTWJ.get_demoFK_joint(1e-3);
+
+gmm = gmm.initGMMTimeBased(Data);
+gmm = gmm.learnGMM(Data);
+
+[expData,expSigma] = gmm.GMR((0:365-1)*1e-3);
+expDataPose = pandaDTWJ.fkine(expData');
+pandaDTWJ = pandaDTWJ.set_exeCartesian(expDataPose);
+
+pandaDTWJ.plotCarteDemo(true);
+
+pandaDTWJ = pandaDTWJ.set_exeJoint(expData);
+pandaDTWJ.plotJointDemo(true);
+%}
+
+%% Try GPR

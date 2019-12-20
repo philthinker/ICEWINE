@@ -1,4 +1,4 @@
-function demo_GPR01
+% function demo_GPR01
 % Gaussian process regression (GPR) 
 %
 % Writing code takes time. Polishing it and making it available to others takes longer! 
@@ -35,7 +35,7 @@ function demo_GPR01
 % You should have received a copy of the GNU General Public License
 % along with PbDlib. If not, see <http://www.gnu.org/licenses/>.
 
-addpath('./m_fcts/');
+% addpath('./m_fcts/');
 
 
 %% Parameters
@@ -49,8 +49,8 @@ p(1)=1E0; p(2)=1E1; p(3)=1E-2; %GPR parameters
 
 %% Load handwriting data
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-demos=[];
-load('data/2Dletters/G.mat');
+% demos=[];
+% load('data/2Dletters/G.mat');
 Data=[];
 for n=1:nbSamples
 	s(n).Data = spline(1:size(demos{n}.pos,2), demos{n}.pos, linspace(1,size(demos{n}.pos,2),nbData)); %Resampling
