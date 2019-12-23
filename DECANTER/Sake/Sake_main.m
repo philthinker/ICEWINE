@@ -149,3 +149,21 @@ pandaDTWJ.plotJointDemo(true);
 %}
 
 %% Try GPR
+
+
+% GP by position (No DTW)
+
+
+% GP by position (DTW in joint space)
+
+
+% GP by joint (DTW in joint space)
+
+
+%% Try HMM + GMM
+
+
+
+%% Try SEDS
+
+
