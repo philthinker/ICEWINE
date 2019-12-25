@@ -3,6 +3,7 @@ classdef GPZero
     %   We assume that the data are column vectors with the first element
     %   being the temporal item.
     %   Standard process: GPZero -> setParam -> preGPR -> GPR
+    %   k(x1,x2) = sigma*
     %
     %   Haopeng Hu
     %   2019.12.19
@@ -13,7 +14,7 @@ classdef GPZero
     
     properties (Access = public)
         nVar;   % D
-        sigma;  % signal variance
+        sigma;  % square of signal variance
         W;      % covariance matrix of Gaussian kernel
         reg;    % matrix regulator
         invK;   % inverse of K matrix
@@ -39,14 +40,17 @@ classdef GPZero
             obj.invK = [];
             obj.xIn = [];
             obj.xOut = [];
+            obj.sigma = 1;
+            obj.W = 10;
+            obj.reg = 1e-3;
         end
         
         function obj = setParam(obj,sigma,W,regulator)
             %setParam Set the hyperparameters of the GP
-            %   sigma: scalar: signal variance
+            %   sigma: scalar: square of signal variance (larger than 0)
             %   W: covariance matrix of Gaussian kernel
             %   regulator: scalar, matrix regulator parameter (optional)
-            obj.sigma = sigma;
+            obj.sigma = abs(sigma);
             obj.W = W;
             if nargin >= 4
                 obj.reg = regulator;

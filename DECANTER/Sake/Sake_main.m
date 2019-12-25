@@ -150,19 +150,59 @@ pandaDTWJ.plotJointDemo(true);
 
 %% Try GPR
 
-
+%{
 % GP by position (No DTW)
+% Totally failed!
+% panda1204demo1224-gp.mat
 
+Data = panda.get_demoFK_position(1e-3); % Note that large amount of data leads to very slow computation
+Data = Data(:,(1:3:size(Data,2)));
 
+gp = GPZero(Data);
+gp = gp.setParam(1e0,1e1,1e-2);
+gp = gp.preGPR();
+expData = gp.GPR(linspace(0,max(Data(1,:)),500));
+
+panda = panda.set_exeCartesian(expData.Data(2:4,:));
+panda.plotCarteDemo(true);
+%}
+
+%{
 % GP by position (DTW in joint space)
+% Totally failed!
+% panda1204demo1224-gp.mat
 
+Data = pandaDTW.get_demoFK_position(1e-3);
+Data = Data(:,(1:3:size(Data,2)));
 
+gp = GPZero(Data);
+gp = gp.setParam(1e0,1e1);
+gp = gp.preGPR();
+expData = gp.GPR(linspace(0,max(Data(1,:)),500));
+
+pandaDTW = pandaDTW.set_exeCartesian(expData.Data(2:4,:));
+pandaDTW.plotCarteDemo(true);
+%}
+
+%{
 % GP by joint (DTW in joint space)
+% Partially succeeded. But the problem has not been solved totally
+% GPRPandaDTW1224Joint-J.fig
+% GPRPandaDTW1224Joint-P.fig
+% panda1204demo1224-gp.mat
 
+Data = pandaDTWJ.get_demoFK_joint(1e-3);
+Data = Data(:,(1:2:size(Data,2)));
 
-%% Try HMM + GMM
+gp = GPZero(Data);
+gp = gp.setParam(1e0,1e1);
+gp = gp.preGPR();
+expData = gp.GPR(linspace(0,max(Data(1,:)),500));
 
-
+pandaDTWJ = pandaDTWJ.set_exeJoint(expData.Data(2:8,:));
+pandaDTWJ.plotCarteDemo(true);
+pandaDTWJ.plotJointDemo(true);
+%}
 
 %% Try SEDS
 
