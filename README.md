@@ -6,7 +6,8 @@ Haopeng Hu
 
 2019.08.06
 
-- BOTTLES： Personal collectors.
+- BOTTLES: Personal collections.
+- CELLAR: Classic collections.
 - DECANTER: Tasting wine.
 - WINE: Necessary source, maybe.
 - WINEGLASS: The hardwares.

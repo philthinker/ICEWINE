@@ -79,6 +79,29 @@ classdef GMMOne
             obj.Mu = TmpMu;
         end
         
+        function obj = initGMMKBins(obj,Data,M,N)
+            %initGMMKBins Initialize the GMM before EM by clustering an
+            %ordered dataset into equal bins.
+            %   Data: D x (N * M), data of all demonstrations
+            %   M: integer, num. of demonstrations
+            %   N: integer, num. of data in each demonstration
+            
+            %Delimit the cluster bins for the first demonstration
+            tSep = round(linspace(0, N, obj.nKernel+1));
+            
+            %Compute statistics for each bin
+            for i=1:obj.nKernel
+                id=[];
+                for n=1:M
+                    id = [id (n-1)*N+[tSep(i)+1:tSep(i+1)]];
+                end
+                obj.Prior(i) = length(id);
+                obj.Mu(:,i) = mean(Data(:,id),2);
+                obj.Sigma(:,:,i) = cov(Data(:,id)') + eye(size(Data,1)) * obj.params_diagRegFact;
+            end
+            obj.Prior = obj.Prior / sum(obj.Prior);
+        end
+        
         function [obj,GAMMA2] = learnGMM(obj,Data)
             %learnGMM Learn the GMM by EM algorithm
             [obj,GAMMA2] = EMGMMOne(obj,Data);

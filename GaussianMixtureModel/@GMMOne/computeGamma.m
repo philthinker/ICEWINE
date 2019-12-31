@@ -1,5 +1,5 @@
 function [L, GAMMA] = computeGamma(obj,Data)
-%computeGamma 此处显示有关此函数的摘要
+%computeGamma Compute the Gamma's value
 %   Data: D x (N * M), All the demonstration data
 %   @GMMOne
 
