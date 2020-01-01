@@ -35,7 +35,7 @@ seds = seds.Refine(Data);
 expDataGMR = seds.GMR(Data0,N);
 
 % Stable SEDS dynamic programming
-expDataDP = seds.DP(Data0,3*N);
+expDataDP = seds.DP(Data0,N);
 
 %% Figure
 

@@ -206,4 +206,40 @@ pandaDTWJ.plotJointDemo(true);
 
 %% Try SEDS
 
+%{
+% SEDS by position (No DTW)
+% Totally failed!
+% As the authors said, it is designed for point-to-point movements.
+% Very slow.
+% panda1204demo1231-seds.mat
+
+M = 6;
+N = 100;
+D = 6;
+dt = 0.001;
+
+Data = zeros(6,M*N);
+Data0 = zeros(3,M);
+for i = 1:M
+    tmpPos = permute(panda.demoFK(i).pose(1:3,4,:),[1,3,2]);
+    tmpData = spline((1:size(tmpPos,2)), tmpPos, linspace(1,size(tmpPos,2),N));
+    tmpData = tmpData - repmat(tmpData(:,end),[1,N]);   % Centered at 0
+    Data0(:,i) = tmpData(:,1);
+    tmpVel = gradient(tmpData)/dt;  % Compute velocities
+    Data(:,(i-1)*N+1:i*N) = [tmpData; tmpVel];
+end
+Data0 = mean(Data0,2);
+
+seds = SEDSZero(D,10,dt);
+seds = seds.preOptim(Data,M,N);
+seds = seds.Refine(Data);
+
+expData = seds.DP(Data0,N);
+
+panda = panda.set_exeCartesian(expData + tmpPos(:,end));
+panda.plotCarteDemo(true);
+%}
+
+%% Try ProMP
+
 

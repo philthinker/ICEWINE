@@ -7,3 +7,4 @@ addpath('GaussianMixtureModel');
 addpath('MovementPrimitive');
 addpath('GaussianProcess');
 addpath('DynamicSystems');
+addpath('ProbabilisticMovementPrimitive');
