@@ -14,8 +14,10 @@ classdef OMCPerformance
     
     properties (Access = public)
         % Indivdual Tags
+        id;             % ID
         name;           % Name of the test experiment
         position;       % Position of test experiment
+        velocity;       % Velocity of test experiment
         % Static performance
         SD;             % Standard deviation
         MaxAE;          % Maximum absolute error
@@ -32,23 +34,33 @@ classdef OMCPerformance
     end
     
     methods
-        function obj = OMCPerformance(position,name)
+        function obj = OMCPerformance(ID,position,name)
             %OMCPerformance Init. the performance
             %   name: String, name of the experiment (optional)
             %   position: 1 x 3, position of the experiment
             if nargin < 2
                 name = [];
             end
+            obj.id = floor(ID);
             obj.name = name;
             obj.position = position;
-            obj.SD = NaN;
-            obj.MAE = NaN;
-            obj.RMSE = NaN;
-            obj.Sensitivity = NaN;
-            obj.ContourPerform.Linear = NaN;
-            obj.ContourPerform.Circle = NaN;
-            obj.PointLossPerform.Linear = NaN;
-            obj.PointLossPerform.Circle = NaN;
+            obj.velocity = [];
+            obj.SD = [];
+            obj.MAE = [];
+            obj.MaxAE = [];
+            obj.RMSE = [];
+            obj.Sensitivity = [];
+            obj.ContourPerform.Linear = [];
+            obj.ContourPerform.Circle = [];
+            obj.PointLossPerform.Linear = [];
+            obj.PointLossPerform.Circle = [];
+        end
+        
+        function obj = setVelocity(obj,velocity)
+            %setVelocity Set the test velocity property
+            %   velocity: scalar, note that it can be a linear velocity or
+            %   angular velocity
+            obj.velocity = velocity;
         end
         
         function obj = staticPerformance(obj,StaticData)
@@ -77,7 +89,7 @@ classdef OMCPerformance
             %dynamicPerformance Output dynamic performance once and for all
             %If there are more than one DtaticData structs, the mean value
             %of each performance will be calculated. We assume that all the
-            %lost points are NaN.
+            %lost points are [].
             %   DynamicData: 1 x N struct array, the data sets of dynamic
             %   performance test, where
             %   DynamicData.Sensitivity: scalar, the sensitivity
@@ -155,7 +167,7 @@ classdef OMCPerformance
         % Dynamic performance
         function [ContourPerform,XX1] = ContourPerformCal(obj,XX,XXR)
             %ContourPerformCal Calculate the contour performance. We assume
-            %that the lost entries are all NaN.
+            %that the lost entries are all [].
             %   XX: N x 3, linear or circle trajectory
             %   XXR: Nr x 3, linear or circle reference trajectory
             %   Contour: scalar, the performance
@@ -172,7 +184,7 @@ classdef OMCPerformance
         end
         function PointLossPerform = PointLossPerformCal(obj,XX)
             %PointLossPerformCal Calculate the point loss performance. We
-            %assume that the lost entries are all NaN.
+            %assume that the lost entries are all [].
             %   XX: N x 3, data trajectory
             %   PointLossPerform: scalar, the performance
             PointLossPerform = 0;   N = size(XX,1);
