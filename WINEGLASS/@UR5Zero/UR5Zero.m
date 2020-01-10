@@ -1,10 +1,11 @@
-classdef PandaZero
-    %PandaZero This class is used to store the demonstration data of Panda.
-    %It can store more than one demonstration trajectories in both joint
-    %and Cartesian space (SE3)
+classdef UR5Zero
+    %UR5Zero Universal Robot 5kg
+    %   This class is used to store the demonstration data of UR5.
+    %   It can store more than one demonstration trajectories in both joint
+    %   and Cartesian space (SE3)
     %
     %   Haopeng Hu
-    %   2019.09.24  Lucky to Dali
+    %   2020.01.08
     %   All rights reserved
     
     properties (Access = public)
@@ -27,8 +28,8 @@ classdef PandaZero
     end
     
     methods
-        function obj = PandaZero(kModelEnable)
-            %PandaZero Init. the Panda.
+        function obj = UR5Zero(kModelEnable)
+            %UR5Zero Init. the UR5.
             %   kModelEnable: boolean, true for the property kModel needed.
             %   Maker sure P. Corke's Robotics toolbox is required if
             %   kModelEnable is set true
@@ -36,21 +37,15 @@ classdef PandaZero
             obj.NCartesianDemo = 0;
             obj.demoJoint = cell([1,1]);
             obj.demoCartesian = cell([1,1]);
-            obj.exeJoint = zeros(1,7);
+            obj.exeJoint = zeros(1,6);
             obj.exeCartesian = eye(4,4);
             obj.exeTime = 0;
             if nargin > 0
                 obj.kModelEnable = kModelEnable;
                 if kModelEnable
-                    % DH parameters
-                    SL1=Link([0       0.333       0         0        0     ],'modified');
-                    SL2=Link([0       0           0         -pi/2    0     ],'modified');
-                    SL3=Link([0       0.316       0         pi/2     0     ],'modified');
-                    SL4=Link([0       0           0.0825    pi/2     0     ],'modified');
-                    SL5=Link([0       0.384       -0.0825   -pi/2    0     ],'modified');
-                    SL6=Link([0       0           0         pi/2     0     ],'modified');
-                    SL7=Link([0       0.2104          0.088     pi/2     0     ],'modified');
-                    obj.kModel=SerialLink([SL1 SL2 SL3 SL4 SL5 SL6 SL7],'name','Panda');
+                    mdl_ur5;
+                    obj.kModel = ur5;
+                    clear qr qz ur5
                 end
             else
                 obj.kModelEnable = false;
@@ -60,7 +55,7 @@ classdef PandaZero
         
         function obj = addJointDemo(obj,demo)
             %addJointDemo Add demo in joint space
-            %   demo: N x 7, joint demo
+            %   demo: N x 6, joint demo
             legal = true;   % Reserved for future use
             if legal
                 obj.NJointDemo = obj.NJointDemo + 1;
@@ -93,10 +88,10 @@ classdef PandaZero
             %id: integer, the index of joint demo to be plotted
             if id == 0
                 % Plot the exeJoint
-                obj.plotPandaJoint(obj.exeJoint);
+                obj.plotUR5Joint(obj.exeJoint);
             else
                 % Plot the id-th demo
-                obj.plotPandaJoint(obj.demoJoint{id});
+                obj.plotUR5Joint(obj.demoJoint{id});
             end
         end
         
@@ -104,8 +99,8 @@ classdef PandaZero
             %plotJointDemo Plot the demos in joint space
             M = obj.NJointDemo;
             figure;
-            for i = 1:7
-                subplot(7,1,i);
+            for i = 1:6
+                subplot(6,1,i);
                 for j = 1:M
                     t = linspace(0,1,size(obj.demoJoint{j},1));
                     plot(t,obj.demoJoint{j}(:,i));
@@ -119,12 +114,12 @@ classdef PandaZero
         function [] = plotJointDemoPlus(obj,dt,exeJointPlus)
             %plotJointDemoPlus Plot the exeJointPlus together with demos
             %   dt: the time step
-            %   exeJointPlus: N x 8, the joint traj. to be plotted, note
+            %   exeJointPlus: N x 7, the joint traj. to be plotted, note
             %   that its very left column is the time series
             demoJointPlus = obj.demoJointChron(dt); % There is no time stamps in demoJoint
             figure;
-            for i = 1:7
-                subplot(7,1,i);
+            for i = 1:6
+                subplot(6,1,i);
                 for j = 1:obj.NJointDemo
                     plot(demoJointPlus{j}(:,1),demoJointPlus{j}(:,i+1),'Color',[0.36,0.36,0.36]);
                     hold on;
@@ -140,9 +135,9 @@ classdef PandaZero
             %id: integer, the index of Cartesian demo to be plotted
             if id == 0
                 % Plot the exeCartesian
-                obj.plot3PandaCartesian(obj.exeCartesian);
+                obj.plot3UR5Cartesian(obj.exeCartesian);
             else
-                obj.plot3PandaCartesian(obj.demoCartesian{id});
+                obj.plot3UR5Cartesian(obj.demoCartesian{id});
             end
         end
         
@@ -179,7 +174,7 @@ classdef PandaZero
             %demoJointChron Add a time series to the very left of demoJoint
             %   dt: scalar, the time step
             %   demoJointPlus: 1 x NJointDemo, the demos in joint space
-            %   with N x 8 joint positions whose very left column is the
+            %   with N x 7 joint positions whose very left column is the
             %   time series.
             demoJointPlus = cell(1,obj.NJointDemo);
             for i = 1:obj.NJointDemo
@@ -188,10 +183,26 @@ classdef PandaZero
             end
         end
         
+        function [obj,demoCarteFK] = demoFKReplace(obj)
+            %demoFKReplace Replace the property demoCartesian with the SE3
+            %data computed by UR5's forward kinematics. It works only when
+            %obj.kModelEnable == true.
+            %   Be careful! The original demos in Cartesian space will be
+            %   discarded once you run the function!
+            obj.NCartesianDemo = obj.NJointDemo;
+            demoCarteFK = cell(1,obj.NJointDemo);
+            if obj.kModelEnable
+                for i = 1:obj.NCartesianDemo
+                    demoCarteFK{i} = obj.fkine(obj.demoJoint{i});
+                end
+            end
+            obj.demoCartesian = demoCarteFK;
+        end
+        
         % Trajectory Generation
         function exeJoint = jtraj(obj,routes,dT)
             %jtraj Trajectory generation by Peter Corke's jtraj function
-            %   routes: K x 8, the route points with time series in the
+            %   routes: K x 7, the route points with time series in the
             %   first column
             %   dT: scalar, seconds per radian
             K = size(routes,1);
@@ -200,7 +211,7 @@ classdef PandaZero
                 tmpdt(i-1) = ceil(max(abs(routes(i,:)-routes(i-1,:))) * dT * obj.InterFreq);
                 [tmpJTrajSeg{i-1},~,~] = jtraj(routes(i-1,:),routes(i,:),tmpdt(i-1));
             end
-            exeJoint = zeros(sum(tmpdt),7);
+            exeJoint = zeros(sum(tmpdt),6);
             tmpIndex = 1;
             for i = 1:K-1
                 exeJoint(tmpIndex:tmpIndex+tmpdt(i)-1,:) = tmpJTrajSeg{i};
@@ -208,38 +219,16 @@ classdef PandaZero
             end
         end
         
-        function exeJoint = jSparse(obj,exeJointIn,THD)
-            %jSparse Trajectory generation for picking up some points
-            %   exeJoint: N x 7, trajectory in joint space
-            %   THD: scalar, the threshold (optional)
-            if nargin < 3
-                THD = 0.01;
-            end
-            N = size(exeJointIn,1);
-            tmpIndex = ones(N,1);   cutRef = exeJointIn(1,:); cutIndex = 1;
-            for i = 2:N-2
-                tmpVariance = max(abs(exeJointIn(i,:) - cutRef));
-                if tmpVariance < THD
-                    if i > cutIndex
-                        tmpIndex(i) = 0;
-                        cutRef = exeJointIn(i+2,:);
-                        cutIndex = i+2;
-                    end
-                end
-            end
-            exeJoint = exeJointIn(tmpIndex == 1,:);
-        end
-        
         % Kinematics
         function T = fkine(obj,joints)
             %fkine Forward kinematics
-            %   joints: N x 7, the joint positions
+            %   joints: N x 6, the joint positions
             %   T: 4 x 4 x N, the homogeneous transformations
             N = size(joints,1);
             T = repmat(eye(4),[1,1,N]);
             if obj.kModelEnable
                 for i = 1:N
-                    T(:,:,i) = obj.kModel.fkine(joints(i,(1:7)));
+                    T(:,:,i) = obj.kModel.fkine(joints(i,(1:6)));
                 end
             end
         end
@@ -247,8 +236,9 @@ classdef PandaZero
     
     methods (Access = protected)
         demoCartesian = demo2SE3(obj,demo);
-        [] = plotPandaJoint(obj,trajJoint, T);
-        [] = plot3PandaCartesian(obj,trajCartesian);
+        [] = plotUR5Joint(obj,trajJoint, T);
+        [] = plot3UR5Cartesian(obj,trajCartesian);
     end
+    
 end
 

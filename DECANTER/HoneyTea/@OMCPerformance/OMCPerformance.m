@@ -18,6 +18,7 @@ classdef OMCPerformance
         name;           % Name of the test experiment
         position;       % Position of test experiment
         velocity;       % Velocity of test experiment
+        acceleration;   % Acceleration of test experiment
         % Static performance
         SD;             % Standard deviation
         MaxAE;          % Maximum absolute error
@@ -25,12 +26,9 @@ classdef OMCPerformance
         RMSE;           % Root mean squared error
         Sensitivity;    % Sensitivity performance
         % Dynamic performance
+        trajectoryR;        % Reference trajectory of test experiment
         ContourPerform;     % Contour performance
         PointLossPerform;   % Point loss performance
-    end
-    
-    properties (Access = public)
-        % Intermidate variables
     end
     
     methods
@@ -41,10 +39,14 @@ classdef OMCPerformance
             if nargin < 2
                 name = [];
             end
+            % ID
             obj.id = floor(ID);
             obj.name = name;
             obj.position = position;
-            obj.velocity = [];
+            obj.velocity = [0.0, 0.0, 0.0];
+            obj.acceleration = [0.0, 0.0, 0.0];
+            obj.trajectoryR = [];
+            % Performance
             obj.SD = [];
             obj.MAE = [];
             obj.MaxAE = [];
@@ -62,7 +64,7 @@ classdef OMCPerformance
             %   angular velocity
             obj.velocity = velocity;
         end
-        
+
         function obj = staticPerformance(obj,StaticData)
             %staticPerformance Output static performance once and for all.
             %If there are more than one StaticData structs, the mean value
