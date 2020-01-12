@@ -50,6 +50,14 @@ classdef SEDSZero < GMMOne
             obj = obj.learnGMM(Data);
         end
         
+        function obj = preOptimTimeBased(obj,Data,t)
+            %preOptim Compute the initial guess of the parameters
+            %   Data: D x (M * N), demo data (centered at zero)
+            
+            obj = obj.initGMMTimeBased(Data);
+            obj = obj.learnGMM(Data);
+        end
+        
         function obj = Refine(obj,Data)
             %Optim Constrained optimization
             %   Data: D x (M * N), demo data (centered at zero)

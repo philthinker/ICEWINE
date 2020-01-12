@@ -104,6 +104,7 @@ classdef GMMOne
         
         function [obj,GAMMA2] = learnGMM(obj,Data)
             %learnGMM Learn the GMM by EM algorithm
+            %   Data: D x (N * M), all the demonstration data.
             [obj,GAMMA2] = EMGMMOne(obj,Data);
         end
         

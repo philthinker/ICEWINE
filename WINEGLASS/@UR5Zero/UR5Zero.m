@@ -95,14 +95,23 @@ classdef UR5Zero
             end
         end
         
-        function [] = plotJointDemo(obj)
+        function [] = plotJointDemo(obj,dt)
             %plotJointDemo Plot the demos in joint space
+            %   dt: scalar, the time difference (optional). Note that if
+            %   you assign this argument, the absolute time series will be
+            %   applied for the figure.
             M = obj.NJointDemo;
             figure;
             for i = 1:6
                 subplot(6,1,i);
                 for j = 1:M
-                    t = linspace(0,1,size(obj.demoJoint{j},1));
+                    if nargin > 1
+                        % Absolute time series
+                        t = dt*(0:size(obj.demoJoint{j},1)-1);
+                    else
+                        % Scaled time series
+                        t = linspace(0,1,size(obj.demoJoint{j},1));
+                    end
                     plot(t,obj.demoJoint{j}(:,i));
                     hold on;
                     ylabel(strcat('Joint ',int2str(i)));
@@ -158,7 +167,16 @@ classdef UR5Zero
             for i = 1:M
                 LEGEND{i} = strcat('Demonstration: ',int2str(i));
                 traj = permute(obj.demoCartesian{i}(1:3,4,:),[3,1,2]);   % 3 x 1 x N to N x 3
-                plot3(traj(:,1),traj(:,2),traj(:,3));
+                if exe
+                    if i == M
+                        COLOR = [0,160/255,233/255];    % It's blue.
+                    else
+                        COLOR = [0.3, 0.3, 0.3];        % It's grey.
+                    end
+                    plot3(traj(:,1),traj(:,2),traj(:,3),'Color',COLOR);
+                else
+                    plot3(traj(:,1),traj(:,2),traj(:,3));
+                end
                 hold on;
             end
             if M > obj.NCartesianDemo
@@ -180,6 +198,44 @@ classdef UR5Zero
             for i = 1:obj.NJointDemo
                 N = size(obj.demoJoint{i},1);
                 demoJointPlus{i} = [(1:N)'*dt,obj.demoJoint{i}];
+            end
+        end
+        
+        function [DataJ,N] = getDemoJoint(obj,dt,tStarting)
+            %getDemoJoint Get a dataset contains all of the demos in joint
+            %space. It can be used for statistic analysis
+            %   dt: scalar, the time step (optional). If it is assigned,
+            %   the very left column will be the time series
+            %   tStarting: scalar, the starting point of time (default:0)
+            %   DataJ: (N * M) x D, demo data in joint space. Not that D
+            %   may be 6 or 7.
+            %   N: integer, the total num. of data
+            N = 0;
+            for i = 1:obj.NJointDemo
+                N = N + size(obj.demoJoint{i},1);
+            end
+            if nargin > 1
+                % dt is assigned. Add the time series to the very left
+                DataJ = zeros(N,7);
+                if nargin < 3
+                    tStarting = 0;
+                end
+                tmpIndex = 1;
+                for i = 1:obj.NJointDemo
+                    tmpN = size(obj.demoJoint{i},1);
+                    DataJ(tmpIndex:tmpIndex+tmpN-1,1) = dt*(0:tmpN-1)' + tStarting;
+                    DataJ(tmpIndex:tmpIndex+tmpN-1,2:end) = obj.demoJoint{i};
+                    tmpIndex = tmpIndex + tmpN;
+                end
+            else
+                % dt is not assigned.
+                DataJ = zeros(N,6);
+                tmpIndex = 1;
+                for i = 1:obj.NJointDemo
+                    tmpN = size(obj.demoJoint{i},1);
+                    DataJ(tmpIndex:tmpIndex+tmpN-1,:) = obj.demoJoint{i};
+                    tmpIndex = tmpIndex + tmpN;
+                end
             end
         end
         
@@ -216,6 +272,32 @@ classdef UR5Zero
             for i = 1:K-1
                 exeJoint(tmpIndex:tmpIndex+tmpdt(i)-1,:) = tmpJTrajSeg{i};
                 tmpIndex = tmpIndex + tmpdt(i);
+            end
+        end
+        
+        function trajMoveit = toMoveitForm(obj,trajCarte)
+            %toMoveitForm Transform the SE3 array into its moveit form:
+            %[x,y,z,i,j,k,w]
+            %   trajCarte: 4 x 4 x N, trajectory in SE3 form (optional). If
+            %   it is not assigned, it will be set as obj.exeCartesian.
+            %   trajMoveit: 7 x N, trajectory in moveit form.
+            if nargin < 2
+                trajCarte = obj.exeCartesian;
+            end
+            N = size(trajCarte,3);
+            trajMoveit = zeros(N,7);
+            for i = 1:N
+                trajMoveit(i,1:3) = trajCarte(1:3,4,i)';
+                tmpSO3 = trajCarte(1:3,1:3,i);
+                % Note that the quat in MATLAB robotics system toolbox is
+                % [w, x, y, z]. But that in moveit is [x, y, z, w]. It can
+                % be modified. Be careful!
+                tmpQuat = rotm2quat(tmpSO3);
+                tmpW = tmpQuat(:,1);
+                tmpQuat(:,1:3) = tmpQuat(:,2:4);
+                tmpQuat(:,4) = tmpW;
+                
+                trajMoveit(i,4:7) = tmpQuat;
             end
         end
         
