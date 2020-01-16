@@ -7,41 +7,41 @@
 %% Data init
 
 %{
-% % UR5kg0107Data.mat
+% UR5kg0107Data.mat
 
-% % load('Data\20200107URData\1.mat');
-% % load('Data\20200107URData\2.mat');
-% 
-% % We use struct arrays
-% M = 11;
-% demo.dataJ = [];
-% demo.dataC = [];
-% demo.dataCFK = [];
-% demo.separation = [];
-% demo = repmat(demo,[1,M]);
-% 
-% for i = 1:9
-%     tmpJ1 = eval(strcat('j10',int2str(i)));
-%     tmpJ2 = eval(strcat('j20',int2str(i)));
-%     tmpN1 = size(tmpJ1,1);
-%     tmpN2 = size(tmpJ2,1);
-%     tmpC1 = eval(strcat('c10',int2str(i))); tmpC1 = tmpC1(end-tmpN1+1:end,:);
-%     tmpC2 = eval(strcat('c20',int2str(i))); tmpC2 = tmpC2(end-tmpN2+1:end,:);
-%     demo(i).dataJ = [tmpJ1;tmpJ2];
-%     demo(i).dataC = [tmpC1;tmpC2];
-%     demo(i).separation = [zeros(tmpN1,1);ones(tmpN2,1)];
-% end
-% for i = 10:11
-%     tmpJ1 = eval(strcat('j1',int2str(i)));
-%     tmpJ2 = eval(strcat('j2',int2str(i)));
-%     tmpN1 = size(tmpJ1,1);
-%     tmpN2 = size(tmpJ2,1);
-%     tmpC1 = eval(strcat('c1',int2str(i))); tmpC1 = tmpC1(end-tmpN1+1:end,:);
-%     tmpC2 = eval(strcat('c2',int2str(i))); tmpC2 = tmpC2(end-tmpN2+1:end,:);
-%     demo(i).dataJ = [tmpJ1;tmpJ2];
-%     demo(i).dataC = [tmpC1;tmpC2];
-%     demo(i).separation = [zeros(tmpN1,1);ones(tmpN2,1)];
-% end
+% load('Data\20200107URData\1.mat');
+% load('Data\20200107URData\2.mat');
+
+% We use struct arrays
+M = 11;
+demo.dataJ = [];
+demo.dataC = [];
+demo.dataCFK = [];
+demo.separation = [];
+demo = repmat(demo,[1,M]);
+
+for i = 1:9
+    tmpJ1 = eval(strcat('j10',int2str(i)));
+    tmpJ2 = eval(strcat('j20',int2str(i)));
+    tmpN1 = size(tmpJ1,1);
+    tmpN2 = size(tmpJ2,1);
+    tmpC1 = eval(strcat('c10',int2str(i))); tmpC1 = tmpC1(end-tmpN1+1:end,:);
+    tmpC2 = eval(strcat('c20',int2str(i))); tmpC2 = tmpC2(end-tmpN2+1:end,:);
+    demo(i).dataJ = [tmpJ1;tmpJ2];
+    demo(i).dataC = [tmpC1;tmpC2];
+    demo(i).separation = [zeros(tmpN1,1);ones(tmpN2,1)];
+end
+for i = 10:11
+    tmpJ1 = eval(strcat('j1',int2str(i)));
+    tmpJ2 = eval(strcat('j2',int2str(i)));
+    tmpN1 = size(tmpJ1,1);
+    tmpN2 = size(tmpJ2,1);
+    tmpC1 = eval(strcat('c1',int2str(i))); tmpC1 = tmpC1(end-tmpN1+1:end,:);
+    tmpC2 = eval(strcat('c2',int2str(i))); tmpC2 = tmpC2(end-tmpN2+1:end,:);
+    demo(i).dataJ = [tmpJ1;tmpJ2];
+    demo(i).dataC = [tmpC1;tmpC2];
+    demo(i).separation = [zeros(tmpN1,1);ones(tmpN2,1)];
+end
 
 % demoCFK
 for i = 1:M
@@ -64,8 +64,7 @@ for i = 1:M
     demoPart2(i).dataC = demo(i).dataC(tmpIndices,:);
     demoPart2(i).dataCFK = demo(i).dataCFK(:,:,tmpIndices);
 end
-%}
-%{
+
 % Temporal alignment (Note that there may be no need to use DTW)
 % DTW in joint space
 % We omit the first demo
@@ -104,8 +103,7 @@ robot = robot.demoFKReplace();
 
 robot.plotJointDemo(1e-3);
 robot.plotCarteDemo();
-%}
-%{
+
 % Separated robot demos
 robots = repmat(UR5Zero(true),[1,2]);
 for i = 2:M
@@ -186,11 +184,14 @@ robots(2).exeCartesian = robots(2).fkine(expData_model2');
 robots(2).plotCarteDemo(true);
 %}
 
-
-
-%% Dual ProMPs
-
-
+%{
+% Plot reproduction
+tmpData = [permute(robots(1).exeCartesian(1:3,4,:),[1,3,2]),...
+    permute(robots(2).exeCartesian(1:3,4,:),[1,3,2])];
+figure;
+plot3(tmpData(1,:),tmpData(2,:),tmpData(3,:),'Color',[1,0,0],'LineWidth',3);
+axis equal;
+%}
 
 %% Simple GMM for contrast
 
@@ -198,9 +199,8 @@ robots(2).plotCarteDemo(true);
 % Data prepare
 DataJ1 = robots(1).getDemoJoint(1e-3,0);
 DataJ2 = robots(2).getDemoJoint(1e-3,max(DataJ1(:,1)));
-% DataJ = [DataJ1;DataJ2]';
-%}
-%{
+DataJ = [DataJ1;DataJ2]';
+
 queryGMMCon = linspace(min(DataJ(1,:)),max(DataJ(1,:)),100);
 
 gmmContrast = GMMOne(10,7);
@@ -213,9 +213,9 @@ robotGMMCon = robot;
 robotGMMCon.plotJointDemoPlus(1e-3,[queryGMMCon', expDataGMMCon']);
 robotGMMCon.exeCartesian = robotGMMCon.fkine(expDataGMMCon');
 robotGMMCon.plotCarteDemo(true);
-%}
 
 % expDataGMMConL = gmmContrast.GMR(linspace(min(queryGMMCon),max(queryGMMCon),500));
+%}
 
 %% Simple GP for contrast
 
@@ -244,8 +244,7 @@ robotGPCon.plotCarteDemo(true);
 % for i = 1:M
 %     DataJdyna(i).data = [(demoPart1dtw(i).dataJ)',(demoPart2dtw(i).dataJ)'];
 % end
-%}
-%{
+
 dmpContrast = ProMPZero(6,20);
 dmpContrast = dmpContrast.leanLRR(DataJdyna);
 
