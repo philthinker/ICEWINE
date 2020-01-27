@@ -40,7 +40,7 @@ classdef ProMPZero
     methods (Access = public)
         % Initialization, Learning and Reproduction
         function obj = ProMPZero(nVar,nKernel,h)
-            %ProMPZero Init. the ProMP with D
+            %ProMPZero Init. the ProMP with D and K
             %   D: integer, D
             %   K: integer, K
             %   h: positive scalar, the variance (optional)
@@ -157,7 +157,7 @@ classdef ProMPZero
             %setNoise Set the variance of the zero-mean noise
             %   epsilony: scalar, the magnitude of noise
             epsilony = abs(epsilony);
-            obj.Sigmay = eye(obj.nKernel * obj.nVar)*epsilony;
+            obj.Sigmay = eye(obj.nVar)*epsilony;
         end
         function obj = setBasis(obj,c,h)
             %setBasis Set the centers, variance and decaying coefficient
