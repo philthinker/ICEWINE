@@ -23,12 +23,6 @@ end
 model = ProMPZero(D,20);
 model = model.leanLRR(Demos);
 
-%% Modulation
-
-% goalData.t = 0.1;
-% goalData.data = [0,0]';
-% model = model.modulate(goalData);
-
 %% Reproduction
 
 [expData,expSigma] = model.reproduct(N);

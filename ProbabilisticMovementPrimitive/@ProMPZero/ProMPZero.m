@@ -20,6 +20,9 @@ classdef ProMPZero
     %   |   D:  Dim. of data or DoF
     %   |   M:  Num. of demos
     %   |   K:  Num. of kernels
+    %   |   p(y|w) = N(y|Phi_t'*w, Sigmay)
+    %   |   p(Y|W) = N(Y|Psi_t'*W, Sigmay)
+    %   |   p(w;theta) = N(w|Muw,Sigmaw)
     
     properties (Access = public)
         % Model parameters
@@ -70,7 +73,7 @@ classdef ProMPZero
             for i = 1:M
                 N = size(Demos(i).data,2);
                 z = linspace(0,1,N);
-                Phi = obj.genBasis(z);
+                Phi = obj.genBasis(z);  % Note that this Phi is not Phi_t
                 for j = 1:D
                     w((j-1)*K+1:j*K,i) = (Phi'*Phi + obj.params_diagRegFact*eye(K))\Phi'*(Demos(i).data(j,:))';
                 end
@@ -103,12 +106,12 @@ classdef ProMPZero
             K = obj.nKernel;
             expData = zeros(D,N);
             expSigma = zeros(D,D,N);
-            Phi = obj.genBasis(z);
+            Phi = obj.genBasis(z);  % Note that this Phi is not Phi_t
             for d = 1:D
                 expData(d,:) = (Phi*obj.Muw((d-1)*K+1:d*K))';
             end
             for n = 1:N
-                % Compute Psi. Note that obly 1-D data is supported.
+                % Compute Psi. Note that only 1-D data is supported.
                 Psi = kron(eye(D),Phi(n,:));
                 expSigma(:,:,n) = Psi*(obj.Sigmaw)*(Psi')+obj.Sigmay;
             end
@@ -133,21 +136,79 @@ classdef ProMPZero
                 viaPoints.Sigma = zeros(obj.nVar,obj.nVar,Nv);
             end
             for i = 1:Nv
-                % Compute Phi
-                Phi_t = obj.genBasis(viaPoints(i).t);
-                % Compute Psi
-                Psi = kron(eye(obj.nVar),Phi_t);
-                % Bayes theorem ???
-                L = obj.Sigmaw*Psi'/(viaPoints(i).Sigma + Psi*obj.Sigmaw*Psi');
-                Muw1 = obj.Muw + L*(viaPoints.data - Psi*obj.Muw);
-                Sigmaw1 = obj.Sigmaw - L*Psi*obj.Sigmaw;
+                % Compute Phi_t
+                Phi_t = (obj.genBasis(viaPoints(i).t))';
+                % Compute Psi_t
+                Psi_t = kron(eye(obj.nVar),Phi_t);
+                % Bayes theorem
+                L = obj.Sigmaw*Psi_t/(viaPoints(i).Sigma + (Psi_t')*obj.Sigmaw*Psi_t);
+                Muw1 = obj.Muw + L*(viaPoints.data - (Psi_t')*obj.Muw);
+                Sigmaw1 = obj.Sigmaw - L*(Psi_t')*obj.Sigmaw;
                 obj.Muw = Muw1;
                 obj.Sigmaw = Sigmaw1;
             end
         end
-        function [obj] = coactivate(obj,Models)
+        
+        function [expData,expSigma] = coactivate(obj,Models,N)
+            %coactivate The combination operation of ProMP with alpha_i = 1
+            %   Models: 1 x Nc ProMPZero array
+            %   N: integer, the num. of data to be producted
+            %   expData: D x N, expected data
+            %   expSigma: D x D x N, covariances
+            Nc = length(Models);
+            [expData0,expSigma0] = obj.reproduct(N);
+            exps = [];
+            exps.data = expData0;
+            exps.SigmaInv = inv(expSigma0);
+            exps = repmat(exps,[1,Nc+1]);
+            for i = 1:Nc
+                [tmpExpData,tmpExpSigma] = Models(i).reproduct(N);
+                exps(i+1).data = tmpExpData;
+                exps(i+1).SigmaInv = inv(tmpExpSigma);
+            end
+            expData = expData0;
+            expSigma = expSigma0;
+            for t = 1:N
+                tmpExpSigmaInv = exps(1).SigmaInv(:,:,t);
+                tmpExpData = tmpExpSigmaInv * exps(1).data(:,t);
+                for i = 2:Nc+1
+                    tmpExpSigmaInv = tmpExpSigmaInv + exps(i).SigmaInv(:,:,t);
+                    tmpExpData = tmpExpData + exps(i).SigmaInv(:,:,t) * exps(i).data(:,t);
+                end
+                expSigma(:,:,t) = inv(tmpExpSigmaInv);
+                expData(:,t) = tmpExpSigmaInv*tmpExpData;
+            end
         end
-        function [obj] = blend(obj,Models,alpha)
+        
+        function [expData,expSigma] = blend(obj,Models,alpha)
+            %blend The combination operation of ProMP with time-variant
+            %alpha_i for each model.
+            %   Models: 1 x Nb ProMPZero array
+            %   alpha: (Nb+1) x N, the combination coefficent [0,1]
+            %   expData: D x N, expected data
+            %   expSigma: D x D x N, covariances
+            Nb = length(Models);
+            N = size(alpha,2);
+            [expData0,expSigma0] = obj.reproduct(N);
+            exps = [];
+            exps.data = expData0;
+            exps.SigmaInv = inv(expSigma0);
+            exps = repmat(exps,[1,Nb+1]);
+            for i = 1:Nb
+                [tmpData,tmpSigma] = Models(i+1).reproduct(N);
+                exps(i).data = tmpData;
+                exps(i).SigmaInv = inv(tmpSigma);
+            end
+            expData = expData0;
+            expSigma = expSigma0;
+            for t = 1:N
+                for i = 2:Nc+1
+                    tmpExpSigmaInv = tmpExpSigmaInv + exps(i).SigmaInv(:,:,t);
+                    tmpExpData = tmpExpData + exps(i).SigmaInv(:,:,t) * exps(i).data(:,t);
+                end
+                expSigma(:,:,t) = inv(tmpExpSigmaInv);
+                expData(:,t) = tmpExpSigmaInv*tmpExpData;
+            end
         end
     end
         
@@ -181,6 +242,7 @@ classdef ProMPZero
     
     methods (Access = protected)
         [Phi] = genBasis(obj,z);
+        [expData,expSigma] = combine(obj,Models,alpha);
     end
 end
 
