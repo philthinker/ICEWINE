@@ -156,28 +156,8 @@ classdef ProMPZero
             %   expData: D x N, expected data
             %   expSigma: D x D x N, covariances
             Nc = length(Models);
-            [expData0,expSigma0] = obj.reproduct(N);
-            exps = [];
-            exps.data = expData0;
-            exps.SigmaInv = inv(expSigma0);
-            exps = repmat(exps,[1,Nc+1]);
-            for i = 1:Nc
-                [tmpExpData,tmpExpSigma] = Models(i).reproduct(N);
-                exps(i+1).data = tmpExpData;
-                exps(i+1).SigmaInv = inv(tmpExpSigma);
-            end
-            expData = expData0;
-            expSigma = expSigma0;
-            for t = 1:N
-                tmpExpSigmaInv = exps(1).SigmaInv(:,:,t);
-                tmpExpData = tmpExpSigmaInv * exps(1).data(:,t);
-                for i = 2:Nc+1
-                    tmpExpSigmaInv = tmpExpSigmaInv + exps(i).SigmaInv(:,:,t);
-                    tmpExpData = tmpExpData + exps(i).SigmaInv(:,:,t) * exps(i).data(:,t);
-                end
-                expSigma(:,:,t) = inv(tmpExpSigmaInv);
-                expData(:,t) = tmpExpSigmaInv*tmpExpData;
-            end
+            alpha = ones(Nc,N);
+            [expData,expSigma] = obj.combine(Models,alpha);
         end
         
         function [expData,expSigma] = blend(obj,Models,alpha)
@@ -187,28 +167,7 @@ classdef ProMPZero
             %   alpha: (Nb+1) x N, the combination coefficent [0,1]
             %   expData: D x N, expected data
             %   expSigma: D x D x N, covariances
-            Nb = length(Models);
-            N = size(alpha,2);
-            [expData0,expSigma0] = obj.reproduct(N);
-            exps = [];
-            exps.data = expData0;
-            exps.SigmaInv = inv(expSigma0);
-            exps = repmat(exps,[1,Nb+1]);
-            for i = 1:Nb
-                [tmpData,tmpSigma] = Models(i+1).reproduct(N);
-                exps(i).data = tmpData;
-                exps(i).SigmaInv = inv(tmpSigma);
-            end
-            expData = expData0;
-            expSigma = expSigma0;
-            for t = 1:N
-                for i = 2:Nc+1
-                    tmpExpSigmaInv = tmpExpSigmaInv + exps(i).SigmaInv(:,:,t);
-                    tmpExpData = tmpExpData + exps(i).SigmaInv(:,:,t) * exps(i).data(:,t);
-                end
-                expSigma(:,:,t) = inv(tmpExpSigmaInv);
-                expData(:,t) = tmpExpSigmaInv*tmpExpData;
-            end
+            [expData,expSigma] = obj.combine(Models,alpha);
         end
     end
         
