@@ -6,10 +6,6 @@
 
 Ijspeert's DMP, never use it anymore. All its functions are transferred to @IjspeertDMP.
 
-### DMPdbGMM (2019.12.06)
-
-DMPdbGMM Dynamic movement primitive which is driven by Gaussian mixture model based forcing term.
-
 ### IjspeertDMP
 
 Ijspeert's DMP.
@@ -17,14 +13,6 @@ Ijspeert's DMP.
 ### SchaalDMP
 
 Schaal's modified DMP.
-
-### DMPGroup
-
-A class for grouping a couple of DMPs to learn multi-DoF trajectories.
-
-### SEDS
-
-Stable estimator of dynamic systems.
 
 ## Demos
 
@@ -37,6 +25,3 @@ Stable estimator of dynamic systems.
 
 Sample data for demos to use.
 
-## Other folders
-
-- Ijspeert              Ijspeert's DMP functions (cloned)
