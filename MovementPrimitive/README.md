@@ -6,9 +6,12 @@
 
 Ijspeert's DMP, never use it anymore. All its functions are transferred to @IjspeertDMP.
 
-### IjspeertDMP
+### IjspeertDMP (RECOMMENDED)
 
-Ijspeert's DMP.
+- IjspeertDMP: the zero version of Ijspeert's dynamic movement primitive
+
+- IjspeertDMP2: Ijspeert's DMP with higher stability and flexibility. Feedback control is supported.
+
 
 ### SchaalDMP
 

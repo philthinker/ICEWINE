@@ -12,7 +12,7 @@ classdef IjspeertDMP
         alphax;     % alphax of the canonical system
     end
     
-    properties (Access = private)
+    properties (Access = protected)
         c;          % centers of the Gaussian basis
         h;          % variance of the Gaussian basis
         N;          % number of Gaussian basis
@@ -129,6 +129,11 @@ classdef IjspeertDMP
             obj.tau = tau;
             obj.dt = tau/size(y,1);
             x = obj.canonicalSystem();
+            if size(x,1) < size(y,1)
+                x(size(y,1)) = 0;
+            else
+                x(end) = 0;
+            end
             % Compute f_target, basis S
             % y: M x 1
             obj.g = y(end); obj.y0 = y(1);
