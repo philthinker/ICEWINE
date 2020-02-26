@@ -16,7 +16,7 @@ w = obj.w;          % K x 1
 for i = 1:K
     Psi(:,i) = obj.basisFunc(x,obj.c(i),obj.h(i));
 end
-fx = (Psi*w)/(Psi*ones(K,1)).*x.*(g-y0);    % N x 1
+fx = (Psi*w)./(Psi*ones(K,1)).*x.*(g-y0);    % N x 1
 
 end
 
