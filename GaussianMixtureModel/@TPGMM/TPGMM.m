@@ -14,7 +14,9 @@ classdef TPGMM < GMMZero
     %           b: D x F, position
     %           data: N x D, original data in world frame
     %           TPData: D x F x N, data in each frame
-    
+    %   Note that once you wanna GMR with time query, you must use the
+    %   augumented A and b.
+    %
     %   Haopeng Hu
     %   2019.10.23
     %   All rights reserved
@@ -129,11 +131,11 @@ classdef TPGMM < GMMZero
         function [expData,expSigma,MuGMR,SigmaGMR] = GMR(obj,query,qFrames)
             %GMR Task-parameterized Gaussian mixture regression
             %   query: Din x N, the query variable  sequence
+            %   qFrames: struct('A',D x D,'b',D x 1) x F, the given pair of query frame
             %   expData: Dout x N, expected/regression data
             %   expSigma:  Dout x Dout x N, exptected covariances
             %   MuGMR: Dout x N x F, expected/regression data in each frame
             %   SigmaGMR: Dout x Dout x N x  F, expected covariances in each frame
-            %   qFrames: struct('A',D x D,'b',D x 1) x obj.nFrame, the given pair of query frame
             Dout = length(obj.Dataout);
             Din = length(obj.Datain);
             nData = size(query,2);

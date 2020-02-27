@@ -97,7 +97,9 @@ classdef IjspeertDMPOne
         end
         
         function obj = learnLWR(obj,Demo)
-            %learnLWR Learn the DMP by LWR.
+            %learnLWR Learn the DMP by LWR. Note that once the beginning
+            %and end of the demo are equal the performance of the
+            %Ijspeert's DMP would be poor.
             %   Demo: N x 3, the demo [y dy ddy]
             % Hyper param.
             TAU = obj.tau;  % recommended: tau = 1 for DMP learning
@@ -113,6 +115,9 @@ classdef IjspeertDMPOne
             % Compute basis
             x = obj.genX(N);
             xi = x .* (gd - y0d);
+            if abs(gd-y0d) < 1e-9   % We regulate the zero xi to 1e-6
+                xi = (1e-6)*ones(size(x));
+            end
             Psi = zeros(N,K);
             for i = 1:K
                 Psi(:,i) = obj.basisFunc(x,obj.c(i),obj.h(i));

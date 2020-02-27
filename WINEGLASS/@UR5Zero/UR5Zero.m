@@ -32,7 +32,7 @@ classdef UR5Zero
             %UR5Zero Init. the UR5.
             %   kModelEnable: boolean, true for the property kModel needed.
             %   Maker sure P. Corke's Robotics toolbox is required if
-            %   kModelEnable is set true
+            %   kModelEnable is set true (default: false)
             obj.NJointDemo = 0;
             obj.NCartesianDemo = 0;
             obj.demoJoint = cell([1,1]);

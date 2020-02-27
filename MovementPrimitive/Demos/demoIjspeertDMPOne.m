@@ -13,7 +13,7 @@ dmp.plotBasis();
 
 %% Run an empty DMP
 
-[Y,x] = dmp.run(0,1,100000);
+[Y,x] = dmp.run(0,1,1000);
 dmp.plotDMP(x,Y);
 
 %% Run an empty DMP iteratively
