@@ -21,7 +21,7 @@ end
 %% Learn a ProMP
 
 model = ProMPZero(D,20);
-model = model.leanLRR(Demos);
+model = model.learnLRR(Demos);
 %}
 %% Advanced operation
 

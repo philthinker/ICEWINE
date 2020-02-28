@@ -60,7 +60,7 @@ classdef ProMPZero
             obj.c = linspace(-2*h,1+2*h,obj.nKernel);
         end
         
-        function obj = leanLRR(obj,Demos)
+        function obj = learnLRR(obj,Demos)
             %leanLRR Learn the param. by linear ridge regression and maximum
             %likelihood estimation.
             %   Demos: 1 x M struct array, where
