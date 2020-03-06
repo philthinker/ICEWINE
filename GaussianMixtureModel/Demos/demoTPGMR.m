@@ -26,7 +26,7 @@ gmm = gmm.learnGMM(Demos);
 
 %% GMR reproduction
 
-query = Demos{1}.data(:,1)';
+query = Demos(1).data(:,1)';
 nData = size(query,2);
 qFrame = struct('A',eye(3) ,'b',zeros(3,1));    % Note that there is one more dimension than the data itself reserved for TP-GMR
 reprodTPGMM = repmat(struct('data',zeros(2, nData),'Sigma', zeros(2,2,nData),'qFrames', repmat(qFrame,[2,1])),[1,size(Demos,2)]);

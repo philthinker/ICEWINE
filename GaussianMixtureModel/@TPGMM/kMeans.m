@@ -4,7 +4,14 @@ function [idList, Mu] = kMeans(obj,Data)
 %   idList: N x 1, cluster ids for each data in Data
 %   Mu: D x obj,nKernel, 
 %   obj.nKernel: Integer, number of centers
-%   @TPGMM
+%   @TPGMMOne
+
+% 
+% Copyright (c) 2015 Idiap Research Institute, http://idiap.ch/
+% Written by Sylvain Calinon, http://calinon.ch/
+% 
+% This file is part of PbDlib, http://www.idiap.ch/software/pbdlib/
+% 
 
 % Criterion to stop the EM iterative update
 cumdist_threshold = 1e-10;

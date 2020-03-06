@@ -5,7 +5,7 @@ function [obj, GAMMA0, GAMMA2] = EMTPGMM(obj,Data)
 %   Data: D x F x N, demo data
 %   GAMMA0: GAMMA in E step
 %   GAMMA2: GAMMA for TP-GMM
-%   @TPGMM
+%   @TPGMMOne
 
 % 
 % Copyright (c) 2015 Idiap Research Institute, http://idiap.ch/

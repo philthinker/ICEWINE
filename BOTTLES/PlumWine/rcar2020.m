@@ -8,45 +8,59 @@
 % Load data from the PlumWine project, or figure in 'Figure' folder
 % load('Data\ur5kg0110.mat') for raw data;
 % load('Data\ur5kgRCAR2020.mat') for simple data
-
+%{
 M = 9;
 dt = 0.01;
+ABeginning = eye(4); 
+AHalf = eye(4); AEnd = eye(4);
+bBeginning = zeros(4,1); bHalf = zeros(4,1); bEnd = zeros(4,1);
 
+% ABeginning(2:4,2:4) = demo(1).dataCFK(1:3,1:3,1);
+AHalf(2:4,2:4) = demoPart1dtw(1).dataCFK(1:3,1:3,end);
+ABeginning = AHalf;
+AEnd(2:4,2:4) = demo(1).dataCFK(1:3,1:3,end);
+bBeginning(2:4) = demo(1).dataCFK(1:3,4,1);
+% bBeginning(2:4) = bBeginning(2:4);
+bHalf(2:4) = demoPart1dtw(1).dataCFK(1:3,4,end);
+bEnd(2:4) = demo(1).dataCFK(1:3,4,end);
+%}
 %% TP-GMM for part I
 %{
-% % Here we use demoPart1dtw as demo data
-% % Init. data for TP-GMM learning and reproduction
-% gmmPartI = TPGMM(6,4,2);
-% demoPart1TP = cell(1,M);
-% A = repmat(eye(4),[1,1,2]);
-% b = zeros(4,2);
-% for m = 1:M
-%     A(2:4,2:4,1) = demoPart1dtw(m).dataCFK(1:3,1:3,1);
-%     A(2:4,2:4,end) = demoPart1dtw(m).dataCFK(1:3,1:3,end);
-%     b(2:end,1) = demoPart1dtw(m).dataCFK(1:3,4,1);
-%     b(2:end,end) = demoPart1dtw(m).dataCFK(1:3,4,end);
-%     tmpData = demoPart1dtw(m).dataCFK(1:3,4,:);
-%     tmpData = permute(tmpData,[1,3,2]);
-%     tmpData = tmpData'; tmpDemo = [linspace(0,1,size(tmpData,1))',tmpData];
-%     demoPart1TP{m} = gmmPartI.dataReconstruct(A,b,tmpDemo);
-% end
+% Here we use demoPart1dtw as demo data
+% Init. data for TP-GMM learning and reproduction
+gmmPartI = TPGMM(6,4,2);
+demoPart1TP = cell(1,M);
+A = repmat(eye(4),[1,1,2]);
+b = zeros(4,2);
+for m = 1:M
+    A(2:4,2:4,1) = demoPart1dtw(m).dataCFK(1:3,1:3,1);
+    A(2:4,2:4,end) = demoPart1dtw(m).dataCFK(1:3,1:3,end);
+    b(2:end,1) = demoPart1dtw(m).dataCFK(1:3,4,1);
+    b(2:end,end) = demoPart1dtw(m).dataCFK(1:3,4,end);
+    tmpData = demoPart1dtw(m).dataCFK(1:3,4,:);
+    tmpData = permute(tmpData,[1,3,2]);
+    tmpData = tmpData'; tmpDemo = [linspace(0,1,size(tmpData,1))',tmpData];
+    demoPart1TP{m} = gmmPartI.dataReconstruct(A,b,tmpDemo);
+end
 
-% % Learn a TP-GMM
-% gmmPartI = gmmPartI.initGMMTimeBased(demoPart1TP);
-% gmmPartI = gmmPartI.learnGMM(demoPart1TP);
+% Learn a TP-GMM
+gmmPartI = gmmPartI.initGMMTimeBased(demoPart1TP);
+gmmPartI = gmmPartI.learnGMM(demoPart1TP);
 
-% % GMR
-% query = linspace(0,1,1000);
-% queryFrames = [];
+% GMR
+query = linspace(0,1,1000);
+queryFrames = [];
 % queryFrames.A = demoPart1TP{1}.A(:,:,1); queryFrames.b = demoPart1TP{1}.b(:,1);
-% queryFrames = repmat(queryFrames,[1,2]);
+queryFrames.A = ABeginning; queryFrames.b = bBeginning;
+queryFrames = repmat(queryFrames,[1,2]);
 % queryFrames(2).A = demoPart1TP{1}.A(:,:,2); queryFrames(2).b = demoPart1TP{2}.b(:,2);
-% expPPartI = gmmPartI.GMR(query,queryFrames);
+queryFrames(2).A = AHalf; queryFrames(2).b = bHalf;
+expPPartI = gmmPartI.GMR(query,queryFrames);
 
-% % Figure
-% robotPartI = UR5Zero(true);
-% robotPartI.exeCartesian = p2SE3(expPPartI,eye(3));
-% robotPartI.plotCarte(0);
+% Figure
+robotPartI = UR5Zero(true);
+robotPartI.exeCartesian = p2SE3(expPPartI,eye(3));
+robotPartI.plotCarte(0);
 %}
 %% Policy I Figure
 %{
@@ -155,42 +169,42 @@ dt = 0.01;
 %}
 %% Policy II Figure
 %{
-% % Here we use ProMP
-% for m = 1:M
-%     demoPart2(m).data = demoPart2(m).dataJ';
-% end
-% promp = ProMPZero(6,40);
-% promp = promp.learnLRR(demoPart2);
+% Here we use ProMP
+for m = 1:M
+    demoPart2(m).data = demoPart2(m).dataJ';
+end
+promp = ProMPZero(6,40);
+promp = promp.learnLRR(demoPart2);
 
-% % Run
-% N = 1000;
-% expJPartII = promp.reproduct(N);
+% Run
+N = 1000;
+expJPartII = promp.reproduct(N);
 
-% % Figure
-% figure;
-% % Plot demos
-% for i = 1:6
-%     subplot(6,1,i);
-%     for m = 1:M
-%         t = linspace(0,1,size(demoPart2(m).data,2));
-%         plot(t,demoPart2(m).data(i,:),'Color',[0.6, 0.6, 0.6],'LineWidth',1);
-% %         aa = axis;
-% %         axis([0,1,min(demoPart2(m).data(i,:))-0.001,max(demoPart2(m).data(i,:))+0.001]);
-%         hold on;
-%     end
-%     t = linspace(0,1,N);
-%     plot(t,expJPartII(i,:),'Color',[0,0.5,1],'LineWidth',1);
-%     grid on; aa = axis;
-%     axis([0,1,aa(3)-0.01,aa(4)+0.01]);
-%     ylabel(strcat('Joint ',int2str(i)));
-% end
+% Figure
+figure;
+% Plot demos
+for i = 1:6
+    subplot(6,1,i);
+    for m = 1:M
+        t = linspace(0,1,size(demoPart2(m).data,2));
+        plot(t,demoPart2(m).data(i,:),'Color',[0.6, 0.6, 0.6],'LineWidth',1);
+%         aa = axis;
+%         axis([0,1,min(demoPart2(m).data(i,:))-0.001,max(demoPart2(m).data(i,:))+0.001]);
+        hold on;
+    end
+    t = linspace(0,1,N);
+    plot(t,expJPartII(i,:),'Color',[0,0.5,1],'LineWidth',1);
+    grid on; aa = axis;
+    axis([0,1,aa(3)-0.01,aa(4)+0.01]);
+    ylabel(strcat('Joint ',int2str(i)));
+end
 
-% % Robot
-% robotPartII = UR5Zero(true);
-% robotPartII.exeJoint = expJPartII';
-% robotPartII.exeCartesian = robotPartII.fkine(robotPartII.exeJoint);
-% robotPartII.plotJoint(0);
-% robotPartII.plotCarte(0);
+% Robot
+robotPartII = UR5Zero(true);
+robotPartII.exeJoint = expJPartII';
+robotPartII.exeCartesian = robotPartII.fkine(robotPartII.exeJoint);
+robotPartII.plotJoint(0);
+robotPartII.plotCarte(0);
 %}
 %% DMP comparison
 %{
@@ -240,91 +254,94 @@ dt = 0.01;
 % robotDMPCom.plotCarte(0);
 %}
 %% ProMP comparison
+%{
+% Init.
+for m = 1:M
+    demo(m).data = demo(m).dataJ';
+end
+prompCom = ProMPZero(6,40);
+prompCom = prompCom.learnLRR(demo);
 
-% % Init.
-% for m = 1:M
-%     demo(m).data = demo(m).dataJ';
-% end
-% prompCom = ProMPZero(6,40);
-% prompCom = prompCom.learnLRR(demo);
+% Run
+N = 1000;
+expProMPCom = prompCom.reproduct(N);
 
-% % Run
-% N = 1000;
-% expProMPCom = prompCom.reproduct(N);
-% 
-% % Figure
-% figure;
-% % Plot demos
-% for i = 1:6
-%     subplot(6,1,i);
-%     for m = 1:M
-%         t = linspace(0,1,size(demo(m).data,2));
-%         plot(t,demo(m).data(i,:),'Color',[0.6, 0.6, 0.6],'LineWidth',1);
-%         hold on;
-%     end
-%     t = linspace(0,1,N);
-%     plot(t,expProMPCom(i,:),'Color',[0,0.5,1],'LineWidth',1);
-%     grid on; aa = axis;
-%     axis([0,1,aa(3)-0.01,aa(4)+0.01]);
-%     ylabel(strcat('Joint ',int2str(i)));
-% end
+% Figure
+figure;
+% Plot demos
+for i = 1:6
+    subplot(6,1,i);
+    for m = 1:M
+        t = linspace(0,1,size(demo(m).data,2));
+        plot(t,demo(m).data(i,:),'Color',[0.6, 0.6, 0.6],'LineWidth',1);
+        hold on;
+    end
+    t = linspace(0,1,N);
+    plot(t,expProMPCom(i,:),'Color',[0,0.5,1],'LineWidth',1);
+    grid on; aa = axis;
+    axis([0,1,aa(3)-0.01,aa(4)+0.01]);
+    ylabel(strcat('Joint ',int2str(i)));
+end
 
-% % Robot
-% robotProMPCom = UR5Zero(true);
-% robotProMPCom.exeJoint = expProMPCom';
-% robotProMPCom.exeCartesian = robotProMPCom.fkine(robotProMPCom.exeJoint);
-% robotProMPCom.plotJoint(0);
-% robotProMPCom.plotCarte(0);
+% Robot
+robotProMPCom = UR5Zero(true);
+robotProMPCom.exeJoint = expProMPCom';
+robotProMPCom.exeCartesian = robotProMPCom.fkine(robotProMPCom.exeJoint);
+robotProMPCom.plotJoint(0);
+robotProMPCom.plotCarte(0);
 
-% % Run with modulation
-% y0Point.data = (demo(1).dataJ(1,:))';
-% y0Point.t = 0;
-% y0Point.Sigma = zeros(6,6,1);
-% prompComM = prompCom.modulate(y0Point);
-% expProMPComM = prompComM.reproduct(N);
-% 
-% % Robot
-% robotProMPComM = UR5Zero(true);
-% robotProMPComM.exeJoint = expProMPComM';
-% robotProMPComM.exeCartesian = robotProMPComM.fkine(robotProMPComM.exeJoint);
-% robotProMPComM.plotJoint(0);
-% robotProMPComM.plotCarte(0);
+% Run with modulation
+y0Point.data = (demo(1).dataJ(1,:))';
+% y0Point.data = y0Point.data + [0.1,0,0,0,0,0]';
+y0Point.t = 0;
+y0Point.Sigma = zeros(6,6,1);
+prompComM = prompCom.modulate(y0Point);
+expProMPComM = prompComM.reproduct(N);
 
+% Robot
+robotProMPComM = UR5Zero(true);
+robotProMPComM.exeJoint = expProMPComM';
+robotProMPComM.exeCartesian = robotProMPComM.fkine(robotProMPComM.exeJoint);
+robotProMPComM.plotJoint(0);
+robotProMPComM.plotCarte(0);
+%}
 %% TP-GMM comparison
 %{
-% % Init. data
-% M = 9;
-% gmmCom = TPGMM(8,4,2);
-% A = repmat(eye(4),[1,1,2]);
-% b = zeros(4,2);
-% demoTP = cell(1,M);
-% for m = 1:M
-%     A(2:4,2:4,1) = demoDTW(m).dataCFK(1:3,1:3,1);
-%     A(2:4,2:4,end) = demoDTW(m).dataCFK(1:3,1:3,end);
-%     b(2:end,1) = demoDTW(m).dataCFK(1:3,4,1);
-%     b(2:end,end) = demoDTW(m).dataCFK(1:3,4,end);
-%     tmpData = demoDTW(m).dataCFK(1:3,4,:);
-%     tmpData = permute(tmpData,[1,3,2]);
-%     tmpData = tmpData'; tmpDemo = [linspace(0,1,size(tmpData,1))',tmpData];
-%     demoTP{m} = gmmCom.dataReconstruct(A,b,tmpDemo);
-% end
+% Init. data
+M = 9;
+gmmCom = TPGMM(6,4,2);
+A = repmat(eye(4),[1,1,2]);
+b = zeros(4,2);
+demoTP = cell(1,M);
+for m = 1:M
+    A(2:4,2:4,1) = demoDTW(m).dataCFK(1:3,1:3,1);
+    A(2:4,2:4,end) = demoDTW(m).dataCFK(1:3,1:3,end);
+    b(2:end,1) = demoDTW(m).dataCFK(1:3,4,1);
+    b(2:end,end) = demoDTW(m).dataCFK(1:3,4,end);
+    tmpData = demoDTW(m).dataCFK(1:3,4,:);
+    tmpData = permute(tmpData,[1,3,2]);
+    tmpData = tmpData'; tmpDemo = [linspace(0,1,size(tmpData,1))',tmpData];
+    demoTP{m} = gmmCom.dataReconstruct(A,b,tmpDemo);
+end
 
-% % Learn a TP-GMM
-% gmmCom = gmmCom.initGMMTimeBased(demoTP);
-% gmmCom = gmmCom.learnGMM(demoTP);
+% Learn a TP-GMM
+gmmCom = gmmCom.initGMMTimeBased(demoTP);
+gmmCom = gmmCom.learnGMM(demoTP);
 
-% % GMR
-% query = linspace(0,1,1000);
-% queryFrames = [];
+% GMR
+query = linspace(0,1,1000);
+queryFrames = [];
 % queryFrames.A = demoTP{1}.A(:,:,1); queryFrames.b = demoTP{1}.b(:,1);
-% queryFrames = repmat(queryFrames,[1,2]);
+queryFrames.A = ABeginning; queryFrames.b = bBeginning;
+queryFrames = repmat(queryFrames,[1,2]);
 % queryFrames(2).A = demoTP{1}.A(:,:,2); queryFrames(2).b = demoTP{2}.b(:,2);
-% expTPGMMCom = gmmCom.GMR(query,queryFrames);
+queryFrames(2).A = AHalf; queryFrames(2).b = bHalf;
+expTPGMMCom = gmmCom.GMR(query,queryFrames);
 
-% % Figure
-% robotGMMCom = UR5Zero(true);
-% robotGMMCom.exeCartesian = p2SE3(expTPGMMCom,eye(3));
-% robotGMMCom.plotCarte(0);
+% Figure
+robotGMMCom = UR5Zero(true);
+robotGMMCom.exeCartesian = p2SE3(expTPGMMCom,eye(3));
+robotGMMCom.plotCarte(0);
 %}
 %% Comparison figure
 %{
@@ -332,8 +349,6 @@ dt = 0.01;
 % TP-GMM traj.
 tpgmmTraj = robotGMMCom.exeCartesian;
 % DMP/ProMP traj.
-dmpTraj = robotDMPCom.exeCartesian;
-prompTraj = robotProMPCom.exeCartesian;
 prompMTraj = robotProMPComM.exeCartesian;
 % merged PbD traj.
 pbdTrajPartI = robotPartI.exeCartesian;
@@ -342,8 +357,33 @@ pbdTraj = zeros(4,4,2*N);
 pbdTraj(:,:,1:N) = pbdTrajPartI;
 pbdTraj(:,:,N+1:end) = pbdTrajPartII;
 % small adjustment
+tpgmmTrajM = tpgmmTraj;
 tpgmmTrajM(1:3,4,:) = tpgmmTraj(1:3,4,:) + prompMTraj(1:3,4,1) - tpgmmTraj(1:3,4,1);
 pbdTrajM = zeros(4,4,2*N+1); pbdTrajM(:,:,2:end) = pbdTraj;  pbdTrajM(:,:,1) = prompMTraj(:,:,1);
+%}
+%{
+tmpP = zeros(3,100); tmpP(:,1) = tpgmmTrajM(1:3,4,end); tmpP(:,end) = bEnd(2:end);
+for i = 1:3
+    tmpP(i,1:end) = pchip([0,1],[tmpP(i,1),tmpP(i,end)],linspace(0,1,100));
+end
+tmpVia = zeros(4,10); tmpVia(2:4,1) = tpgmmTrajM(1:3,4,end); tmpVia(1,1) = 0;
+tmpVia(2:4,end) = bEnd(2:end); tmpVia(1,end) = 1; tmpL = 10;
+for i = 2:9
+    tmpVia(1,i) = i*tmpL/100;
+    tmpVia(2:end,i) = tmpP(:,(i-1)*tmpL);
+    if i < 6
+        tmpVia(2:end,i) = tmpVia(2:end,i) + [0;-0.0006*i;0];
+    else
+        tmpVia(2:end,i) = tmpVia(2:end,i) + [0;-0.0006*(10-i);0];
+    end
+end
+for i = 1:3
+    tmpP(i,1:end) = spline(tmpVia(1,:),tmpVia(i+1,:),linspace(0,1,100));
+end
+
+tpgmmTrajM2 = zeros(4,4,1100); tpgmmTrajM2(:,:,1:1000) = tpgmmTrajM; tpgmmTrajM2(1:3,4,1001:end) = tmpP;
+%}
+%{
 % Figure
 figure; hold on;
 % plot demos
@@ -353,13 +393,9 @@ for m = 1:M
         permute(demo(m).dataCFK(3,4,:),[3,1,2]),'Color',[0.4,0.4,0.4],'LineWidth',0.8);
 end
 % plot TP-GMM traj.
-plot3(permute(tpgmmTrajM(1,4,:),[3,1,2]),...
-    permute(tpgmmTrajM(2,4,:),[3,1,2]),...
-    permute(tpgmmTrajM(3,4,:),[3,1,2]),'Color',[1,0.5,0],'LineWidth',1.5);
-% % plot ProMP traj.
-% plot3(permute(prompTraj(1,4,:),[3,1,2]),...
-%     permute(prompTraj(2,4,:),[3,1,2]),...
-%     permute(prompTraj(3,4,:),[3,1,2]),'Color',[0,0.5,1],'LineWidth',1.5);
+plot3(permute(tpgmmTrajM2(1,4,:),[3,1,2]),...
+    permute(tpgmmTrajM2(2,4,:),[3,1,2]),...
+    permute(tpgmmTrajM2(3,4,:),[3,1,2]),'Color',[1,0.5,0],'LineWidth',1.5);
 % plot modulated ProMP traj.
 plot3(permute(prompMTraj(1,4,:),[3,1,2]),...
     permute(prompMTraj(2,4,:),[3,1,2]),...

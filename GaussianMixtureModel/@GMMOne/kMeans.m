@@ -1,6 +1,8 @@
 function [idList, Mu] = kMeans(obj,Data)
 %kMeans The K-Means clustering algorithm
 %   Data:D x (N * M), data vectors
+%   idList: N x 1, cluster ids for each data in Data
+%   Mu: D x K, centers
 %   @GMMOne
 
 % 
