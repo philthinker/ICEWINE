@@ -1,5 +1,5 @@
 function [obj,GAMMA2,LL] = TrajEMGMM(obj,Data)
-%EMGMMZero Expectation Maximization for GMMZero
+%TrajEMGMM Expectation Maximization for TrajGMM
 %   Data: DD x N, demonstration data.
 %   GAMMA2:regulized gamma
 %   LL:the log-likelihood
