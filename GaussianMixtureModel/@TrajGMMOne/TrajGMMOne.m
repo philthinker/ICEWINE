@@ -29,6 +29,7 @@ classdef TrajGMMOne < TPGMMOne
     
     properties (Access = protected)
         tpFlag;     % boolean, true for TP-Traj-GMM
+        param_x_amplifier = 1E2;
     end
     
     methods
@@ -63,7 +64,8 @@ classdef TrajGMMOne < TPGMMOne
                 M = length(Demos);
                 TimingSeq = zeros(1,size(Data,2)); tmpIndex = 1;
                 for m = 1:M
-                    TimingSeq(1:tmpIndex:tmpIndex+Ns(m)-1) = (1:Ns);
+                    TimingSeq(tmpIndex:tmpIndex+Ns(m)-1) = (1:Ns(m));
+                    tmpIndex = tmpIndex + Ns(m);
                 end
                 Data = [TimingSeq;Data];
                 TimingSep = linspace(min(Data(1,:)), max(Data(1,:)), obj.nKernel+1); % Note that the first row is time series
@@ -83,6 +85,16 @@ classdef TrajGMMOne < TPGMMOne
             end
         end
         
+        function [obj,Data] = initGMMKMeans(obj,Demos,dt)
+            %initGMMKMeans Init. the GMM by K-Means algorithm
+            %   Demos: 1 x M struct array:
+            %   |   data: DPos x N, demo data
+            %   dt: scalar, time difference
+            %   Data: D x N*M, demo data in matrix form
+            Data = obj.dataFlattening_dyna(Demos,dt);
+            obj = obj.initGMMKMeans@GMMOne(Data);
+        end
+        
         function obj = learnGMM(obj,Demos,dt)
             %learnGMM Learn the GMM by EM algorithm
             %   Demos: 1 x M struct array:
@@ -97,16 +109,17 @@ classdef TrajGMMOne < TPGMMOne
             end
         end
         
-        function [expData, expSigma] = reproduct(obj,query,LSMode)
+        function [expData, expSigma] = reproduct(obj,query,dt,LSMode)
             %reproduct Reproduction 
             %   query: 1 x N, the query state sequence
+            %   dt: scalar, time difference
             %   LSMode: integer, the computation method of LS
             %   |   0: Using MATLAB func. lscov (Default)
             %   |   1: Most readable but not optimized method
             %   |   2: Using Cholesky and QR decompositions
             %   expData: DPos x N, expected data
             %   expSigma: DPos x DPos x N, expected covairances
-            if nargin < 3
+            if nargin < 4
                 LSMode = 0;
             end
             if obj.tpFlag
@@ -115,47 +128,50 @@ classdef TrajGMMOne < TPGMMOne
                 % Ordinary Traj-GMM
                 % Create single Gaussian N(MuQ,SigmaQ) based on query sequence q
                 N = size(query,2);
-                MuQ = reshape(obj.Mu(:,query), (obj.nVar)*N, 1);
-                SigmaQ = zeros((obj.nVar)*N);
-                for t=1:obj.nData
-                    id = ((t-1)*(obj.nVar)+1:t*(obj.nVar));
+                D = obj.nVar;
+                DPos = obj.nVar/obj.nDiff;
+                Phi1 = obj.constructPhi1(N,dt);
+                MuQ = reshape(obj.Mu(:,query), D*N, 1);
+                SigmaQ = zeros(D*N);
+                for t=1:N
+                    id = ((t-1)*D+1:t*D);
                     SigmaQ(id,id) = obj.Sigma(:,:,query(t));
                 end
                 if LSMode == 1
                     % Most readable but not optimized method
                     PHIinvSigmaQ = obj.Phi1' / SigmaQ;
-                    Rq = PHIinvSigmaQ * (obj.Phi1);
+                    Rq = PHIinvSigmaQ * (Phi1);
                     rq = PHIinvSigmaQ * MuQ;
                     zeta = Rq \ rq;             % Can also be computed with c = lscov(Rq, rq)
-                    expData = reshape(zeta, model.nbVarPos, nbData);  % Reshape data for plotting
+                    expData = reshape(zeta, DPos, N);  % Reshape data for plotting
                     %Covariance Matrix computation of ordinary least squares estimate
-                    mse =  (MuQ'*SigmaQ\MuQ - rq'*Rq\rq) ./ ((obj.nVar-obj.nVarPos)*(obj.nData));
+                    mse =  (MuQ'*SigmaQ\MuQ - rq'*Rq\rq) ./ ((D-DPos)*N);
                     S = Rq\mse;
                 elseif LSMode == 2
                     % Using Cholesky and QR decompositions
                     T = chol(SigmaQ)'; %SigmaQ=T*T'
-                    TA = T \ obj.Phi1;
+                    TA = T \ Phi1;
                     TMuQ = T \ MuQ;
                     [Q, R, perm] = qr(TA,0); %obj.Phi1(:,perm)=Q*R
                     z = Q' * TMuQ;
-                    zeta = zeros(obj.nData * obj.nVarPos,1);
+                    zeta = zeros(N * DPos,1);
                     zeta(perm,:) = R \ z; %zeta=(TA'*TA)\(TA'*TMuQ)
-                    expData = reshape(zeta, obj.nVarPos, obj.nbData); %Reshape data for plotting
+                    expData = reshape(zeta, DPos, N); %Reshape data for plotting
                     %Covariance Matrix computation of ordinary least squares estimate
                     err = TMuQ - Q*z;
-                    mse = err'*err ./ ((obj.nVar) * (obj.nData) - (obj.nVarPos) * (obj.nData));
-                    Rinv = R \ eye((obj.nVarPos) * (obj.nData));
+                    mse = err'*err ./ (D * N - DPos * N);
+                    Rinv = R \ eye(DPos * N);
                     S(perm,perm) = Rinv*Rinv' .* mse;
                 else
                     % Using MATLAB func. lscov (Default)
-                    [zeta,~,mse,S] = lscov(obj.Phi1, MuQ, SigmaQ, 'chol'); %Retrieval of data with weighted least squares solution
-                    expData = reshape(zeta, obj.nVarPos, obj.nData); %Reshape data for plotting
+                    [zeta,~,~,S] = lscov(Phi1, MuQ, SigmaQ, 'chol'); %Retrieval of data with weighted least squares solution
+                    expData = reshape(zeta, DPos, N); %Reshape data for plotting
                 end
                 % Rebuild covariance by reshaping S
-                expSigma = zeros(obj.nVarPos,obj.nVarPos,obj.nData);
-                for t=1:obj.nData
-                    id = ((t-1) * (obj.nVarPos)+1 : t * (obj.nVarPos));
-                    expSigma(:,:,t) = S(id,id) * obj.nData;
+                expSigma = zeros(DPos,DPos,N);
+                for t=1:N
+                    id = ((t-1) * DPos+1 : t * DPos);
+                    expSigma(:,:,t) = S(id,id) * N;
                 end
             end
         end
@@ -165,6 +181,7 @@ classdef TrajGMMOne < TPGMMOne
         % Auxiliary func.
         [Data,Ns] = dataRegulate(obj,Demos);
         [dynaData,Ns,Phi] = dataFlattening_dyna(obj,Demos,dt);
+        [query] = deriveQuery4Reprod(obj,Demo,N);
     end
     
     methods (Access = protected)

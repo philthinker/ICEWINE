@@ -9,7 +9,7 @@ Haopeng Hu
 - GMMZero: the simple GMM class (**deprecated**)
 - TPGMM < GMMZero: task-parameterized GMM class (**to be deprecated**)
 - GMMOne: the simple GMM class with vector habit
-- TPGMMOne < GMMOne: task-parameterzied GMM with vector habit (**developing**)
+- TPGMMOne < TPGMMOne: task-parameterzied GMM with vector habit (**developing**)
 - TrajGMM < GMMOne: trajectory GMM class
 
 ## Demos

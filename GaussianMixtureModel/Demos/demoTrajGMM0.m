@@ -22,6 +22,7 @@ end
 
 % gmm = gmm.initGMMKMeans(Data1);
 gmm = gmm.initGMMTimeBased_TmpTime(Data,nData);
+
 [gmm,GAMMA] = gmm.learnGMM(Data);
 
 %% Reproduction by trajectory-GMM
@@ -83,7 +84,8 @@ if gmm.nVarPos>1
 	for n=1:1
 		plot(expData(1,:), expData(2,:), '-','lineWidth',2.5,'color',[.8 0 0]);
 	end
-	set(gca,'xtick',[],'ytick',[]); axis equal; axis square;
+	set(gca,'xtick',[],'ytick',[]); 
+    axis equal; axis square;
 	xlabel(('$x_1$'),'interpreter','latex','fontsize',18);
 	ylabel(('$x_2$'),'interpreter','latex','fontsize',18);
 end

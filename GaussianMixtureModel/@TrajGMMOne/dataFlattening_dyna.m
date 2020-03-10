@@ -15,8 +15,8 @@ Phi = obj.constructPhi(Demos,dt);
 % Re-arrange data in vector form
 DPos = (obj.nVar)/(obj.nDiff); % DPos = D/DD
 NM = size(posData,2);
-% Scale the data to avoid numerical computation problem
-x = reshape(posData, DPos*NM, 1) * 1E2; % [x1(1),x2(1),x1(2),x2(2),x1(3),x2(3),...]'
+% Scale the data to avoid numerical computation problem (param_x_amplifer)
+x = reshape(posData, DPos*NM, 1)*obj.param_x_amplifier; % [x1(1),x2(1),x1(2),x2(2),x1(3),x2(3),...]'
 zeta = Phi * x;   % [x1(1), x2(1), x1d(1), x2d(1), x1(2), x2(2), x1d(2), x2d(2), ...]'
 % Include derivatives in dynaData
 dynaData = reshape(zeta, obj.nVar, NM);    

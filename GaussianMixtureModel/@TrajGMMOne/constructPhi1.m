@@ -7,8 +7,7 @@ function [Phi1,Phi0] = constructPhi1(obj,N,dt)
 %   @TrajGMMOne
 
 DD = obj.nDiff;
-M = length(Demos);
-DPos = size(Demos(1).data,1);
+DPos = obj.nVar/obj.nDiff;
 
 phi = zeros(DD);    % Basic transformation for 1 1-D data
 phi(1,end) = 1;     % x(T) = x(T), dx(T) = (x(T) - x(T-1))/dt
