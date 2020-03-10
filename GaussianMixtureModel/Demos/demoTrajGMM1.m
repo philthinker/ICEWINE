@@ -7,19 +7,25 @@
 
 %% Load hand-writting data
 
-% For ordinary Traj-GMM:
-% load('Data\LetterS.mat');
-M = 4;    % Num. of demos needed
-N = 100;    % Num. of data in one trajectory
-Demos = cell(1,M);
-for n=1:M
-	Demos{n} = spline(1:size(demos{n}.pos,2), demos{n}.pos, linspace(1,size(demos{n}.pos,2),N)); %Resampling
-end
+% % For ordinary Traj-GMM:
+% % load('Data\LetterS.mat');
+% M = 4;    % Num. of demos needed
+% N = 100;    % Num. of data in one trajectory
+% Demos = []; Demos.data = []; Demos = repmat(Demos,[1,M]);
+% for n=1:M
+% 	Demos(n).data = spline(1:size(demos{n}.pos,2), demos{n}.pos, linspace(1,size(demos{n}.pos,2),N)); %Resampling
+% end
+% dt = 0.001;
 
 %% Init. an ordinary traj-GMM
 
-model = TrajGMMOne(5,2,3,1);    % K, DPos, DD, F
-% model = model.initGMMTimeBased_TmpTime();
+% model = TrajGMMOne(5,2,3,1);    % K, DPos, DD, F
+% [model,Data_test] = model.initGMMTimeBased_TmpTime(Demos,dt);
+% model = model.learnGMM(Demos,dt);
+
+%% Reproduction of the ordinary traj-GMM
+
+
 
 %% Load TP data
 

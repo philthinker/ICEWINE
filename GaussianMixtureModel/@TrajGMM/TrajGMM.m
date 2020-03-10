@@ -90,7 +90,7 @@ classdef TrajGMM < GMMOne
             elseif LSMode == 2
                 % Using Cholesky and QR decompositions
                 T = chol(SigmaQ)'; %SigmaQ=T*T'
-                TA = T \ PHI1;
+                TA = T \ obj.Phi1;
                 TMuQ = T \ MuQ;
                 [Q, R, perm] = qr(TA,0); %obj.Phi1(:,perm)=Q*R
                 z = Q' * TMuQ;
