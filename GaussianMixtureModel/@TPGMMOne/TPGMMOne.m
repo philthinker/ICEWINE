@@ -103,11 +103,11 @@ classdef TPGMMOne < GMMOne
             %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         end
         
-        function obj = learnGMM(obj,TPDemos)
+        function [obj,GAMMA0,GAMMA2] = learnGMM(obj,TPDemos)
             %learnGMM Learn the TP-GMM by EM algorithm
             %   TPDemos: 1 x M TPDemo struct array, demo data
             Data = obj.dataFlattening(TPDemos,0);
-            obj = obj.EMTPGMM(Data);
+            [obj,GAMMA0,GAMMA2] = obj.EMTPGMM(Data);
         end
         
         function [expData,expSigma,expGMR] = GMR(obj,query,qFrames)

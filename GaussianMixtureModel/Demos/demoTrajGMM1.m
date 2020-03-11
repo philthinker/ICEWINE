@@ -46,12 +46,4 @@ axis equal; axis square;
 xlabel(('$x_1$'),'interpreter','latex','fontsize',18);
 ylabel(('$x_2$'),'interpreter','latex','fontsize',18);
 
-%% Load TP data
 
-% For TP-Traj-GMM:
-% load('Data\Data04_2d2frame.mat');
-%   TPDemo struct:
-%   |   data: D x N, demo data
-%   |   A: D x D x F, orientation matrices
-%   |   b: D x F, position vectors
-%   |   TPData: D x F x N, demo data in each frame

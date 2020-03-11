@@ -13,10 +13,10 @@ classdef TrajGMMOne < TPGMMOne
     %   |   DD: ord. of diff. (1 pos., 2 vel., 3 acc., 4 jer.)
     %   |   DPos: dim. of the pos. data
     %   |   TPDemo struct:
-    %   |   |   data: D x N, demo data
+    %   |   |   data: DPos x N, demo data
     %   |   |   A: D x D x F, orientation matrices
     %   |   |   b: D x F, position vectors
-    %   |   |   TPData: D x F x N, demo data in each frame
+    %   |   |   TPData: DPos x F x N, demo data in each frame
     %
     %   Haopeng Hu
     %   2020.03.07
@@ -52,12 +52,17 @@ classdef TrajGMMOne < TPGMMOne
         function [obj,Data] = initGMMTimeBased_TmpTime(obj,Demos,dt)
             %initGMMTimeBased_TmpTime Init. param. of the GMM based on
             %temporary time sequence
+            %   If obj.tpFlag == false:
             %   Demos: 1 x M struct array:
             %   |   data: DPos x N, demo data
             %   dt: scalar, time difference
             %   Data: D+1 x N*m, demo data with time sequence
+            %   If obj.tpFlag == true:
+            %   Demos: 1 x M TPDemo struct array
             if obj.tpFlag
                 % Use Mus and Sigmas
+                % Developping ...
+                %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
             else
                 % Use Mu and Sigma
                 [Data,Ns] = obj.dataFlattening_dyna(Demos,dt);
@@ -87,12 +92,42 @@ classdef TrajGMMOne < TPGMMOne
         
         function [obj,Data] = initGMMKMeans(obj,Demos,dt)
             %initGMMKMeans Init. the GMM by K-Means algorithm
+            %   If obj.tpFlag == false
             %   Demos: 1 x M struct array:
             %   |   data: DPos x N, demo data
             %   dt: scalar, time difference
             %   Data: D x N*M, demo data in matrix form
-            Data = obj.dataFlattening_dyna(Demos,dt);
-            obj = obj.initGMMKMeans@GMMOne(Data);
+            %   If obj.tpFlag == true
+            %   Demos: 1 x M TPDemo struct array
+            if obj.tpFlag
+                % Use Mus and Sigmas
+                
+            else
+                % Use Mu and Sigma
+                Data = obj.dataFlattening_dyna(Demos,dt);
+                obj = obj.initGMMKMeans@GMMOne(Data);
+            end
+        end
+        
+        function [obj,Data] = initGMMKMeans2EM_Pos(obj,TPDemos,dt)
+            %initGMMKMeans_Pos Init. the GMM by K-Means and EM based on pos. demo data only
+            %   TPDemos: 1 x M, TPDemo struct array
+            %   dt: scalar, time difference
+            if obj.tpFlag
+                tmpModel = TPGMMOne(obj.nKernel,obj.nVar/obj.nDiff,obj.nFrame);
+                tmpModel = tmpModel.initGMMKMeans(TPDemos);
+                [~,~,GAMMA2] = tmpModel.learnGMM(TPDemos);
+                Data = obj.dataFlattening_dyna(TPDemos,dt);
+                obj.Prior = tmpModel.Prior;
+                for i = 1:obj.nKernel
+                    for j = 1:obj.nFrame
+                        DataTmp = squeeze(Data(:,j,:));
+                        obj.Mus(:,j,i) = DataTmp * GAMMA2(i,:)';
+                        DataTmp = DataTmp - repmat(obj.Mus(:,j,i),1,size(Data,3)); % N*M
+                        obj.Sigmas(:,:,j,i) = DataTmp * diag(GAMMA2(i,:)) * DataTmp';
+                    end
+                end
+            end
         end
         
         function obj = learnGMM(obj,Demos,dt)
