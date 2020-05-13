@@ -21,9 +21,9 @@ Schaal's modified DMP.
 
 - DMP2Demo.m            Never use it anymore.
 - IjspeertDMPDemo.m     Learn and run demo for Ijspeert's DMP.
-- IIjspeertDMPDemoOne.m     Learn and run (iteratively) demo for @IjspeertDMPOne
+- demoIjspeertDMPOne.m     Learn and run (iteratively) demo for @IjspeertDMPOne
 - SchaalDMPDemo.m       Learn and run demo for Schaal's modified DMP.
-- DMP3dDemo.m           Learn and run demo for the DMPGroup with Ijspeert's DMPs.
+
 
 ## Data
 
