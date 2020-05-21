@@ -17,13 +17,17 @@ Ijspeert's DMP, never use it anymore. All its functions are transferred to @Ijsp
 
 Schaal's modified DMP.
 
+### CDMP
+
+Cartesian Space Dynamic Movement Primitive - 2020.05.14
+
 ## Demos
 
 - DMP2Demo.m            Never use it anymore.
 - IjspeertDMPDemo.m     Learn and run demo for Ijspeert's DMP.
-- demoIjspeertDMPOne.m     Learn and run (iteratively) demo for @IjspeertDMPOne
+- demoIjspeertDMPOne.m  Learn and run (iteratively) demo for @IjspeertDMPOne
 - SchaalDMPDemo.m       Learn and run demo for Schaal's modified DMP.
-
+- demoCDMP.m            Learn and run demo for @CDMP
 
 ## Data
 
