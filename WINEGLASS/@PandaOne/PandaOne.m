@@ -69,6 +69,8 @@ classdef PandaOne < PandaZero
                 % Joint position
                 if size(traj,2) == 7
                     [flag,error_id] = obj.checkJP(traj);
+                else
+                    error_id = 5;
                 end
             elseif mode == 1
                 % Joint velocity
