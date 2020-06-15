@@ -15,9 +15,9 @@ N = size(trajIn,1);
 constraint = obj.JointConstraint;
 
 %% Empirical maximum discrepancy interpolation
-% Safe but very slow!
+% Safe but very slow and jittering
 % The last choice.
-delta_q_max = [4e-4, 4e-4, 6e-4, 6e-4, 8e-4, 8e-4, 8e-4]/2; % Never forget its RT feature
+delta_q_max = [4e-4, 4e-4, 6e-4, 6e-4, 8e-4, 8e-4, 8e-4]/4; % Never forget its RT feature
 tmpTrajs = cell(1,N-1);
 for i = 2:N
     tmpN = max(ceil(abs(trajIn(i,:) - trajIn(i-1,:))./delta_q_max));

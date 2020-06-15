@@ -7,6 +7,7 @@
 
 addpath('WINE');
 addpath('WINEGLASS');
+addpath('WINEGLASS\ALCOHOL');
 addpath('DECANTER');
 
 % addpath('DECANTER\PlumWine');
