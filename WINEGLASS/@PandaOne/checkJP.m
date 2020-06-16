@@ -27,21 +27,12 @@ error_id = 0;
 
 % q_max, q_min, dq_max, ddq_max, dddq_max
 constraint = obj.JointConstraint;
-% q1, q2, q3, q4, q5, q6, q7
-constraint_deltaJP_empirical = [6e-4, 6e-4, 8e-4, 8e-4, 8e-4, 1e-3, 1e-3];
 
 % traj
 % Check whether q violates its constraint
 flag = flag && all(max(traj,[],1) < constraint(1,:)) && all(min(traj,[],1) > constraint(2,:));
 if ~flag
     error_id = 1;
-    return
-end
-% Check whether q violates the empirical constraint
-dtraj = abs(traj(2:end,:) - traj(1:end-1,:));
-flag = flag && all(max(dtraj,[],1) < constraint_deltaJP_empirical);
-if ~flag
-    error_id = 2;
     return
 end
 %{
