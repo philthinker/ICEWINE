@@ -13,10 +13,12 @@ function [trajOut, NOut] = interpJP(obj,trajIn)
 N = size(trajIn,1);
 % q_max, q_min, dq_max, ddq_max, dddq_max
 constraint = obj.JointConstraint;
+dt = 0.001;
 
-%% Empirical maximum discrepancy interpolation
+%% Empirical maximum discrepancy interpolation (Not recommended)
 % Safe but very slow and jittering
 % The last choice.
+%{
 delta_q_max = [4e-4, 4e-4, 6e-4, 6e-4, 8e-4, 8e-4, 8e-4]/4; % Never forget its RT feature
 tmpTrajs = cell(1,N-1);
 for i = 2:N
@@ -35,36 +37,15 @@ for i = 2:N
 end
 trajOut = trajs2traj(tmpTrajs);
 NOut = size(trajOut,1);
-
-%% Simple point-to-point maximum jerk iterative interpolation
-%{
-tmpTrajs = cell(1,N-1);
-tmpN = 0;
-for i = 2:N
-    
-end
-trajOut = trajs2traj(tmpTrajs);
-NOut = size(trajOut,1);
 %}
+
+%% S-spline point-to-point motion plan
+
+ssplineConstraint_max = [pi/8, pi/8, pi/6, pi/6, pi/6, pi/4, pi/4];
+ssplineConstraint_min = [1e-4, 1e-4, 1e-3, 1e-3, 1e-3, 1e-3, 1e-3];
+trajOut = SSpline(trajIn,dt,0.5, [ssplineConstraint_max; ssplineConstraint_min]);
+NOut = size(trajOut,1);
 
 %% 
 
-end
-
-function [traj] = trajs2traj(trajs)
-    %trajs2traj Merge the data in cells into one matrix
-    %   trajs: 1 x M cell
-    %   traj: NOut x 7
-    M = length(trajs);
-    tmpN = zeros(1,M);
-    for i = 1:M
-        tmpN(i) = size(trajs{i},1);
-    end
-    NOut = sum(tmpN);
-    traj = zeros(NOut,7);
-    tmpIndex = 1;
-    for i = 1:M
-        traj(tmpIndex : tmpIndex+tmpN(i)-1,:) = trajs{i};
-        tmpIndex = tmpIndex + tmpN(i);
-    end
 end
