@@ -42,7 +42,7 @@ NOut = size(trajOut,1);
 %% S-spline point-to-point motion plan
 
 ssplineConstraint_max = [pi/8, pi/8, pi/6, pi/6, pi/6, pi/4, pi/4];
-ssplineConstraint_min = [1e-4, 1e-4, 1e-3, 1e-3, 1e-3, 1e-3, 1e-3];
+ssplineConstraint_min = [5e-4, 5e-4, 5e-4, 1e-3, 1e-3, 2e-3, 2e-3];
 trajOut = SSpline(trajIn,dt,0.5, [ssplineConstraint_max; ssplineConstraint_min]);
 NOut = size(trajOut,1);
 
