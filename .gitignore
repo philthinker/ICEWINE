@@ -4,3 +4,4 @@ Documents
 pbdlib\*
 *.m~
 *.csv
+.DS_Store
