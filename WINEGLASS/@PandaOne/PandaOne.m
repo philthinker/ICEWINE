@@ -7,7 +7,7 @@ classdef PandaOne < PandaZero
     %   All rights reserved
     
     properties (Access = public)
-        
+        RobotState;         % Robot state of libfranka
     end
     
     properties (Access = protected)
@@ -28,6 +28,7 @@ classdef PandaOne < PandaZero
                 kModelEnable = false;
             end
             obj = obj@PandaZero(kModelEnable);
+            obj.RobotState = PandaState();
             % Joint constraint
             % q_max, q_min, dq_max, ddq_max, dddq_max
             obj.JointConstraint = [2.8973, 1.7628, 2.8973, -0.0698, 2.8973, 3.7525, 2.8973; ...
