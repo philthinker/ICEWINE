@@ -1,11 +1,7 @@
-function demo_DPMeans_Online01
-% Online clustering with DP-Means algorithm
+function demo_DPmeans_online01
+% Online clustering with DP-Means algorithm.
 % 
-% Writing code takes time. Polishing it and making it available to others takes longer! 
-% If some parts of the code were useful for your research of for a better understanding 
-% of the algorithms, please reward the authors by citing the related publications, 
-% and consider making your own research available in this way.
-%
+% If this code is useful for your research, please cite the related publication:
 % @article{Bruno17AURO,
 % 	author="Bruno, D. and Calinon, S. and Caldwell, D. G.",
 % 	title="Learning Autonomous Behaviours for the Body of a Flexible Surgical Robot",
@@ -35,6 +31,7 @@ function demo_DPMeans_Online01
 % along with PbDlib. If not, see <http://www.gnu.org/licenses/>.
 
 addpath('./m_fcts/');
+disp('Draw path with the left mouse button, and exit with the right mouse button.');
 
 
 %% Parameters

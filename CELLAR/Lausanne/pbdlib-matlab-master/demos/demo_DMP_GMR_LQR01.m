@@ -7,24 +7,19 @@ function demo_DMP_GMR_LQR01
 % nonlinear force profile. The gains of the spring-damper system are further refined by LQR 
 % based on the retrieved covariance information.  
 %
-% Writing code takes time. Polishing it and making it available to others takes longer! 
-% If some parts of the code were useful for your research of for a better understanding 
-% of the algorithms, please reward the authors by citing the related publications, 
-% and consider making your own research available in this way.
-%
-% @article{Calinon16JIST,
-%   author="Calinon, S.",
-%   title="A Tutorial on Task-Parameterized Movement Learning and Retrieval",
-%   journal="Intelligent Service Robotics",
-%		publisher="Springer Berlin Heidelberg",
-%		doi="10.1007/s11370-015-0187-9",
-%		year="2016",
-%		volume="9",
-%		number="1",
-%		pages="1--29"
+% If this code is useful for your research, please cite the related publication:
+% @incollection{Calinon19chapter,
+% 	author="Calinon, S. and Lee, D.",
+% 	title="Learning Control",
+% 	booktitle="Humanoid Robotics: a Reference",
+% 	publisher="Springer",
+% 	editor="Vadakkepat, P. and Goswami, A.", 
+% 	year="2019",
+% 	doi="10.1007/978-94-007-7194-9_68-1",
+% 	pages="1--52"
 % }
 % 
-% Copyright (c) 2015 Idiap Research Institute, http://idiap.ch/
+% Copyright (c) 2019 Idiap Research Institute, http://idiap.ch/
 % Written by Sylvain Calinon, http://calinon.ch/
 % 
 % This file is part of PbDlib, http://www.idiap.ch/software/pbdlib/
@@ -59,8 +54,8 @@ nbData = 200; %Number of datapoints in a trajectory
 nbSamples = 4; %Number of demonstrations
 
 %Canonical system parameters
-A = kron([0 1; 0 0], eye(model.nbVarPos)); %See Eq. (5.1.1) in doc/TechnicalReport.pdf
-B = kron([0; 1], eye(model.nbVarPos)); %See Eq. (5.1.1) in doc/TechnicalReport.pdf
+A = kron([0 1; 0 0], eye(model.nbVarPos)); 
+B = kron([0; 1], eye(model.nbVarPos)); 
 C = kron([1,0],eye(model.nbVarPos));
 %Discretize system (Euler method)
 Ad = A*model.dt + eye(size(A));
@@ -69,7 +64,7 @@ Bd = B*model.dt;
 R = eye(model.nbVar) * model.rFactor;
 R = kron(eye(nbData),R);
 
-%Create transformation matrix to compute xhat = x + dx*kV/kP + ddx/kP, see Eq. (4.0.2) in doc/TechnicalReport.pdf
+%Create transformation matrix to compute xhat = x + dx*kV/kP + ddx/kP
 K1d = [1, model.kV/model.kP, 1/model.kP];
 K = kron(K1d,eye(model.nbVarPos));
 
@@ -108,10 +103,10 @@ model = EM_tensorGMM(DataDMP, model);
 %Task-adaptive spring-damper attractor path retrieval
 r(n).p(1).A = eye(model.nbVar);
 r(n).p(1).b = s(n).p(1).b + [0; 0; 5]; %Offset added to test generalization capability
-[r(n).Mu, r(n).Sigma] = productTPGMM0(model, r(n).p); %See Eq. (6.0.5), (6.0.6) and (6.0.7) in doc/TechnicalReport.pdf
+[r(n).Mu, r(n).Sigma] = productTPGMM0(model, r(n).p); 
 r(n).Priors = model.Priors;
 r(n).nbStates = model.nbStates;
-[r(1).currTar, r(1).currSigma] = GMR(r(n), sIn, 1, 2:model.nbVar); %See Eq. (3.0.2) to (3.0.5) in doc/TechnicalReport.pdf
+[r(1).currTar, r(1).currSigma] = GMR(r(n), sIn, 1, 2:model.nbVar); 
 
 %LQR tracking (discrete version)
 Q = zeros(model.nbVarPos*2, model.nbVarPos*2);

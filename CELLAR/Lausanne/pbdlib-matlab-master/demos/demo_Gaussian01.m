@@ -1,24 +1,19 @@
 function demo_Gaussian01
 % Use of Chi-square values to determine the percentage of data within the contour of a multivariate normal distribution.
 %
-% Writing code takes time. Polishing it and making it available to others takes longer! 
-% If some parts of the code were useful for your research of for a better understanding 
-% of the algorithms, please reward the authors by citing the related publications, 
-% and consider making your own research available in this way.
-%
-% @article{Calinon16JIST,
+% If this code is useful for your research, please cite the related publication:
+% @incollection{Calinon19MM,
 % 	author="Calinon, S.",
-% 	title="A Tutorial on Task-Parameterized Movement Learning and Retrieval",
-% 	journal="Intelligent Service Robotics",
-%		publisher="Springer Berlin Heidelberg",
-%		doi="10.1007/s11370-015-0187-9",
-%		year="2016",
-%		volume="9",
-%		number="1",
-%		pages="1--29"
+% 	title="Mixture Models for the Analysis, Edition, and Synthesis of Continuous Time Series",
+% 	booktitle="Mixture Models and Applications",
+% 	publisher="Springer",
+% 	editor="Bouguila, N. and Fan, W.", 
+% 	year="2019",
+% 	pages="39--57",
+% 	doi="10.1007/978-3-030-23876-6_3"
 % }
 % 
-% Copyright (c) 2015 Idiap Research Institute, http://idiap.ch/
+% Copyright (c) 2019 Idiap Research Institute, http://idiap.ch/
 % Written by Sylvain Calinon, http://calinon.ch/
 % 
 % This file is part of PbDlib, http://www.idiap.ch/software/pbdlib/
@@ -125,5 +120,5 @@ for nn=1:nbStd
 end
 
 %print('-dpng','graphs/demo_Gaussian01.png');
-%pause;
-%close all;
+pause;
+close all;

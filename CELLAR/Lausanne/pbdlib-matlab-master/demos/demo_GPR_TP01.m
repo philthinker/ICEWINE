@@ -2,11 +2,7 @@ function demo_GPR_TP01
 % Gaussian processs regression (GPR) used for task adaptation, with DS-GMR used to 
 % retrieve continuous movements.
 % 
-% Writing code takes time. Polishing it and making it available to others takes longer! 
-% If some parts of the code were useful for your research of for a better understanding 
-% of the algorithms, please reward the authors by citing the related publications, 
-% and consider making your own research available in this way.
-%
+% If this code is useful for your research, please cite the related publication:
 % @article{Calinon16JIST,
 %   author="Calinon, S.",
 %   title="A Tutorial on Task-Parameterized Movement Learning and Retrieval",
@@ -19,7 +15,7 @@ function demo_GPR_TP01
 %		pages="1--29"
 % }
 % 
-% Copyright (c) 2015 Idiap Research Institute, http://idiap.ch/
+% Copyright (c) 2019 Idiap Research Institute, http://idiap.ch/
 % Written by Sylvain Calinon, http://calinon.ch/
 % 
 % This file is part of PbDlib, http://www.idiap.ch/software/pbdlib/
@@ -72,7 +68,7 @@ D(end,end) = 0;
 %Create transformation matrix to compute XHAT = X + DX*kV/kP + DDX/kP
 K1d = [1, model.kV/model.kP, 1/model.kP];
 K = kron(K1d,eye(nbVarOut));
-%Create data with XHAT instead of X, see Eq. (4.0.2) in doc/TechnicalReport.pdf
+%Create data with XHAT instead of X
 Data = s(1).Data0(1,:);
 for n=1:nbSamples
 	DataTmp = s(n).Data0(2:end,:);
@@ -129,7 +125,7 @@ for n=1:nbSamples
 		r(n).Sigma(:,:,i) = V * max(D,5E-4) * V';
 	end
 	
-	%Retrieval of attractor path through GMR, see Eq. (17)-(19)
+	%Retrieval of attractor path through GMR
 	currTar = GMR(r(n), DataIn, 1, [2:model.nbVar]); 
 	
 	%Motion retrieval with spring-damper system
@@ -174,7 +170,7 @@ for n=1:nbRepros
 		rnew(n).Sigma(:,:,i) = V * max(D,1E-3) * V';
 	end
 	
-	%Retrieval of attractor path through GMR, see Eq. (17)-(19)
+	%Retrieval of attractor path through GMR
 	currTar = GMR(rnew(n), DataIn, 1, [2:model.nbVar]); 
 	
 	%Motion retrieval with spring-damper system
@@ -258,7 +254,5 @@ end
 axis(limAxes); axis square; set(gca,'xtick',[],'ytick',[]);
 
 %print('-dpng','graphs/demo_GPR_TP01.png');
-%pause;
-%close all;
-
-
+pause;
+close all;
