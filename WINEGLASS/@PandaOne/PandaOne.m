@@ -94,6 +94,26 @@ classdef PandaOne < PandaZero
                 ylabel(labels{i});
             end
         end
+        function [] = plot3CarteDemoPlus(obj,exeCartesian)
+            %plot3CarteDemoPlus Plot3 the Cartesian demo's positions with
+            %exeCartesian's positions
+            %   exeCartesian: 4 x 4 x N or N x 3, Carteisan trajectories
+            figure;
+            hold on;
+            for i = 1:obj.NCartesianDemo
+                demoCarteP = permute(obj.demoCartesian{i}(1:3,4,:),[1,3,2]);
+                plot3(demoCarteP(1,:),demoCarteP(2,:),demoCarteP(3,:),'Color',[0.6,0.6,0.6]);
+            end
+            if size(exeCartesian,2) == 4
+                % 4 x 4 x N SE(3)
+                exeCarteP = permute(exeCartesian(1:3,4,:),[1,3,2]);
+            else
+                exeCarteP = exeCartesian';
+            end
+            plot3(exeCarteP(1,:),exeCarteP(2,:),exeCarteP(3,:),'Color',[0 0.4470 0.7410]);
+            grid on; axis equal;
+            view(3);
+        end
     end
     
     methods (Access = public)
