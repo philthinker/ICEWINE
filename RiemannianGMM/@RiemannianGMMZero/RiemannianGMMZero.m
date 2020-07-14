@@ -32,6 +32,11 @@ classdef RiemannianGMMZero
         MuMan;        % (DoutM+Din) x K, Gaussian means on Riemannian manifold
         Sigma;           % D x D x K, Covariances
         Prior;              % 1 x K, Priors
+        center = [0;1;0;0];                % Center of the manifold 
+                                                  % (Default: [w; i; j; k] = [0; 1; 0; 0], i.e. Rotate the original frame for pi/2 around x-axis )
+                                                  % Refer to this websit:
+                                                  % https://eater.net/quaternions/video/intro
+                                                  % for visualization.
     end
     
     properties (Access = protected)
@@ -47,11 +52,6 @@ classdef RiemannianGMMZero
         outIndicesM;                      % Indices of the data out in manifold in GMR
         nIterGN = 10;                     % Number of iteration for the Gauss Newton algorithm
         nIterEM = 10;                     % Number of iteration for the EM algorithm
-        center = [0;1;0;0];                % Center of the manifold 
-                                                  % (Default: [w; i; j; k] = [0; 1; 0; 0], i.e. Rotate the original frame for pi/2 around x-axis )
-                                                  % Refer to this websit:
-                                                  % https://eater.net/quaternions/video/intro
-                                                  % for visualization.
     end
     
     methods
@@ -241,6 +241,34 @@ classdef RiemannianGMMZero
                 RiemannianData.expDataM = [];
                 RiemannianData.expData = [];
                 RiemannianData.expSigma = [];
+            end
+        end
+        function [quatOut] = quatRegulate(obj,quatIn,mod)
+            %quatRegulate Regulate the unit quaternion to avoid double
+            %cover problem
+            %   quatIn: 4 x N, unit quaternions [w,x,y,z]'
+            %   mod: boolean, true for positive real part, false for
+            %   negative real part (default:true)
+            %   quatOut: 4 x N, unit quaternions [w,x,y,z]'
+            quatOut = quatIn;
+            if nargin < 3
+                mod = true;
+            end
+            N = size(quatIn,2);
+            if mod
+                % Positive real part
+                for i = 1:N
+                    if quatOut(1,i) < 0
+                        quatOut(1,i) = -quatOut(1,i);
+                    end
+                end
+            else
+                % Negative real part
+                for i = 1:N
+                    if quatOut(1,i) > 0
+                        quatOut(1,i) = -quatOut(1,i);
+                    end
+                end
             end
         end
     end
