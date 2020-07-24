@@ -76,7 +76,6 @@ classdef QGMMZero < GMMOne
                     exp_eta(:,i) = [cos(tmp_norm_eta);  sin(tmp_norm_eta)*eta(:,i)/tmp_norm_eta];
                 end
             end
-            disp(exp_eta);
             q = obj.quatProduct(exp_eta,repmat(obj.q_a,[1,N]));
         end
     end

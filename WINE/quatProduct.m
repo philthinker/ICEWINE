@@ -12,7 +12,7 @@ for i = 1:N
                         tmpq(2),   tmpq(1),  -tmpq(4),    tmpq(3);...
                         tmpq(3),   tmpq(4),    tmpq(1),  -tmpq(2);...
                         tmpq(4),  -tmpq(3),    tmpq(2),   tmpq(1) ];
-    q(:,i) = q1Matrix*q2;
+    q(:,i) = q1Matrix*q2(:,i);
 end
 
 end
