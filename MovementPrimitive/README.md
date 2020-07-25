@@ -12,18 +12,29 @@ Ijspeert's DMP, never use it anymore. All its functions are transferred to @Ijsp
 
 - IjspeertDMPOne: Ijspeert's DMP with higher stability and flexibility. Feedback control is supported.
 
+- IjspeertDMPTwo: Ijspeert's multivariate DMP. Some modifications are supported for robust performance.
 
-### SchaalDMP
+### CDMP
 
-Schaal's modified DMP.
+Cartesian Space Dynamic Movement Primitive - 2020.05.14
+
+- PositionDMP: Ijspeert's DMP of 3 dimensions.
+
+- QuaternionDMP: Quaternion DMP.
+
+- CDMP: Combination of @PositionDMP and @QuaternionDMP. They share the same canonical system.
+
+### Others
+
+- SchaalDMP: Schaal's modified DMP.
 
 ## Demos
 
 - DMP2Demo.m            Never use it anymore.
 - IjspeertDMPDemo.m     Learn and run demo for Ijspeert's DMP.
-- IIjspeertDMPDemoOne.m     Learn and run (iteratively) demo for @IjspeertDMPOne
+- demoIjspeertDMPOne.m  Learn and run (iteratively) demo for @IjspeertDMPOne
 - SchaalDMPDemo.m       Learn and run demo for Schaal's modified DMP.
-- DMP3dDemo.m           Learn and run demo for the DMPGroup with Ijspeert's DMPs.
+- demoCDMP.m            Learn and run demo for @CDMP
 
 ## Data
 

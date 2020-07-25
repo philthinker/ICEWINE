@@ -7,10 +7,12 @@ Haopeng Hu
 ## Classes
 
 - GMMZero: the simple GMM class (**deprecated**)
-- TPGMM < GMMZero: task-parameterized GMM class (**to be deprecated**)
+- TPGMM < GMMZero: task-parameterized GMM class (**deprecated**)
 - GMMOne: the simple GMM class with vector habit
-- TPGMMOne < TPGMMOne: task-parameterzied GMM with vector habit (**developing**)
+- TPGMMOne < TPGMMOne: task-parameterzied GMM with vector habit
 - TrajGMM < GMMOne: trajectory GMM class
+- TrajGMMOne < GMMOne: trajectory GMM with TP feature (**developing**)
+- QGMMZero < GMMOne: Quaternion GMM with auxiliary unit quaternion
 
 ## Demos
 
@@ -25,7 +27,9 @@ Haopeng Hu
 ### Other demos
 
 - demoGMR1: A demo for GMMOne 
-- demoTPGMR1: Task-parameterized GMM and GMR
-- demoTrajGMM0: Trajectory-GMM
+- demoTPGMR1: Task-parameterized GMM and GMR demo
+- demoTrajGMM0: Trajectory-GMM demo
+- demoTrajGMM1: TP-trajectory-GMM demo
+- demoQGMM: Quaternion GMM and GMR demo
 
 *Coding and drinking with peach blossom!*

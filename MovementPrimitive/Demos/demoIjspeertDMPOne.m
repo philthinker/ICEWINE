@@ -1,5 +1,5 @@
 %demoIjspeertDMPOne
-%   A demo for class @IjspeertDMP2
+%   A demo for class @IjspeertDMPOne
 %   Haopeng Hu
 %   2020.02.25
 %   All rights reserved

@@ -8,7 +8,7 @@ classdef GMMOne
     %   |   K:      num. of Gaussians
     %   |   M:      num. of demos
     %   |   N:      num. of data
-    
+    %
     %   Haopeng Hu
     %   2019.10.29
     %   All rights reserved

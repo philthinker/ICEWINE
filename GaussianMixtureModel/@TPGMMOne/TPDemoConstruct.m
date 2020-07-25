@@ -27,7 +27,8 @@ if tmpTime
         Demo.A(2:D,2:D,f) = A(:,:,f);
         Demo.b(2:D,f) = b(:,f);
         for n = 1:N
-            Demo.TPData(:,f,n) = (Demo.A(:,:,f)) * data(:,n) + (Demo.b(:,f));
+%             Demo.TPData(:,f,n) = (Demo.A(:,:,f)) * data(:,n) + (Demo.b(:,f));
+            Demo.TPData(:,f,n) = (Demo.A(:,:,f))' * (data(:,n) - (Demo.b(:,f)));
         end
     end
 else
@@ -38,7 +39,8 @@ else
     Demo.TPData = zeros(D,F,N);
     for f = 1:F
         for n = 1:N
-            Demo.TPData(:,f,n) = A(:,:,f)*data(:,n) + b(:,f);
+%             Demo.TPData(:,f,n) = A(:,:,f)*data(:,n) + b(:,f);
+            Demo.TPData(:,f,n) = A(:,:,f)' * (data(:,n) - b(:,f));
         end
     end
 end
