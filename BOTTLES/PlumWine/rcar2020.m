@@ -168,7 +168,7 @@ robotPartI.plotCarte(0);
 % robotPartII.plotCarte(0);
 %}
 %% Policy II Figure
-%{
+
 % Here we use ProMP
 for m = 1:M
     demoPart2(m).data = demoPart2(m).dataJ';
@@ -187,24 +187,24 @@ for i = 1:6
     subplot(6,1,i);
     for m = 1:M
         t = linspace(0,1,size(demoPart2(m).data,2));
-        plot(t,demoPart2(m).data(i,:),'Color',[0.6, 0.6, 0.6],'LineWidth',1);
+        plot(t,demoPart2(m).data(i,:),'Color',[0, 0.5, 1],'LineWidth',1);
 %         aa = axis;
 %         axis([0,1,min(demoPart2(m).data(i,:))-0.001,max(demoPart2(m).data(i,:))+0.001]);
         hold on;
     end
     t = linspace(0,1,N);
-    plot(t,expJPartII(i,:),'Color',[0,0.5,1],'LineWidth',1);
+    plot(t,expJPartII(i,:),'Color',[1,0.2,0],'LineWidth',2);
     grid on; aa = axis;
     axis([0,1,aa(3)-0.01,aa(4)+0.01]);
     ylabel(strcat('Joint ',int2str(i)));
 end
 
-% Robot
-robotPartII = UR5Zero(true);
-robotPartII.exeJoint = expJPartII';
-robotPartII.exeCartesian = robotPartII.fkine(robotPartII.exeJoint);
-robotPartII.plotJoint(0);
-robotPartII.plotCarte(0);
+% % Robot
+% robotPartII = UR5Zero(true);
+% robotPartII.exeJoint = expJPartII';
+% robotPartII.exeCartesian = robotPartII.fkine(robotPartII.exeJoint);
+% robotPartII.plotJoint(0);
+% robotPartII.plotCarte(0);
 %}
 %% DMP comparison
 %{
