@@ -131,9 +131,9 @@ for i = 1:M
 end
 grid on; axis equal;
 %}
-
+%{
 for i = 1:M
-    Data_pre_w(i).query_p = linspace(0,1,200);
+    Data_pre_w(i).query_p = linspace(0,1,1000);
     Data_pre_w(i).query_frame(1).A = Demos_pre(i).A(:,:,1);
     Data_pre_w(i).query_frame(1).b = Demos_pre(i).b(:,1);
     Data_pre_w(i).query_frame(2).A = Demos_pre(i).A(:,:,2);
@@ -186,13 +186,13 @@ end
 %}
 
 % % Retrieve quat
-%{
-% for i = 1:M
-%     Data_pre(i).query_q = permute(Demos_pre(i).TPData(4,2,:),[1,3,2]);
-%     [Data_pre(i).expData_eta, Data_pre(i).expSigma_eta] = policy_pre_quat.GMR(Data_pre(i).query_q);
-%     Data_pre(i).expData_q = policy_pre_quat.expmap(Data_pre(i).expData_eta);
-%     Data_pre(i).expData_realq = quatProduct(repmat(Data_pre(i).qa,[1,size(Data_pre(i).expData_q,2)]), Data_pre(i).expData_q);
-% end
+
+for i = 1:M
+    Data_pre(i).query_q = permute(Demos_pre(i).TPData(4,2,:),[1,3,2]);
+    [Data_pre(i).expData_eta, Data_pre(i).expSigma_eta] = policy_pre_quat.GMR(Data_pre(i).query_q);
+    Data_pre(i).expData_q = policy_pre_quat.expmap(Data_pre(i).expData_eta);
+    Data_pre(i).expData_realq = quatProduct(repmat(Data_pre(i).qa,[1,size(Data_pre(i).expData_q,2)]), Data_pre(i).expData_q);
+end
 
 % for i = 1:M
 %     Data_pre_q(i).query_q = Data_pre(i).query_q;
