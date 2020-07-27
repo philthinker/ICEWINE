@@ -63,6 +63,7 @@ policy_pre_quat = policy_pre_quat.learnGMM(policy_pre_quat.dataRegulate(Demos_pr
 % % Init. data storation
 %{
 MG = 9;
+N = 1000;
 
 Data_pre = [];
 Data_pre.query_p = [];
@@ -155,25 +156,6 @@ for i = 1:M
     plot3(X,Y,Z,'b');
 end
 grid on; axis equal;
-%}
-%{
-figure;
-for i = 1:M
-    X = Demos_pre(i).data(2,:);
-    Y = Demos_pre(i).data(3,:);
-    Z = Demos_pre(i).data(4,:);
-    plot3(X,Y,Z,'Color',[0.6,0.6,0.6]);
-    hold on;
-    X = Data_pre(i).expData_p(1,:);
-    Y = Data_pre(i).expData_p(2,:);
-    Z = Data_pre(i).expData_p(3,:);
-    plot3(X,Y,Z,'r');
-    X = Data_pre_w(i).expData_p(1,:);
-    Y = Data_pre_w(i).expData_p(2,:);
-    Z = Data_pre_w(i).expData_p(3,:);
-    plot3(X,Y,Z,'b');
-end
-grid on; axis equal;
 figure;
 for i = 1:1
     t = (1:size(Data_pre_w(i).alpha,2))*dt-dt;
@@ -187,21 +169,29 @@ end
 
 % % Retrieve quat
 
-for i = 1:M
-    Data_pre(i).query_q = permute(Demos_pre(i).TPData(4,2,:),[1,3,2]);
-    [Data_pre(i).expData_eta, Data_pre(i).expSigma_eta] = policy_pre_quat.GMR(Data_pre(i).query_q);
-    Data_pre(i).expData_q = policy_pre_quat.expmap(Data_pre(i).expData_eta);
-    Data_pre(i).expData_realq = quatProduct(repmat(Data_pre(i).qa,[1,size(Data_pre(i).expData_q,2)]), Data_pre(i).expData_q);
-end
-
 % for i = 1:M
-%     Data_pre_q(i).query_q = Data_pre(i).query_q;
-%     Data_pre_q(i).qa = Data_pre(i).qa;
-%     Data_pre_q(i).expData_eta = Data_pre(i).expSigma_eta;
-%     Data_pre_q(i).expSigma_eta = Data_pre(i).expSigma_eta;
-%     Data_pre_q(i).expData_q = quatRegulate( Data_pre(i).expData_q );
-%     Data_pre_q(i).expData_realq = quatRegulate( Data_pre(i).expData_realq );
+%     Data_pre(i).query_q = permute(Demos_pre(i).TPData(4,2,:),[1,3,2]);
+%     [Data_pre(i).expData_eta, Data_pre(i).expSigma_eta] = policy_pre_quat.GMR(Data_pre(i).query_q);
+%     Data_pre(i).expData_q = policy_pre_quat.expmap(Data_pre(i).expData_eta);
+%     Data_pre(i).expData_realq = quatProduct(repmat(Data_pre(i).qa,[1,size(Data_pre(i).expData_q,2)]), Data_pre(i).expData_q);
 % end
+
+for i = 1:M
+    % Generate query
+    tmpDataPre = Data_pre_w(i);
+    tmpFrame = tmpDataPre.query_frame(2);
+    tmpTPData_p = zeros(3,N);
+    for j = 1:N
+        tmpTPData_p(:,j) = (tmpFrame.A(2:4,2:4))' * ( tmpDataPre.expData_p(:,j) - tmpFrame.b(2:4) );
+    end
+    Data_pre_q(i).query_q = tmpTPData_p(3,:);
+    Data_pre_q(i).qa = Data_pre(i).qa;
+    [Data_pre_q(i).expData_eta, Data_pre_q(i).expSigma_eta] = policy_pre_quat.GMR(Data_pre_q(i).query_q);
+    Data_pre_q(i).expData_q = quatRegulate( policy_pre_quat.expmap(Data_pre_q(i).expData_eta) );
+    Data_pre_q(i).expData_realq = quatRegulate( quatProduct(...
+        repmat(Data_pre_q(i).qa,[1,N]),...
+        Data_pre_q(i).expData_q) );
+end
 
 % figure;
 % for i = 1:M
@@ -241,9 +231,9 @@ figure;
 for i = 1:4
     subplot(4,1,i);
     for j = 1:M
-        t = (1:size(Data_pre_q(j).expData_q,2))*dt-dt;
-        plot(t,Data_pre(i).expData_q(i,:),'Color',[0.0,0.0,0.9]); hold on;
-        t = (1:size(Demos_pre(j).q,2))*dt-dt;
+        t = linspace(0,1,N);
+        plot(t,Data_pre_q(i).expData_q(i,:),'Color',[0.0,0.0,0.9]); hold on;
+        t = linspace(0,1,size(Demos_pre(j).q,2));
         tmpDemo_q = quatRegulate( Demos_pre(j).q );
         plot(t,tmpDemo_q(i,:),'Color',[0.6,0.6,0.6]);
     end
