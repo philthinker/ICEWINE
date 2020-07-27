@@ -109,7 +109,7 @@ Data_pre_q = repmat(Data_pre_q,[1,M+MG]);
 % % Retrieve position
 %{
 for i = 1:M
-    Data_pre(i).query_p = linspace(0,1,100);
+    Data_pre(i).query_p = linspace(0,1,200);
     Data_pre(i).query_frame(1).A = Demos_pre(i).A(:,:,1);
     Data_pre(i).query_frame(1).b = Demos_pre(i).b(:,1);
     Data_pre(i).query_frame(2).A = Demos_pre(i).A(:,:,2);
@@ -131,9 +131,9 @@ for i = 1:M
 end
 grid on; axis equal;
 %}
-%{
+
 for i = 1:M
-    Data_pre_w(i).query_p = linspace(0,1,100);
+    Data_pre_w(i).query_p = linspace(0,1,200);
     Data_pre_w(i).query_frame(1).A = Demos_pre(i).A(:,:,1);
     Data_pre_w(i).query_frame(1).b = Demos_pre(i).b(:,1);
     Data_pre_w(i).query_frame(2).A = Demos_pre(i).A(:,:,2);
