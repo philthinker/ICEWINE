@@ -92,6 +92,7 @@ Data_pre_w.query_frame = repmat(query_frame,[1,2]);
 Data_pre_w.expData_p = [];
 Data_pre_w.expSigma_p = [];
 Data_pre_w.alpha = [];
+Data_pre_w.expData_pPlus = [];
 
 Data_pre_w = repmat(Data_pre_w,[1,M+MG]);
 %}
@@ -168,7 +169,7 @@ end
 %}
 
 % % Retrieve quat
-
+%{
 % for i = 1:M
 %     Data_pre(i).query_q = permute(Demos_pre(i).TPData(4,2,:),[1,3,2]);
 %     [Data_pre(i).expData_eta, Data_pre(i).expSigma_eta] = policy_pre_quat.GMR(Data_pre(i).query_q);
@@ -249,5 +250,15 @@ for i = 1:4
         plot(t,Data_pre_q(j).expData_realq(i,:)); hold on;
     end
     grid on;
+end
+%}
+
+%% Add the terminal state
+%{
+for i = 1:M
+    Data_pre_w(i).expData_pPlus = Data_pre_w(i).expData_p;
+    Data_pre_w(i).expData_pPlus(:,end+1) = Demos_pre(i).data(2:4,end);
+    Data_pre_q(i).expData_realqPlus = Data_pre_q(i).expData_realq;
+    Data_pre_q(i).expData_realqPlus(:,end+1) = Data_pre_q(i).qa;
 end
 %}

@@ -6,4 +6,3 @@ for i = 1:7
     subplot(7,1,i);
     plot(t,testtau1(:,i));
 end
-    
