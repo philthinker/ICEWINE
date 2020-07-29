@@ -58,7 +58,7 @@ policy_pre_quat = policy_pre_quat.initGMMKMeans(policy_pre_quat.dataRegulate(Dem
 policy_pre_quat = policy_pre_quat.learnGMM(policy_pre_quat.dataRegulate(Demos_pre_eta));
 %}
 
-%% Retrieve or generalize
+%% Retrieve
 
 % % Init. data storation
 %{
@@ -134,8 +134,9 @@ end
 grid on; axis equal;
 %}
 %{
+N = 20000;
 for i = 1:M
-    Data_pre_w(i).query_p = linspace(0,1,1000);
+    Data_pre_w(i).query_p = linspace(0,1,N);
     Data_pre_w(i).query_frame(1).A = Demos_pre(i).A(:,:,1);
     Data_pre_w(i).query_frame(1).b = Demos_pre(i).b(:,1);
     Data_pre_w(i).query_frame(2).A = Demos_pre(i).A(:,:,2);
@@ -253,7 +254,7 @@ for i = 1:4
 end
 %}
 
-%% Add the terminal state
+% % Add the terminal state
 %{
 for i = 1:M
     Data_pre_w(i).expData_pPlus = Data_pre_w(i).expData_p;
@@ -262,3 +263,122 @@ for i = 1:M
     Data_pre_q(i).expData_realqPlus(:,end+1) = Data_pre_q(i).qa;
 end
 %}
+
+%% Generalization init
+
+% % Init. data
+%{
+Gen_pre = [];
+Gen_pre.init_otee = [];
+Gen_pre.final_otee = [];
+Gen_pre.init_se3 = [];
+Gen_pre.final_se3 = [];
+Gen_pre.init_p = [];
+Gen_pre.final_p = [];
+Gen_pre.init_q = [];
+Gen_pre.final_q = [];
+
+Gen_pre =repmat(Gen_pre,[1,MG]);
+%}
+%{
+for i = 1:MG
+    % Read data
+    Gen_pre(i).init_otee = readmatrix(strcat('DECANTER\FleshWaxberry\Data\07-29\pre_gen\gen0',...
+                                                                    int2str(i), '_OTEE.csv'));
+    % Get rid of the last column
+    Gen_pre(i).init_otee = Gen_pre(i).init_otee(:,1:end-1);
+    Gen_pre(i).init_se3 = fold2SE3(Gen_pre(i).init_otee);
+    Gen_pre(i).init_p = Gen_pre(i).init_otee(:,13:15)';
+    Gen_pre(i).init_q = quatRegulate(tform2quat(Gen_pre(i).init_se3)');
+    Gen_pre(i).final_otee = readmatrix(strcat('DECANTER\FleshWaxberry\Data\07-29\pre_gen\ret0',...
+                                                                    int2str(1), '_dummy.csv'));
+    % Get rid of the last column
+    Gen_pre(i).final_otee = Gen_pre(i).final_otee(:,1:end-1);
+    Gen_pre(i).final_se3 = fold2SE3(Gen_pre(i).final_otee);
+    Gen_pre(i).final_p = Gen_pre(i).final_otee(:,13:15)';
+    Gen_pre(i).final_q = quatRegulate(tform2quat(Gen_pre(i).final_se3)');
+end
+%}
+
+% % Generate query of p
+%{
+for i = M+1 : M+MG
+    Data_pre_w(i).query_p = linspace(0,1,N);
+    tmpA1 = eye(4); tmpA1(2:4,2:4) = Gen_pre(i-M).init_se3(1:3,1:3);
+    tmpA2 = eye(4); tmpA2(2:4,2:4) = Gen_pre(i-M).final_se3(1:3,1:3);
+    Data_pre_w(i).query_frame(1).A = tmpA1;
+    Data_pre_w(i).query_frame(2).A = tmpA2;
+    tmpb1 = zeros(4,1); tmpb1(2:4,1) = Gen_pre(i-M).init_p;
+    tmpb2 = zeros(4,1); tmpb2(2:4,1) = Gen_pre(i-M).final_p;
+    Data_pre_w(i).query_frame(1).b = tmpb1;
+    Data_pre_w(i).query_frame(2).b = tmpb2;
+end
+%}
+
+% % Generalize p
+%{
+% for i = M+1 : M+ MG
+%     [Data_pre_w(i).expData_p, Data_pre_w(i).expSigma_p,Data_pre_w(i).alpha] =...
+%         policy_pre_posi_w.GMR(Data_pre_w(i).query_p,Data_pre_w(i).query_frame);
+% end
+
+figure;
+for i = 1:M
+    X = Demos_pre(i).data(2,:);
+    Y = Demos_pre(i).data(3,:);
+    Z = Demos_pre(i).data(4,:);
+    plot3(X,Y,Z,'Color',[0.6,0.6,0.6]);
+    hold on;
+    X = Data_pre_w(i).expData_p(1,:);
+    Y = Data_pre_w(i).expData_p(2,:);
+    Z = Data_pre_w(i).expData_p(3,:);
+    plot3(X,Y,Z,'b');
+end
+for i = M+1:M+MG
+    X = Data_pre_w(i).expData_p(1,:);
+    Y = Data_pre_w(i).expData_p(2,:);
+    Z = Data_pre_w(i).expData_p(3,:);
+    plot3(X,Y,Z,'r');
+end
+grid on; axis equal;
+figure;
+for i = 1:M+MG
+    t = (1:size(Data_pre_w(i).alpha,2))*dt-dt;
+    for j = 1:2
+        plot(t,Data_pre_w(i).alpha(j,:));
+        hold on;
+    end
+    grid on; legend('alpha 1','alpha 2');
+end
+%}
+
+% % Generate query of q
+%{
+for i = M+1:M+MG
+    Data_pre_q(i).qa = Gen_pre(i-M).final_q;
+    tmp_quer_q = (Data_pre_w(i).query_frame(2).A(2:4,2:4))' * (Data_pre_w(i).expData_p - Data_pre_w(i).query_frame(2).b(2:4));
+    Data_pre_q(i).query_q = tmp_quer_q(3,:);
+end
+%}
+
+% % Generalize q
+%{
+for i = M+1 : M+MG
+    [Data_pre_q(i).expData_eta, Data_pre_q(i).expSigma_eta] = policy_pre_quat.GMR(Data_pre_q(i).query_q);
+    Data_pre_q(i).expData_q = quatRegulate(policy_pre_quat.expmap(Data_pre_q(i).expData_eta));
+    Data_pre_q(i).expData_realq = quatRegulate( quatProduct(...
+        repmat(Data_pre_q(i).qa,[1,N]),...
+        Data_pre_q(i).expData_q) );
+end
+%}
+
+% % Compensation
+%{
+for i = M+1:M+MG
+    Data_pre_w(i).expData_pPlus = Data_pre_w(i).expData_p;
+    Data_pre_w(i).expData_pPlus(:,end+1) = Gen_pre(i-M).final_p;
+    Data_pre_q(i).expData_realqPlus = Data_pre_q(i).expData_realq;
+    Data_pre_q(i).expData_realqPlus(:,end+1) = Data_pre_q(i).qa;
+end
+%}
+

@@ -6,12 +6,22 @@
 
 % load('Data/lead0722')
 
-% csvwrite('ret01pre_p.csv',toPandaCarte(Data_pre_w(1).expData_p));
-% csvwrite('ret01pre_q.csv',toPandaCarte(Data_pre_q(1).expData_realq));
-% csvwrite('ret01pre_p_plus.csv',toPandaCarte(Data_pre_w(1).expData_pPlus));
-% csvwrite('ret01pre_q_plus.csv',toPandaCarte(Data_pre_q(1).expData_realqPlus));
+% Generate origin exp data
+%{
+fileName = 'ret_pre_';
+for i = 1:M
+    csvwrite( strcat(fileName,'p_',int2str(i),'.csv'),toPandaCarte(Data_pre_w(i).expData_p));
+    csvwrite( strcat(fileName,'q_',int2str(i),'.csv'),toPandaCarte(Data_pre_q(i).expData_realq));
+    csvwrite( strcat(fileName,'pPlus_',int2str(i),'.csv'),toPandaCarte(Data_pre_w(i).expData_pPlus));
+    csvwrite( strcat(fileName,'qPlus_',int2str(i),'.csv'),toPandaCarte(Data_pre_q(i).expData_realqPlus));
+    tmpSO3 = quat2rotm(Data_pre_q(i).expData_realqPlus');
+    tmpSE3 = SO3P2SE3(tmpSO3, Data_pre_w(i).expData_pPlus);
+    csvwrite( strcat(fileName,'se3_',int2str(i),'.csv'),flattenSE3(tmpSE3));
+end
+%}
 
 % % Comparison
+%{
 figure;
 for i = 1:M
     tmpX = Demos_pre(i).data(2,:);
@@ -51,5 +61,6 @@ for i = 1:4
     end
     grid on;
 end
+%}
 
 %% Policy Pre Retrieve P,Q
