@@ -130,9 +130,13 @@ for i = 1:M
     Y = Data_cis(i).expData_p(2,:);
     Z = Data_cis(i).expData_p(3,:);
     plot3(X,Y,Z,'Color',[0,0,0.6]);
+    legend({'Demonstrated trajectories','Retrieved trajectories'});
 end
 grid on; axis equal;
-view(3);
+xlabel('x/mm');
+ylabel('y/mm');
+zlabel('z/mm');
+view(128,20);
 %}
 
 % % Retrieve quaternion data
@@ -189,6 +193,12 @@ end
 figure;
 for i = 1:6
     subplot(6,1,i);
+    for j = 1:M
+        [tmp_query_w, tmp_Index] = sort(Demos_cis(j).posi(3,:));
+        tmp_w = Demos_cis(j).ofk(:,tmp_Index);
+        plot(tmp_query_w, tmp_w(i,:),'Color',[0.6,0.6,0.6]);
+        hold on;
+    end
     for j = 1:M
         [tmp_query_w, tmp_Index] = sort(Data_cis(j).query_w);
         tmp_w = Data_cis(j).expData_w(:,tmp_Index);

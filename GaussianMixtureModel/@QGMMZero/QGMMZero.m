@@ -124,6 +124,47 @@ classdef QGMMZero < GMMOne
             end
         end
         % Figure
+        function [points] = genSphereCoordinate(obj,q)
+            %genSphere Generate sphere coordinates of unit quaternions
+            %   q: 4 x N, quat
+            %   points: 3 x N, [x;y;z] in unit sphere
+            N = size(q,2);
+            points = zeros(3,N);
+            for i = 1:N
+                tmpQ = quatProduct( quatProduct(q(:,i),[0,0,0,1]'), quatConjugate(q(:,i)) );
+                points(:,i) = tmpQ(2:4,1);
+            end
+        end
+        function [] = plotSphere(obj,q,c,l,mod)
+            %plotSphere plot the sphere points of unit quaternions
+            %   q: 4 x N, quat
+            %   c: 1 x 3 or 0, color or default color
+            %   l : scalar, Line width
+            %   mod: integer, plot mode, 0 for plot3, 1 for scatter3
+            %   (default: 0)
+            if nargin < 5
+                mod = 0;
+            end
+            if size(c,2) < 3
+                c = 0;
+            end
+            p = obj.genSphereCoordinate(q);
+            if mod == 1
+                % scatter3
+                if c == 0
+                    scatter3(p(1,:),p(2,:),p(3,:));
+                else
+                    scatter3(p(1,:),p(2,:),p(3,:),'Color',c);
+                end
+            else
+                % plot3
+                if c == 0
+                    plot3(p(1,:),p(2,:),p(3,:),'Color',c,'LineWidth',l);
+                else
+                    plot3(p(1,:),p(2,:),p(3,:),'Color',c,'LineWidth',l);
+                end
+            end
+        end
     end
     
     methods (Access = protected)

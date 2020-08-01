@@ -20,6 +20,19 @@ for i = 1:M
 end
 %}
 
+%{
+fileName = 'gen_pre_';
+for i = M+1:M+MG
+    csvwrite( strcat(fileName,'p_',int2str(i),'.csv'),toPandaCarte(Data_pre_w(i).expData_p));
+    csvwrite( strcat(fileName,'q_',int2str(i),'.csv'),toPandaCarte(Data_pre_q(i).expData_realq));
+    csvwrite( strcat(fileName,'pPlus_',int2str(i),'.csv'),toPandaCarte(Data_pre_w(i).expData_pPlus));
+    csvwrite( strcat(fileName,'qPlus_',int2str(i),'.csv'),toPandaCarte(Data_pre_q(i).expData_realqPlus));
+    tmpSO3 = quat2rotm(Data_pre_q(i).expData_realqPlus');
+    tmpSE3 = SO3P2SE3(tmpSO3, Data_pre_w(i).expData_pPlus);
+    csvwrite( strcat(fileName,'se3_',int2str(i),'.csv'),flattenSE3(tmpSE3));
+end
+%}
+
 % % Comparison
 %{
 figure;
@@ -63,4 +76,19 @@ for i = 1:4
 end
 %}
 
-%% Policy Pre Retrieve P,Q
+%% Policy Cis Retrieve P,Q,W
+
+% load('Data/lead0724')
+
+% Generate origin exp data
+%{
+fileName = 'ret_cis_';
+for i = 1:M+1
+    csvwrite( strcat(fileName,'p_',int2str(i),'.csv'),toPandaCarte(Data_cis(i).expData_p/1000)); % Never forget the unit issue
+    csvwrite( strcat(fileName,'q_',int2str(i),'.csv'),toPandaCarte(Data_cis(i).expData_realq));
+    csvwrite( strcat(fileName,'w_',int2str(i),'.csv'),toPandaCarte(Data_cis(i).expData_w));
+    tmpSO3 = quat2rotm(Data_cis(i).expData_realq');
+    tmpSE3 = SO3P2SE3(tmpSO3, Data_cis(i).expData_p/1000);
+    csvwrite( strcat(fileName,'se3_',int2str(i),'.csv'),flattenSE3(tmpSE3));
+end
+%}

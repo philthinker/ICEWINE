@@ -144,7 +144,8 @@ for i = 1:M
     [Data_pre_w(i).expData_p,Data_pre_w(i).expSigma_p,Data_pre_w(i).alpha] =...
         policy_pre_posi_w.GMR(Data_pre_w(i).query_p,Data_pre_w(i).query_frame);
 end
-
+%}
+%{
 figure;
 for i = 1:M
     X = Demos_pre(i).data(2,:);
@@ -156,16 +157,22 @@ for i = 1:M
     Y = Data_pre_w(i).expData_p(2,:);
     Z = Data_pre_w(i).expData_p(3,:);
     plot3(X,Y,Z,'b');
+    legend({'Demonstrated trajectories','Retrieved trajectories'});
 end
 grid on; axis equal;
+xlabel('x/m');
+ylabel('y/m');
+zlabel('z/m');
+view(128,20);
+
 figure;
 for i = 1:1
-    t = (1:size(Data_pre_w(i).alpha,2))*dt-dt;
+    t = (1:size(Data_pre_w(i).alpha,2))*0.001 - 0.001;
     for j = 1:2
         plot(t,Data_pre_w(i).alpha(j,:));
         hold on;
     end
-    grid on; legend('alpha 1','alpha 2');
+    grid on; legend('\alpha^{(1)}','\alpha^{(2)}');
 end
 %}
 
@@ -194,7 +201,9 @@ for i = 1:M
         repmat(Data_pre_q(i).qa,[1,N]),...
         Data_pre_q(i).expData_q) );
 end
+%}
 
+%{
 % figure;
 % for i = 1:M
 %     X = Data_pre(i).expData_eta(1,:);
@@ -229,29 +238,45 @@ end
 %     grid on;
 % end
 
-figure;
-for i = 1:4
-    subplot(4,1,i);
-    for j = 1:M
-        t = linspace(0,1,N);
-        plot(t,Data_pre_q(i).expData_q(i,:),'Color',[0.0,0.0,0.9]); hold on;
-        t = linspace(0,1,size(Demos_pre(j).q,2));
-        tmpDemo_q = quatRegulate( Demos_pre(j).q );
-        plot(t,tmpDemo_q(i,:),'Color',[0.6,0.6,0.6]);
-    end
-    grid on;
-end
+% figure;
+% for i = 1:4
+%     subplot(4,1,i);
+%     for j = 1:M
+%         t = linspace(0,1,N);
+%         plot(t,Data_pre_q(i).expData_q(i,:),'Color',[0.0,0.0,0.9]); hold on;
+%         t = linspace(0,1,size(Demos_pre(j).q,2));
+%         tmpDemo_q = quatRegulate( Demos_pre(j).q );
+%         plot(t,tmpDemo_q(i,:),'Color',[0.6,0.6,0.6]);
+%     end
+%     grid on;
+% end
+
+% figure;
+% dt = 0.1;
+% for i = 1:4
+%     subplot(4,1,i);
+%     for j = 1:1
+%         t = (1:size(Data_pre_q(j).expData_realq,2))*dt-dt;
+%         plot(t,Data_pre_q(j).expData_realq(i,:)); hold on;
+%     end
+%     grid on;
+% end
 
 figure;
-dt = 0.1;
-for i = 1:4
-    subplot(4,1,i);
-    for j = 1:1
-        t = (1:size(Data_pre_q(j).expData_realq,2))*dt-dt;
-        plot(t,Data_pre_q(j).expData_realq(i,:)); hold on;
-    end
-    grid on;
+[X,Y,Z] = sphere(20);
+mesh(X,Y,Z,'EdgeColor',[0.6,0.6,0.6]);
+% axis([-1.5,1.5,-1.5,1.5,-1.5,1.5]);
+hold on;
+for i = 1:M
+    policy_pre_quat.plotSphere(Demos_pre(i).q,[0.4,0.4,0.4],1.2);
+    hold on;
+    policy_pre_quat.plotSphere(Data_pre_q(i).expData_q,[0.0,0.635,0.908],2.0);
 end
+axis equal;
+grid on;
+xlabel('x'); ylabel('y'); zlabel('z');
+axis([-1,1,-1,1,0,1]);
+view(25,35);
 %}
 
 % % Add the terminal state
@@ -321,26 +346,32 @@ end
 %     [Data_pre_w(i).expData_p, Data_pre_w(i).expSigma_p,Data_pre_w(i).alpha] =...
 %         policy_pre_posi_w.GMR(Data_pre_w(i).query_p,Data_pre_w(i).query_frame);
 % end
+%}
 
 figure;
 for i = 1:M
     X = Demos_pre(i).data(2,:);
     Y = Demos_pre(i).data(3,:);
     Z = Demos_pre(i).data(4,:);
-    plot3(X,Y,Z,'Color',[0.6,0.6,0.6]);
+    plot3(X,Y,Z,'Color',[0.6,0.6,0.6],'LineWidth',1.2);
     hold on;
-    X = Data_pre_w(i).expData_p(1,:);
-    Y = Data_pre_w(i).expData_p(2,:);
-    Z = Data_pre_w(i).expData_p(3,:);
-    plot3(X,Y,Z,'b');
+%     X = Data_pre_w(i).expData_p(1,:);
+%     Y = Data_pre_w(i).expData_p(2,:);
+%     Z = Data_pre_w(i).expData_p(3,:);
+%     plot3(X,Y,Z,'b');
 end
 for i = M+1:M+MG
     X = Data_pre_w(i).expData_p(1,:);
     Y = Data_pre_w(i).expData_p(2,:);
     Z = Data_pre_w(i).expData_p(3,:);
-    plot3(X,Y,Z,'r');
+    plot3(X,Y,Z,'r','LineWidth',1.8);
 end
 grid on; axis equal;
+xlabel('x/m');
+ylabel('y/m');
+zlabel('z/m');
+view(128,20);
+
 figure;
 for i = 1:M+MG
     t = (1:size(Data_pre_w(i).alpha,2))*dt-dt;
