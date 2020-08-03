@@ -1,6 +1,7 @@
 %tii202006_PolicyCis
 
-% policy_cis_posi = TPGMMOne(6,4,2);
+% policy_cis_posi = TPGMMOne(4,4,2);
+% % policy_cis_posi = TPGMMOne(6,4,2);
 % policy_cis_quat = QGMMZero(6,5,[1;0;0;0]);
 % policy_cis_wren = GMMOne(6,7);
 
@@ -109,7 +110,7 @@ Data_cis= repmat(Data_cis,[1,M+MG]);
 %{
 for i = 1:M
     % Query
-    Data_cis(i).query_p = linspace(0,1,5000);
+    Data_cis(i).query_p = linspace(0,1,1000);
     Data_cis(i).query_frame(1).A = Demos_cis(i).A(:,:,1);
     Data_cis(i).query_frame(1).b = Demos_cis(i).b(:,1);
     Data_cis(i).query_frame(2).A = Demos_cis(i).A(:,:,2);
@@ -124,13 +125,13 @@ for i = 1:M
     X = Demos_cis(i).data(2,:);
     Y = Demos_cis(i).data(3,:);
     Z = Demos_cis(i).data(4,:);
-    plot3(X,Y,Z,'Color',[0.6,0.6,0.6]);
+    plot3(X,Y,Z,'Color',[0.6,0.6,0.6],'LineWidth',1.2);
     hold on;
     X = Data_cis(i).expData_p(1,:);
     Y = Data_cis(i).expData_p(2,:);
     Z = Data_cis(i).expData_p(3,:);
-    plot3(X,Y,Z,'Color',[0,0,0.6]);
-    legend({'Demonstrated trajectories','Retrieved trajectories'});
+    plot3(X,Y,Z,'b','LineWidth',1.8);
+%     legend({'Demonstrated trajectories','Retrieved trajectories'});
 end
 grid on; axis equal;
 xlabel('x/mm');
@@ -213,15 +214,28 @@ end
 
 % % Query p
 %{
-Data_cis(M+1).query_p = linspace(0,1,5000);
-Data_cis(M+1).pre_frame = fold2SE3(ret01dummy);
-Data_cis(M+1).cis_frame = fold2SE3(ret01final);
-Data_cis(M+1).query_frame(1).A = eye(4); Data_cis(M+1).query_frame(1).A(2:4,2:4) = Data_cis(M+1).pre_frame(1:3,1:3);
-Data_cis(M+1).query_frame(2).A = eye(4); Data_cis(M+1).query_frame(2).A(2:4,2:4) = Data_cis(M+1).cis_frame(1:3,1:3);
-% Never forget the unit problem
-Data_cis(M+1).query_frame(1).b = zeros(4,1); Data_cis(M+1).query_frame(1).b(2:4,1) = Data_cis(M+1).pre_frame(1:3,4) * 1000;
-Data_cis(M+1).query_frame(2).b = zeros(4,1); Data_cis(M+1).query_frame(2).b(2:4,1) = Data_cis(M+1).cis_frame(1:3,4) * 1000;
-[Data_cis(M+1).expData_p, Data_cis(M+1).expSigma_p] = policy_cis_posi.GMR(Data_cis(M+1).query_p, Data_cis(M+1).query_frame);
+for i = M+1:M+MG
+    Data_cis(i).query_p = linspace(0,1,1000);
+    Data_cis(i).pre_frame = pq2SE3(Data_pre_w(i).expData_p(:,end)-[0.0;0.0;0.003], Data_pre_q(i).expData_realq(:,end));
+    Data_cis(i).cis_frame = fold2SE3(ret01final);
+    Data_cis(i).query_frame(1).A = eye(4); Data_cis(i).query_frame(1).A(2:4,2:4) = Data_cis(i).pre_frame(1:3,1:3);
+    Data_cis(i).query_frame(2).A = eye(4); Data_cis(i).query_frame(2).A(2:4,2:4) = Data_cis(i).cis_frame(1:3,1:3);
+    % Never forget the unit problem
+    Data_cis(i).query_frame(1).b = zeros(4,1); Data_cis(i).query_frame(1).b(2:4,1) = Data_cis(i).pre_frame(1:3,4) * 1000;
+    Data_cis(i).query_frame(2).b = zeros(4,1); Data_cis(i).query_frame(2).b(2:4,1) = Data_cis(i).cis_frame(1:3,4) * 1000;
+    [Data_cis(i).expData_p, Data_cis(i).expSigma_p] = policy_cis_posi.GMR(Data_cis(i).query_p, Data_cis(i).query_frame);
+end
+
+
+% Data_cis(M+1).query_p = linspace(0,1,1000);
+% Data_cis(M+1).pre_frame = fold2SE3(ret01dummy);
+% Data_cis(M+1).cis_frame = fold2SE3(ret01final);
+% Data_cis(M+1).query_frame(1).A = eye(4); Data_cis(M+1).query_frame(1).A(2:4,2:4) = Data_cis(M+1).pre_frame(1:3,1:3);
+% Data_cis(M+1).query_frame(2).A = eye(4); Data_cis(M+1).query_frame(2).A(2:4,2:4) = Data_cis(M+1).cis_frame(1:3,1:3);
+% % Never forget the unit problem
+% Data_cis(M+1).query_frame(1).b = zeros(4,1); Data_cis(M+1).query_frame(1).b(2:4,1) = Data_cis(M+1).pre_frame(1:3,4) * 1000;
+% Data_cis(M+1).query_frame(2).b = zeros(4,1); Data_cis(M+1).query_frame(2).b(2:4,1) = Data_cis(M+1).cis_frame(1:3,4) * 1000;
+% [Data_cis(M+1).expData_p, Data_cis(M+1).expSigma_p] = policy_cis_posi.GMR(Data_cis(M+1).query_p, Data_cis(M+1).query_frame);
 %}
 %{
 figure;
@@ -229,14 +243,20 @@ for i = 1:M
     X = Demos_cis(i).data(2,:);
     Y = Demos_cis(i).data(3,:);
     Z = Demos_cis(i).data(4,:);
-    plot3(X,Y,Z,'Color',[0.6,0.6,0.6]);
+    plot3(X,Y,Z,'Color',[0.6,0.6,0.6],'LineWidth',1.2);
     hold on;
 end
+for i = M+1 : M+MG
+    X = Data_cis(M+1).expData_p(1,:);
+    Y = Data_cis(M+1).expData_p(2,:);
+    Z = Data_cis(M+1).expData_p(3,:);
+    plot3(X,Y,Z,'r','LineWidth',1.8);
+end
 grid on; axis equal;
-X = Data_cis(M+1).expData_p(1,:);
-Y = Data_cis(M+1).expData_p(2,:);
-Z = Data_cis(M+1).expData_p(3,:);
-plot3(X,Y,Z,'r');
+xlabel('x/mm');
+ylabel('y/mm');
+zlabel('z/mm');
+view(128,20);
 %}
 
 % % Query q
