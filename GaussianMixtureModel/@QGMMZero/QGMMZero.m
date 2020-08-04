@@ -159,7 +159,7 @@ classdef QGMMZero < GMMOne
             else
                 % plot3
                 if c == 0
-                    plot3(p(1,:),p(2,:),p(3,:),'Color',c,'LineWidth',l);
+                    plot3(p(1,:),p(2,:),p(3,:),'LineWidth',l);
                 else
                     plot3(p(1,:),p(2,:),p(3,:),'Color',c,'LineWidth',l);
                 end

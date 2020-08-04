@@ -145,7 +145,7 @@ for i = 1:M
         policy_pre_posi_w.GMR(Data_pre_w(i).query_p,Data_pre_w(i).query_frame);
 end
 %}
-
+%{
 figure;
 for i = 1:M
     X = Demos_pre(i).data(2,:);
