@@ -48,6 +48,20 @@
 
 % % ¡®lead0722¡¯
 
+% % Load joint position
+%{
+for i = 1:M
+    Demo(i).pre.JP = readmatrix(strcat('DECANTER\FleshWaxberry\Data\08-06\demo\waxberry_',...
+        'pre0', int2str(i), '_JP.csv'));
+    Demo(i).pre.JP = Demo(i).pre.JP(:,1:end-1);
+    Demo(i).cis.JP = readmatrix(strcat('DECANTER\FleshWaxberry\Data\08-06\demo\waxberry_',...
+        'cis0', int2str(i), '_JP.csv'));
+    Demo(i).cis.JP = Demo(i).cis.JP(:,1:end-1);
+end
+%}
+
+% % 'lead0806_test'
+
 %% Plot raw data
 
 %{
