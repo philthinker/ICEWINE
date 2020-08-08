@@ -130,9 +130,10 @@ classdef QGMMZero < GMMOne
             %   points: 3 x N, [x;y;z] in unit sphere
             N = size(q,2);
             points = zeros(3,N);
+            tmpQ = zeros(4,N);
             for i = 1:N
-                tmpQ = quatProduct( quatProduct(q(:,i),[0,0,0,1]'), quatConjugate(q(:,i)) );
-                points(:,i) = tmpQ(2:4,1);
+                tmpQ(:,i) = quatProduct( quatProduct(q(:,i),[0.0, 0.0, 0.0, 1.0]'), quatConjugate(q(:,i)) );
+                points(:,i) = tmpQ(2:4,i);
             end
         end
         function [] = plotSphere(obj,q,c,l,mod)

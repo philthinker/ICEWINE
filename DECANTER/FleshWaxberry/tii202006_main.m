@@ -42,8 +42,23 @@ for i = 1:M
     writematrix([Demo(i).pre.JP(1,:);Demo(i).pre.JP(end,:)],strcat('DECANTER\FleshWaxberry\Data\08-06\ret\pre\dataprej',int2str(i),'.csv'));
 end
 %}
+%{
+% The real q data
+for i = 1:M
+    tmp_log =...
+        readmatrix(strcat('DECANTER\FleshWaxberry\Data\08-06\ret\pre\logpreq',int2str(i),'.csv'));
+    % Get rid of the trivial data
+    tmp_log_SE3 = fold2SE3(tmp_log(:,1:16));
+    Data_pre_q(i).exeData_realq = tform2quat(tmp_log_SE3)';
+    tmp_log_SO3 = tmp_log_SE3(1:3,1:3,:);
+    for j = 1:size(tmp_log_SO3,3)
+        tmp_log_SO3(:,:,j) = (Demos_pre(i).R(:,:,2))' * tmp_log_SE3(1:3,1:3,j);
+    end
+    Data_pre_q(i).exeData_q = rotm2quat(tmp_log_SO3)';
+end
+%}
 % % Generate K
-
+%{
 N = size(Data_pre_w(1).expData_pPlus,2);
 K = repmat(linspace(300,400,N)',[1,6]);
 writematrix(K,'DECANTER\FleshWaxberry\Data\08-06\ret\pre\dataprek.csv');

@@ -15,7 +15,6 @@ if size(qa,2) < N
 end
 bar_qa = quatConjugate(qa);
 dq = quatProduct(q,bar_qa);
-disp(dq);
 
 w = acos(dq(1,:));
 for i =1:N

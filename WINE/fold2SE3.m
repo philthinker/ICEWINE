@@ -1,6 +1,6 @@
 function [SE3Out] = fold2SE3(DataIn,mode)
 %fold2SE3 Flod the N x 16 data into SE(3) form
-%   DataIn: N x 16 or N x 12, pose data
+%   DataIn: N x 16, pose data
 %   mode: integer, 0 for column-major and 1 for row-major data (default: 0,
 %   column-major)
 %   SE3Out: 4 x 4 x N, SE3 data

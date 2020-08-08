@@ -6,6 +6,7 @@
 addpath('GaussianMixtureModel');
 % addpath('MovementPrimitive');
 % addpath('RiemannianGMM');
+addpath('DECANTER\FleshWaxberry\FUNCTIONS');
 
 %% Executables
 
