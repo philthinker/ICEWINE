@@ -20,7 +20,7 @@ view(128,20);
 %}
 
 %% Test ret pre ori
-
+%{
 figure;
 [X,Y,Z] = sphere(20);
 mesh(X,Y,Z,'EdgeColor',[0.6,0.6,0.6]);
@@ -50,3 +50,43 @@ for i = 1:4
     grid on;
 end
 %}
+
+%% Test ret pre pos-ori
+
+% figure;
+% for m = 1:M
+%     tmpx = Data_pre_w(m).expData_simp(1,:);
+%     tmpy = Data_pre_w(m).expData_simp(2,:);
+%     tmpz = Data_pre_w(m).expData_simp(3,:);
+%     plot3(tmpx,tmpy,tmpz,'Color',[0.6,0.6,0.0]);
+%     hold on;
+% end
+% grid on; axis equal;
+% view(3);
+
+% figure;
+% t = (1:N)*controller_pre.dt - controller_pre.dt;
+% for m = 1:M
+%     plot(t,Data_pre_w(m).expData_simp(3,:));
+%     hold on;
+% end
+
+figure;
+ylabels = {'qw','qx','qy','qz'};
+t = (1:N)*controller_pre.dt - controller_pre.dt;
+for j = 1:4
+    subplot(5,1,j);
+    for m = 1:1
+        plot(t,Data_pre_q(m).expData_simq(j,:),'r');
+        hold on;
+        plot(t,Data_pre_q(m).expData_hat_q_c(j,:),'b');
+    end
+    ylabel(ylabels{j});
+end
+subplot(5,1,5);
+for m = 1:1
+    plot(t,Data_pre_w(m).expData_simp(3,:),'r');
+    hold on;
+    plot(t,Data_pre_w(m).expData_hatp_c(3,:),'b');
+end
+ylabel('z');

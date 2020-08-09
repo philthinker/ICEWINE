@@ -69,14 +69,18 @@ for i = 1:4
         % Retrieve
         [tmp_z,tmp_i] = zRegulate(Data_pre_q(j).query_q);
         tmp_q = quatRegulate(Data_pre_q(j).expData_q);
-        plot(tmp_z,tmp_q(i,tmp_i),'Color',[0.0,0.635,0.908],'LineWidth',1.2);
-%         % Execution
-%         [tmp_z,tmp_i] = zRegulate(Data_pre_q(j).query_q);
-%         tmp_q = quatRegulate(Data_pre_q(j).exeData_q);
-%         plot(tmp_z,tmp_q(i,tmp_i),'Color',[0.85,0.325,0.098],'LineWidth',1.2);
+        plot(tmp_z,tmp_q(i,tmp_i),'Color',[0.0,0.635,0.908],'LineWidth',1.6);
+        % Execution
+        [tmp_z,tmp_i] = zRegulate(Data_pre_w(j).expData_simp(3,:));
+        tmp_q = quatRegulate(Data_pre_q(j).expData_simq);
+        plot(tmp_z,tmp_q(i,tmp_i),'Color',[0.85,0.325,0.098],'LineWidth',1.5);
     end
     grid on;
     ylabel(ylabels{i});
+    axis([-0.8,0.0,-Inf,Inf]);
+    if i ==4
+        xlabel('z(m)');
+    end
 end
 %}
 % scatter with z input
@@ -95,5 +99,37 @@ for i = 1:4
 %         plot(quatRegulate(Data_pre_q(j).exeData_q(i,:)),'Color',[0.85,0.325,0.098],'LineWidth',1.2);
     end
     grid on;
+end
+%}
+
+%% Generate pre q
+
+% plot with z input
+%{
+figure;
+ylabels = {'qw','qx','qy','qz'};
+for i = 1:4
+    subplot(4,1,i);
+    for j = 1:M
+        % Demo
+        [tmp_z,tmp_i] = zRegulate(Demos_pre(j).posi(3,:));
+        tmp_q = quatRegulate(Demos_pre(j).q);
+        plot(tmp_z, tmp_q(i,tmp_i),'Color',[0.4,0.4,0.4],'LineWidth',0.8);
+        hold on;
+        % Retrieve
+        [tmp_z,tmp_i] = zRegulate(Data_pre_q(j).query_q);
+        tmp_q = quatRegulate(Data_pre_q(j).expData_q);
+        plot(tmp_z,tmp_q(i,tmp_i),'Color',[0.0,0.635,0.908],'LineWidth',1.6);
+        % Execution
+        [tmp_z,tmp_i] = zRegulate(Data_pre_w(j).expData_simp(3,:));
+        tmp_q = quatRegulate(Data_pre_q(j).expData_simq);
+        plot(tmp_z,tmp_q(i,tmp_i),'Color',[0.85,0.325,0.098],'LineWidth',1.5);
+    end
+    grid on;
+    ylabel(ylabels{i});
+    axis([-0.8,0.0,-Inf,Inf]);
+    if i ==4
+        xlabel('z(m)');
+    end
 end
 %}

@@ -342,10 +342,10 @@ end
 
 % % Generalize p
 %{
-% for i = M+1 : M+ MG
-%     [Data_pre_w(i).expData_p, Data_pre_w(i).expSigma_p,Data_pre_w(i).alpha] =...
-%         policy_pre_posi_w.GMR(Data_pre_w(i).query_p,Data_pre_w(i).query_frame);
-% end
+for i = M+1 : M+ MG
+    [Data_pre_w(i).expData_p, Data_pre_w(i).expSigma_p,Data_pre_w(i).alpha] =...
+        policy_pre_posi_w.GMR(Data_pre_w(i).query_p,Data_pre_w(i).query_frame);
+end
 %}
 %{
 figure;
@@ -355,10 +355,6 @@ for i = 1:M
     Z = Demos_pre(i).data(4,:);
     plot3(X,Y,Z,'Color',[0.6,0.6,0.6],'LineWidth',1.2);
     hold on;
-%     X = Data_pre_w(i).expData_p(1,:);
-%     Y = Data_pre_w(i).expData_p(2,:);
-%     Z = Data_pre_w(i).expData_p(3,:);
-%     plot3(X,Y,Z,'b');
 end
 for i = M+1:M+MG
     X = Data_pre_w(i).expData_p(1,:);
