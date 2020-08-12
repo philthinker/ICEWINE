@@ -52,24 +52,24 @@ end
 %}
 
 %% Test ret pre pos-ori
+%{
+figure;
+for m = 1:M
+    tmpx = Data_pre_w(m).expData_simp(1,:);
+    tmpy = Data_pre_w(m).expData_simp(2,:);
+    tmpz = Data_pre_w(m).expData_simp(3,:);
+    plot3(tmpx,tmpy,tmpz,'Color',[0.6,0.6,0.0]);
+    hold on;
+end
+grid on; axis equal;
+view(3);
 
-% figure;
-% for m = 1:M
-%     tmpx = Data_pre_w(m).expData_simp(1,:);
-%     tmpy = Data_pre_w(m).expData_simp(2,:);
-%     tmpz = Data_pre_w(m).expData_simp(3,:);
-%     plot3(tmpx,tmpy,tmpz,'Color',[0.6,0.6,0.0]);
-%     hold on;
-% end
-% grid on; axis equal;
-% view(3);
-
-% figure;
-% t = (1:N)*controller_pre.dt - controller_pre.dt;
-% for m = 1:M
-%     plot(t,Data_pre_w(m).expData_simp(3,:));
-%     hold on;
-% end
+figure;
+t = (1:N)*controller_pre.dt - controller_pre.dt;
+for m = 1:M
+    plot(t,Data_pre_w(m).expData_simp(3,:));
+    hold on;
+end
 
 figure;
 ylabels = {'qw','qx','qy','qz'};
@@ -90,3 +90,27 @@ for m = 1:1
     plot(t,Data_pre_w(m).expData_hatp_c(3,:),'b');
 end
 ylabel('z');
+%}
+
+%% Test gen pre pos
+
+figure;
+N = 100000;
+dt = 0.001;
+t = (1:N)*dt - dt;
+for i = 1:3
+    subplot(3,1,i);
+    for j = M+1:M+MG
+        plot(t, Data_pre_w(j).expData_simp(i,:));
+        hold on;
+    end
+end
+
+figure;
+for i = 1:4
+    subplot(4,1,i);
+    for j = M+1:M+MG
+        plot(t, Data_pre_q(j).expData_simq(i,:));
+        hold on;
+    end
+end

@@ -391,11 +391,10 @@ end
 % % Generalize q
 %{
 for i = M+1 : M+MG
-    [Data_pre_q(i).expData_eta, Data_pre_q(i).expSigma_eta] = policy_pre_quat.GMR(Data_pre_q(i).query_q);
-    Data_pre_q(i).expData_q = quatRegulate(policy_pre_quat.expmap(Data_pre_q(i).expData_eta));
+%     [Data_pre_q(i).expData_eta, Data_pre_q(i).expSigma_eta] = policy_pre_quat.GMR(Data_pre_q(i).query_q);
+    Data_pre_q(i).expData_q = quatNormalize( quatRegulate(policy_pre_quat.expmap(Data_pre_q(i).expData_eta)) );
     Data_pre_q(i).expData_realq = quatRegulate( quatProduct(...
-        repmat(Data_pre_q(i).qa,[1,N]),...
-        Data_pre_q(i).expData_q) );
+        Data_pre_q(i).expData_q, repmat(Data_pre_q(i).qa,[1,N])) );
 end
 %}
 

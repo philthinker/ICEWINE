@@ -110,26 +110,46 @@ figure;
 ylabels = {'qw','qx','qy','qz'};
 for i = 1:4
     subplot(4,1,i);
-    for j = 1:M
-        % Demo
-        [tmp_z,tmp_i] = zRegulate(Demos_pre(j).posi(3,:));
-        tmp_q = quatRegulate(Demos_pre(j).q);
-        plot(tmp_z, tmp_q(i,tmp_i),'Color',[0.4,0.4,0.4],'LineWidth',0.8);
-        hold on;
+    for j = M+1:M+MG
         % Retrieve
         [tmp_z,tmp_i] = zRegulate(Data_pre_q(j).query_q);
         tmp_q = quatRegulate(Data_pre_q(j).expData_q);
         plot(tmp_z,tmp_q(i,tmp_i),'Color',[0.0,0.635,0.908],'LineWidth',1.6);
+        hold on;
         % Execution
-        [tmp_z,tmp_i] = zRegulate(Data_pre_w(j).expData_simp(3,:));
-        tmp_q = quatRegulate(Data_pre_q(j).expData_simq);
+%         [tmp_z,tmp_i] = zRegulate(Data_pre_w(j).expData_simp(3,:));
+%         tmp_q = quatRegulate(Data_pre_q(j).expData_simq);
+        tmp_z = Data_pre_w(j).expData_simp(3,:);
+        tmp_i = (1:N);
+        tmp_q = Data_pre_q(j).expData_simq;
         plot(tmp_z,tmp_q(i,tmp_i),'Color',[0.85,0.325,0.098],'LineWidth',1.5);
     end
     grid on;
     ylabel(ylabels{i});
-    axis([-0.8,0.0,-Inf,Inf]);
+%      axis([-Inf,Inf,-Inf,Inf]);
     if i ==4
         xlabel('z(m)');
     end
 end
 %}
+
+% plot with time input
+figure;
+t = (1:N)*dt - dt;
+ylabels = {'qw','qx','qy','qz'};
+for i = 1:4
+    subplot(4,1,i);
+    for j = M+1:M+MG
+        % plot the reference
+        plot(t,Data_pre_q(j).expData_hat_q_c(i,:),'Color',[0.0,0.635,0.908],'LineWidth',0.8);
+        hold on;
+        % plot the simq
+        plot(t,Data_pre_q(j).expData_simq(i,:),'Color',[0.85,0.325,0.098],'LineWidth',1.2);
+    end
+    grid on;
+    ylabel(ylabels{i});
+    if i == 4
+        xlabel('t(s)');
+    end
+    axis([0.0, 50, -Inf, Inf]);
+end
