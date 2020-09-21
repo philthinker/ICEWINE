@@ -93,7 +93,7 @@ ylabel('z');
 %}
 
 %% Test gen pre pos
-
+%{
 figure;
 N = 100000;
 dt = 0.001;
@@ -113,4 +113,49 @@ for i = 1:4
         plot(t, Data_pre_q(j).expData_simq(i,:));
         hold on;
     end
+end
+%}
+
+%% FW2 test 
+
+policy_pre_p_test = FWTPGMM2(8,4,2);
+policy_pre_p_test = policy_pre_p_test.initGMMTimeBased(Demos_pre);
+policy_pre_p_test = policy_pre_p_test.learnGMM(Demos_pre);
+N = 1000;
+for i = 1:M
+    data_pre_p_test(i).query_p = linspace(0,1,N);
+    data_pre_p_test(i).query_frame(1).A = Demos_pre(i).A(:,:,1);
+    data_pre_p_test(i).query_frame(1).b = Demos_pre(i).b(:,1);
+    data_pre_p_test(i).query_frame(2).A = Demos_pre(i).A(:,:,2);
+    data_pre_p_test(i).query_frame(2).b = Demos_pre(i).b(:,2);
+    [data_pre_p_test(i).expData_p,data_pre_p_test(i).expSigma_p,data_pre_p_test(i).alpha] =...
+        policy_pre_p_test.GMR(data_pre_p_test(i).query_p,data_pre_p_test(i).query_frame);
+end
+figure;
+for i = 1:M
+    X = Demos_pre(i).data(2,:);
+    Y = Demos_pre(i).data(3,:);
+    Z = Demos_pre(i).data(4,:);
+    plot3(X,Y,Z,'Color',[0.6,0.6,0.6],'LineWidth',1.2);
+    hold on;
+    X = data_pre_p_test(i).expData_p(1,:);
+    Y = data_pre_p_test(i).expData_p(2,:);
+    Z = data_pre_p_test(i).expData_p(3,:);
+    plot3(X,Y,Z,'b','LineWidth',1.8);
+%     legend({'Demonstrated trajectories','Retrieved trajectories'});
+end
+grid on; axis equal;
+xlabel('x/m');
+ylabel('y/m');
+zlabel('z/m');
+view(128,20);
+
+figure;
+for i = 1:1
+    t = (1:size(data_pre_p_test(i).alpha,2))*0.001 - 0.001;
+    for j = 1:2
+        plot(t,data_pre_p_test(i).alpha(j,:));
+        hold on;
+    end
+    grid on; legend('\alpha^{(1)}','\alpha^{(2)}');
 end

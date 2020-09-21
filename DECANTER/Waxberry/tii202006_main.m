@@ -12,7 +12,7 @@
 
 %% For demo-retrieve pre
 % What we want are
-%   the initial joint position,
+%   the initial and final joint position,
 %   the position and quat trajectory in pre phase and cis phase
 %   the K trajectory in pre phase and cis phase
 %   the dummy poses for compensation
@@ -67,5 +67,39 @@ writematrix(K,'DECANTER\FleshWaxberry\Data\08-06\ret\pre\dataprek.csv');
 %% For gen pre
 
 %% For demo-retrieve cis
+% What we want are
+%   the initial and final joint position,
+%   the position and quat trajectory in cis phase
+%   the K trajectory in cis phase
+% What we figure are
+%   the quat trajectory
+%   the wrench trajectory
+
+% Generate K
+%{
+stiffness = 30;
+N = 500;
+K = 30 * ones(N,6);
+K(:,4:6) = sqrt(K(:,4:6));
+%}
+% File out
+%{
+tmp_file = 'DECANTER\FleshWaxberry\Data\08-06\ret\cis\datacis';
+for i = 1:M
+    % Write the init. and final joint position for compensation
+    writematrix([Demo(i).cis.JP(1,:); Demo(i).cis.JP(end,:)],...
+        strcat(tmp_file, 'j', int2str(i), '.csv'));
+    % Write position data
+    writematrix(Data_cis(i).expData_p'/1000,...
+        strcat(tmp_file, 'p', int2str(i), '.csv'));
+    % Write quaternion data
+    writematrix(Data_cis(i).expData_realq',...
+        strcat(tmp_file, 'q', int2str(i), '.csv'));
+    % Write wrench data
+    writematrix(Data_cis(i).expData_w',...
+        strcat(tmp_file,'w',int2str(i), '.csv'));
+    % Write K
+    writematrix(K, strcat(tmp_file,'k','.csv'));end
+%}
 
 %% For gen cis

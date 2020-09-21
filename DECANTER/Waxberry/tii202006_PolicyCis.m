@@ -110,7 +110,7 @@ Data_cis= repmat(Data_cis,[1,M+MG]);
 %{
 for i = 1:M
     % Query
-    Data_cis(i).query_p = linspace(0,1,1000);
+    Data_cis(i).query_p = linspace(0,1,500);
     Data_cis(i).query_frame(1).A = Demos_cis(i).A(:,:,1);
     Data_cis(i).query_frame(1).b = Demos_cis(i).b(:,1);
     Data_cis(i).query_frame(2).A = Demos_cis(i).A(:,:,2);
@@ -148,7 +148,7 @@ for i = 1:M
     Data_cis(i).qa = Demos_cis(i).qa;
     [Data_cis(i).expData_eta, Data_cis(i).expSigma_eta] = policy_cis_quat.GMR(Data_cis(i).query_q);
     Data_cis(i).expData_q = quatRegulate( policy_cis_quat.expmap(Data_cis(i).expData_eta) );
-    Data_cis(i).expData_realq = quatRegulate( quatProduct(repmat(Data_cis(i).qa,[1,size(Data_cis(i).expData_q,2)]), Data_cis(i).expData_q) );
+    Data_cis(i).expData_realq = quatNormalize( quatRegulate( quatProduct( Data_cis(i).expData_q, repmat(Data_cis(i).qa,[1,size(Data_cis(i).expData_q,2)]) ) ) );
 end
 %}
 %{
@@ -186,8 +186,8 @@ end
 for i = 1:M
     Data_cis(i).query_w = Data_cis(i).query_q;
     [Data_cis(i).expData_w, Data_cis(i).expSigma_w] = policy_cis_wren.GMR(Data_cis(i).query_w);
-    Data_cis(i).pre_frame = fold2SE3(ret01dummy);
-    Data_cis(i).cis_frame = fold2SE3(ret01final);
+%     Data_cis(i).pre_frame = fold2SE3(ret01dummy);
+%     Data_cis(i).cis_frame = fold2SE3(ret01final);
 end
 %}
 %{
