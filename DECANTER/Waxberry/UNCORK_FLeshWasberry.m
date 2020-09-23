@@ -2,11 +2,9 @@
 
 %% Packages
 
-% addpath('DynamicSystems');
 addpath('GaussianMixtureModel');
 % addpath('MovementPrimitive');
-% addpath('RiemannianGMM');
-addpath('DECANTER\FleshWaxberry\FUNCTIONS');
+addpath('DynamicSystems');
 
 %% Executables
 
