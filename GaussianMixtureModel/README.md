@@ -9,10 +9,11 @@ Haopeng Hu
 - GMMZero: the simple GMM class (**deprecated**)
 - TPGMM < GMMZero: task-parameterized GMM class (**deprecated**)
 - GMMOne: the simple GMM class with vector habit
-- TPGMMOne < TPGMMOne: task-parameterzied GMM with vector habit
-- TrajGMM < GMMOne: trajectory GMM class
-- TrajGMMOne < GMMOne: trajectory GMM with TP feature (**developing**)
+- TPGMMOne < TPGMMOne: Task-parameterzied GMM with vector habit
+- TrajGMM < GMMOne: Trajectory GMM class
+- TrajGMMOne < GMMOne: Trajectory GMM with TP feature (**developing**)
 - QGMMZero < GMMOne: Quaternion GMM with auxiliary unit quaternion
+- FWTPGMMZero < TPGMMOne: Frame-weighted TP-GMM with inverse alpha
 
 ## Demos
 

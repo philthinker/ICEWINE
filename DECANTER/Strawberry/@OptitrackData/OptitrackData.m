@@ -17,9 +17,8 @@ classdef OptitrackData
         Nb;              % integer, num. of rigid bodies
         Nm;             % integer, num. of markers
         time;            % N x 1, time series
-        body;           % Nb x 1 cell, data of rigid bodies
-        marker;        % Nm x 1 cell, data of markers
-        estiBody;      % Nb x 1 cell, estimated rigid bodies
+        body;           % 1 x Nb cell, data of rigid bodies
+        marker;        % 1 x Nm cell, data of markers
     end
     
     methods
@@ -44,7 +43,6 @@ classdef OptitrackData
                     obj.body{i} = Data(:,tmpIndex:tmpIndex+7-1);    % qx qy qz qw x y z
                     tmpIndex = tmpIndex + 7;
                 end
-                obj.estiBody = obj.body;
             end
             % Install raw marker data
             if obj.Nm > 0
@@ -55,10 +53,11 @@ classdef OptitrackData
                 end
             end
         end
-        
         function [Data] = getBodyData(obj,index)
             %getBodyData Get data of some body
             %   index: integer, the body to be retrieved (default: 1)
+            %   -----------------------------------------
+            %   Data: N x 7, the trajectory data
             if nargin < 2
                 index = 1;
             end
@@ -69,10 +68,11 @@ classdef OptitrackData
                 Data = [];
             end
         end
-        
         function [Data] = getMarkerData(obj,index)
             %getMarkerData Get data of some marker
             %   index: integer, the marker to be retrieved (default: 1)
+            %   -----------------------------------------
+            %   Data: N x 3, the trajectory data
             if nargin < 2
                 index = 1;
             end
@@ -81,6 +81,27 @@ classdef OptitrackData
                 Data = obj.marker{index};
             else
                 Data = [];
+            end
+        end
+        function [Data] = getGapFreeBodyData(obj,index,mode)
+            %getGapFreeBodyData Get the body's trajectory without gap
+            %   index: integer, the index of bodies
+            %   mode: integer, 1 for data with time seq. to the left column
+            %   (default: 0)
+            %   -----------------------------------------
+            %   Data: N x 7 or N x 8, body's trajectory
+            if nargin < 3
+                mode = 0;
+            end
+            index = min(round(index(1,1)),obj.Nb);
+            tmpData = obj.body{index};
+            logicalIndices = ~isnan(tmpData(:,1));
+            if mode == 1
+                % Time seq. to the left
+                Data = [obj.time(logicalIndices), tmpData(logicalIndices,:)];
+            else
+                % No time seq. to the left
+                Data = tmpData(logicalIndices,:);
             end
         end
     end
@@ -185,8 +206,9 @@ classdef OptitrackData
             % We take the first column of data as baseline
             xq = obj.time;
             index = ~isnan(DataIn(:,1)); 
-            x = xq(index);
-            y = DataIn(index,:);
+            x = xq(index)';
+            y = DataIn(index,:)';
+            xq = xq';
             if mode == 1
                 % pchip
                 DataOut = pchip(x,y,xq);
@@ -197,6 +219,49 @@ classdef OptitrackData
                 % makima
                 % Note that only row vector is supported
                 DataOut = makima(x,y,xq);
+            end
+            DataOut = DataOut';
+        end
+        % Data pre-process
+        function [obj] = markerReorder(obj,order)
+            %markerReorder Reorder the marker's data with a new order
+            %   order:  1 x Nm integer, new order
+            if size(order,2) == obj.Nm
+                order = round(order(1,:));
+                tmpMarker = obj.marker;
+                for i = 1:obj.Nm
+                    obj.marker{i} = tmpMarker{order(i)};
+                end
+            else
+                error('The column num. of order must equal to Nm');
+            end
+        end
+        function [obj] = bodyReorder(obj,order)
+            %bodyRecorder Reorder the body's data with a new order
+            %   order:  1 x Nb integer, new order
+            if size(order,2) == obj.Nb
+                order = round(order(1,:));
+                tmpBody = obj.body;
+                for i = 1:obj.Nb
+                    obj.body{i} = tmpBody{order(i)};
+                end
+            else
+                error('The column num. of order must equal to Nb');
+            end
+        end
+        function [obj] = quatWXYZ(obj)
+            %quatWXYZ Adjust the optitrack body data 
+            %[qx qy qz qw x y z] to [ qw qx qy qz x y z]
+            if obj.Nb <= 0
+                return;
+            end
+            for i = 1:obj.Nb
+                tmpData = obj.body{i};
+                tmpQuat  = zeros(size(tmpData,1),4);
+                tmpQuat(:,1) = tmpData(:,4);
+                tmpQuat(:,2:4) = tmpData(:,1:3);
+                tmpData(:,1:4) = tmpQuat;
+                obj.body{i} = tmpData;
             end
         end
     end
