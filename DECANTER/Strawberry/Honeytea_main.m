@@ -26,7 +26,7 @@ xlabel('x(m)'); ylabel('y(m)'); zlabel('z(m)');
 view(3);
 %}
 
-%% TP-GMM
+%% TP-Data prepare
 
 % Data prepare
 %{
@@ -83,26 +83,43 @@ for i = 1:M
     Demos(i).b = zeros(4,2);                      % b(:,1) is the init. position, b(:,2) goal position
     Demos(i).A(2:4,2:4,1) = tform2rotm(tmpData(:,:,1)');
     Demos(i).A(2:4,2:4,2) = tform2rotm(tmpData(:,:,end)');
-    Demos(i).b(2:4) = tmpData(1:3,4,1);
-    Demos(i).b(2:4) = tmpData(1:3,4,end);
+    Demos(i).b(2:4,1) = tmpData(1:3,4,1);
+    Demos(i).b(2:4,2) = tmpData(1:3,4,end);
     Demos(i).TPData_init = permute(Demos(i).movingPartInitData(1:3,4,:),[1,3,2]);
     Demos(i).TPData_goal = permute(Demos(i).movingPartGoalData(1:3,4,:),[1,3,2]);
 end
 %}
 
 % Show TP demos
+%{
+figure;
+for i = 1:M
+    plot3(Demos(i).TPData_init(1,:), Demos(i).TPData_init(2,:), Demos(i).TPData_init(3,:),...
+        'Color',Morandi_popsicle(1),'LineWidth',1.5);
+    hold on;
+end
+grid on; axis equal; view(3);
+xlabel('x(m)'); ylabel('y(m)'); zlabel('z(m)');
 
-
+figure;
+for i = 1:M
+    plot3(Demos(i).TPData_goal(1,:), Demos(i).TPData_goal(2,:), Demos(i).TPData_goal(3,:),...
+        'Color',Morandi_popsicle(2),'LineWidth',1.5);
+    hold on;
+end
+grid on; axis equal; view(3);
+xlabel('x(m)'); ylabel('y(m)'); zlabel('z(m)');
+%}
 
 %% TP-GMM and alpha-TP-GMR
 
 % TP-GMM and EM algorithm
 
-
+policy = FWTPGMMZero(5,4,2);
 
 % Show TP-GMM
 
-
+ 
 
 % Show robot motion
 

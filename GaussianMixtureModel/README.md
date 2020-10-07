@@ -31,6 +31,7 @@ Haopeng Hu
 - demoTPGMR1: Task-parameterized GMM and GMR demo
 - demoTrajGMM0: Trajectory-GMM demo
 - demoTrajGMM1: TP-trajectory-GMM demo
-- demoQGMM: Quaternion GMM and GMR demo
+- demoQGMM: Quaternion GMM and GMR demo (**developing**)
+- demoFWTPGMR0: Frame-weighted TP-GMM demo
 
 *Coding and drinking with peach blossom!*
