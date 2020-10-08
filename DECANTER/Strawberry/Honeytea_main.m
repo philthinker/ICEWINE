@@ -90,6 +90,46 @@ for i = 1:M
 end
 %}
 
+% % Time variable
+%{
+queryMin = 0;
+queryMax = 0.5;
+for i = 1:M
+    tmpN = size(Demos(i).TPData_goal,2);
+    tmpQuery = linspace(queryMin, queryMax,tmpN);
+    Demos(i).data = [tmpQuery; permute(Demos(i).fixedPartBaseData(1:3,4,:), [1,3,2]) ];
+    Demos(i).query = tmpQuery;
+    Demos(i).TPData = zeros(4,2,tmpN);
+    for j = 1:tmpN
+        Demos(i).TPData(:,1,j) = [tmpQuery(j); Demos(i).TPData_init(:,j)];
+        Demos(i).TPData(:,2,j) = [tmpQuery(j); Demos(i).TPData_goal(:,j)];
+    end
+end
+%}
+% % Phase variable
+%{
+queryMin = 0;
+queryMax = 0.5;
+for i = 1:M
+    tmpData = permute(Demos(i).fixedPartBaseData(1:3,4,:), [1,3,2]);
+    tmpN = size(tmpData,2);
+    % Phase computation
+    tmpLength = norm(tmpData(:,1) - tmpData(:,end));
+    tmpQuery = zeros(1,tmpN);
+    for j = 1:tmpN
+        tmpQuery(j) = (norm(tmpData(:,j) - tmpData(:,end))/tmpLength)*(queryMax - queryMin) + queryMin;
+    end
+    %%%%%%%%%%%%%%%%%%%%%%%%%
+    Demos(i).data = [tmpQuery; tmpData ];
+    Demos(i).query = tmpQuery;
+    Demos(i).TPData = zeros(4,2,tmpN);
+    for j = 1:tmpN
+        Demos(i).TPData(:,1,j) = [tmpQuery(j); Demos(i).TPData_init(:,j)];
+        Demos(i).TPData(:,2,j) = [tmpQuery(j); Demos(i).TPData_goal(:,j)];
+    end
+end
+%}
+
 % Show TP demos
 %{
 figure;
@@ -98,7 +138,7 @@ for i = 1:M
         'Color',Morandi_popsicle(1),'LineWidth',1.5);
     hold on;
 end
-grid on; axis equal; view(3);
+grid on; axis equal; view(131,53);
 xlabel('x(m)'); ylabel('y(m)'); zlabel('z(m)');
 
 figure;
@@ -107,7 +147,7 @@ for i = 1:M
         'Color',Morandi_popsicle(2),'LineWidth',1.5);
     hold on;
 end
-grid on; axis equal; view(3);
+grid on; axis equal; view(131,53);
 xlabel('x(m)'); ylabel('y(m)'); zlabel('z(m)');
 %}
 
@@ -115,12 +155,66 @@ xlabel('x(m)'); ylabel('y(m)'); zlabel('z(m)');
 
 % TP-GMM and EM algorithm
 
-policy = FWTPGMMZero(5,4,2);
+% policy = FWTPGMMZero(6,4,2);
+% policy = policy.initGMMTimeBased(Demos);
+% policy = policy.learnGMM(Demos);
 
-% Show TP-GMM
+% % Show TP-GMM (Be patient)
+%{
+movingPartInit.Mu = permute(policy.Mus(2:4,1,:), [1,3,2]);
+movingPartInit.Sigma = permute(policy.Sigmas(2:4,2:4,1,:),[1,2,4,3]);
 
- 
+figure;
+plotGMM3SC(movingPartInit.Mu,movingPartInit.Sigma,Morandi_popsicle(1),0.4,1);
+hold on;
+for i = 1:M
+    tmpData = Demos(i).TPData_init;
+    plot3(tmpData(1,:), tmpData(2,:), tmpData(3,:),'Color',[0.5,0.5,0.5],'LineWidth',1.5);
+end
+grid on; axis equal;
+view(3);
 
-% Show robot motion
+movingPartGoal.Mu = permute(policy.Mus(2:4,2,:), [1,3,2]);
+movingPartGoal.Sigma = permute(policy.Sigmas(2:4,2:4,2,:),[1,2,4,3]);
 
+figure;
+plotGMM3SC(movingPartGoal.Mu,movingPartGoal.Sigma,Morandi_popsicle(1),0.4,1);
+hold on;
+for i = 1:M
+    tmpData = Demos(i).TPData_goal;
+    plot3(tmpData(1,:), tmpData(2,:), tmpData(3,:),'Color',[0.5,0.5,0.5],'LineWidth',1.5);
+end
+grid on; axis equal;
+view(3);
+%}
 
+% TP-GMR
+%{
+motionData.query = linspace(queryMax,queryMin,200);
+[motionData.expData, motionData.expSigma, motionData.alpha] = policy.GMR(motionData.query, motionData.queryFrame);
+%}
+
+% % Show robot motion
+
+figure;
+tmpData = motionData.expData;
+plot3(tmpData(1,:), tmpData(2,:), tmpData(3,:),'Color',Morandi_popsicle(3),'LineWidth',2.0);
+hold on;
+legend('Robot motion trajectory');
+for i = 1:M
+    tmpData = Demos(i).TPData_init;
+    tmpData = motionData.queryFrame(1).A(2:4,2:4) * tmpData + motionData.expData(:,1);
+    plot3(tmpData(1,:),tmpData(2,:),tmpData(3,:),'Color',Morandi_popsicle(1));
+    tmpData = Demos(i).TPData_goal;
+    tmpData = motionData.queryFrame(2).A(2:4,2:4) * tmpData + motionData.expData(:,end);
+    plot3(tmpData(1,:),tmpData(2,:),tmpData(3,:),'Color',Morandi_popsicle(2));
+end
+grid on; axis equal;
+axis([-Inf, Inf,-Inf, 0.15, 0, 0.5]);
+xlabel('x(m)'); ylabel('y(m)'); zlabel('z(m)');
+view(3);
+
+% figure;
+% plot(motionData.query, motionData.alpha);
+% grid on; grid on;
+%}

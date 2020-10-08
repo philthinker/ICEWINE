@@ -115,7 +115,10 @@ for n=1:size(genProductionTPGMM,2)
 end
 axis(limAxes); axis square; set(gca,'xtick',[],'ytick',[]);
 
+% Plot the weights
 figure;
 plot(query,alpha);
 xlabel('Query'); ylabel('\alpha');
+legend('\alpha_{1}', '\alpha_{2}');
+grid on;
 
