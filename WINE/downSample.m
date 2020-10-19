@@ -2,6 +2,7 @@ function [DataOut,Nout] = downSample(DataIn,downScalar)
 %downSample Down sample the data to save time
 %   DataIn: N x D, data input
 %   downScalar: integer < N/2, the size scalar
+%   -------------------------------------------------
 %   DataOut: Nout x D, data output
 %   Nout: integer < N, number of output data
 

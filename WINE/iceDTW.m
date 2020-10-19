@@ -2,6 +2,9 @@ function [trajsOut,r] = iceDTW(trajs,window)
 %iceDTW Dynamic time warping
 %   trajs: 1 x M cell of N x D trajectories
 %   window: scalar, the width of warping time window
+%   -------------------------------------------------
+%   trajsOut: 1 x M cell of N x D trajectories
+%   r: 1 x M struct, memory
 
 % Copyright (c) 2015 Idiap Research Institute, http://idiap.ch/
 % Written by Sylvain Calinon, http://calinon.ch/
