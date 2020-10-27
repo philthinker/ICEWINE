@@ -4,11 +4,12 @@ function [Data] = readOptitrackData(dataPath,M)
 %   M: integer, the num. of .csv files (default:0)
 %   -------------------------------------------------
 %   Data: N x Nc (M == 0) or 1 x M cell, data
+%   |   frame time qx qy qz qw x y z ...
 
 if nargin < 2
     M = 0;
 else
-    M = max([round(M),1]);
+    M = max([round(M),0]);
 end
 
 if M == 0

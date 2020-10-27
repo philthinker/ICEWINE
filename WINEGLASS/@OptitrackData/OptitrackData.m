@@ -7,10 +7,10 @@ classdef OptitrackData
     %   All rights reserved
     %
     %   Notations:
-    %   |   N:      num. of data
-    %   |   Nc:    num. of columns in raw data
-    %   |   Nb:    num. of rigid bodies
-    %   |   Nm:   num. of markers
+    %   |   N:  num. of data
+    %   |   Nc:	num. of columns in raw data
+    %   |   Nb:	num. of rigid bodies
+    %   |   Nm:	num. of markers
     
     properties
         N;                % integer, num. of data
@@ -22,14 +22,20 @@ classdef OptitrackData
     end
     
     methods
-        function obj = OptitrackData(Data,Nb,Nm)
+        function obj = OptitrackData(Nb,Nm,Data)
             %OptitrackData Initialize the data storation
             %   Data: N x Nc, raw data
+            %   |   frame, time, qx, qy, qz, x, y, z, ..., x, y, z
             %   Nb: integer, num. of rigid bodies
             %   Nm: integer, num. of markers
-            if nargin < 1
+            if nargin < 3
                 % Just for memory allocation
-                Data = [0,0]; Nb = 0; Nm = 0;
+                %  But you must assign Nb and Nm.
+                Data = [0,0,0,0];
+                obj.N = size(Data,1);
+                obj.Nb = round(Nb);
+                obj.Nm = round(Nm);
+                return;
             end
             obj.N = size(Data,1);
             obj.Nb = round(Nb);
@@ -38,6 +44,7 @@ classdef OptitrackData
             % Install raw rigid body data
             tmpIndex = 3;
             if obj.Nb > 0
+                % We always assume that the bodies' data comes firstly.
                 obj.body = cell(1,Nb);
                 for i = 1:obj.Nb
                     obj.body{i} = Data(:,tmpIndex:tmpIndex+7-1);    % qx qy qz qw x y z
@@ -53,6 +60,44 @@ classdef OptitrackData
                 end
             end
         end
+        
+        function [obj] = readOptitrackData(obj,dataPath,M)
+            %readOptitrackData Read the data from a data file.
+            %   Note that the current data will be replaced.
+            %   It is used to store data into vacuum object
+            %   dataPath: String, the path of the data file without '.csv'
+            %   We assume the last letter is a number.
+            %   M: Integer, the number of data file. Once M == 0, you must
+            %   give the full name with '.csv' (default: 0)
+            if nargin < 3
+                M = 0;
+            else
+                M = max([round(M),0]);
+            end
+            if M == 0
+                % Read only one file
+                % The full file name is required
+                tmpData = readmatrix(dataPath);
+                tmpN = size(tmpData,1);
+                j = 1;
+                while isnan(tmpData(j,1)) && j < tmpN
+                    j = j+1;
+                end
+                Data = tmpData(j:end,:);
+            else
+                % Read the M-th file
+                % We assume the last letter is the num. of file
+                tmpData = readmatrix(strcat(dataPath,int2str(M),'.csv'));
+                tmpN = size(tmpData,1);
+                j = 1;
+                while isnan(tmpData(j,1)) && j < tmpN
+                    j = j+1;
+                end
+                Data = tmpData(j:end,:);
+            end
+            obj = OptitrackData(obj.Nb,obj.Nm,Data);
+        end
+        
         function [Data] = getBodyData(obj,index)
             %getBodyData Get data of some body
             %   index: integer, the body to be retrieved (default: 1)
@@ -68,6 +113,7 @@ classdef OptitrackData
                 Data = [];
             end
         end
+        
         function [Data] = getMarkerData(obj,index)
             %getMarkerData Get data of some marker
             %   index: integer, the marker to be retrieved (default: 1)
@@ -83,6 +129,7 @@ classdef OptitrackData
                 Data = [];
             end
         end
+        
         function [Data] = getGapFreeBodyData(obj,index,mode)
             %getGapFreeBodyData Get the body's trajectory without gap
             %   index: integer, the index of bodies
@@ -126,7 +173,7 @@ classdef OptitrackData
             end
         end
         function [] = plot3Bodies(obj)
-            %plot3Bodies
+            %plot3Bodies Plot the bodies data (x y z)
             figure;
             for i = 1:obj.Nb
                 tmpXYZ = obj.body{i};
@@ -191,6 +238,7 @@ classdef OptitrackData
                 PLRate = 0;
             end
         end
+        % Raw data pre-process
         function [DataOut] = interpTraj(obj,DataIn,mode)
             %interpChip Interpolate the data with MATLAB functions
             %   DataIn: N x D, data with NaN

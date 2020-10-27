@@ -27,3 +27,14 @@ xlabel('x(m)'); ylabel('y(m)'); zlabel('z(m)');
 view(3);
 %}
 
+%% Import OptitrackData data
+
+M = 7;
+optiData = repmat(OptitrackData(),[1,M]);
+path = 'DECANTER\Blueberry\Data\10-26\00';
+
+for i = 1:M
+    optiData(i) = OptitrackData(readOptitrackData(path,i),2,8);
+
+Data = readOptitrackData('DECANTER\Blueberry\Data\10-26\00',1);
+
