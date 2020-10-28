@@ -130,13 +130,14 @@ classdef OptitrackData
             end
         end
         
-        function [Data] = getGapFreeBodyData(obj,index,mode)
+        function [Data,gapIndices] = getGapFreeBodyData(obj,index,mode)
             %getGapFreeBodyData Get the body's trajectory without gap
             %   index: integer, the index of bodies
             %   mode: integer, 1 for data with time seq. to the left column
             %   (default: 0)
             %   -----------------------------------------
             %   Data: N x 7 or N x 8, body's trajectory
+            %   gapIndices: N x 1, the logical indices of lost points
             if nargin < 3
                 mode = 0;
             end
@@ -150,6 +151,31 @@ classdef OptitrackData
                 % No time seq. to the left
                 Data = tmpData(logicalIndices,:);
             end
+            gapIndices = ~logicalIndices;
+        end
+        
+        function [Data,gapIndices] = getGapFreeMarkerData(obj,index,mode)
+            %getGapFreeMarkerData Get the marker's trajectory without gap
+            %   index: integer, the index of bodies
+            %   mode: integer, 1 for data with time seq. to the left column
+            %   (default: 0)
+            %   -----------------------------------------
+            %   Data: N x 3 or N x 4, marker's trajectory
+            %   gapIndices: N x 1, the logical indices of lost points
+            if nargin < 3
+                mode = 0;
+            end
+            index = min(round(index(1,1)),obj.Nm);
+            tmpData = obj.marker{index};
+            logicalIndices = ~isnan(tmpData(:,1));
+            if mode == 1
+                % Time seq. to the left
+                Data = [obj.time(logicalIndices), tmpData(logicalIndices,:)];
+            else
+                % No time seq. to the left
+                Data = tmpData(logicalIndices,:);
+            end
+            gapIndices = ~logicalIndices;
         end
     end
     
@@ -219,7 +245,7 @@ classdef OptitrackData
         % State monitor
         function [PLRate] = getPointLossRate(obj)
             %getPointLossRate Get the point loss rate
-            %   PLRate: 1 x M, point loss rate of each object
+            %   PLRate: 1 x (Nb+Nm), point loss rate of each object
             if obj.Nb + obj.Nm > 0
                 PLRate = zeros(1,obj.Nb + obj.Nm);
                 if obj.Nb > 0
@@ -312,10 +338,6 @@ classdef OptitrackData
                 obj.body{i} = tmpData;
             end
         end
-    end
-    
-    methods (Access = protected)
-        % Build-in func.
     end
 end
 
