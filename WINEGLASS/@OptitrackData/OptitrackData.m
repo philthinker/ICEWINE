@@ -297,6 +297,7 @@ classdef OptitrackData
             DataOut = DataOut';
         end
         % Data pre-process
+        [flag, order] = orderCheck(obj, distances, epsilon);
         function [obj] = markerReorder(obj,order)
             %markerReorder Reorder the marker's data with a new order
             %   order:  1 x Nm integer, new order

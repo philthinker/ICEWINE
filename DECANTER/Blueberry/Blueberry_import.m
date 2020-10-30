@@ -1,24 +1,22 @@
 %Blueberry_import
 
 %% Import OTEE data
-%{
-pathName = 'DECANTER\Blueberry\Data\10-17\';
-N = 9;
+
+pathName = 'DECANTER\Blueberry\Data\10-30\';
+M = 9;
 
 % Data storation
-Data = [];
-Data.OTEE_app = [];
-Data.OTEE_ass = [];
-Data = repmat(Data,[1,N]);
+frankaData = [];
+frankaData.OTEE = [];
+frankaData = repmat(frankaData,[1,M]);
 
-for i = 1:N
-    Data(i).OTEE_app = readmatrix(strcat(pathName,'lead_app_0',int2str(i),'_OTEE.csv'));
-    Data(i).OTEE_ass = readmatrix(strcat(pathName,'lead_ass_0',int2str(i),'_OTEE.csv'));
+for i = 1:M
+    frankaData(i).OTEE = readmatrix(strcat(pathName,'lead0',int2str(i),'_OTEE.csv'));
 end
 
 figure;
-for i = 1:N
-    tmpData = Data(i).OTEE_app;
+for i = 1:M
+    tmpData = frankaData(i).OTEE;
     plot3(tmpData(:,13),tmpData(:,14),tmpData(:,15));
     hold on;
 end
@@ -28,12 +26,14 @@ view(3);
 %}
 
 %% Import OptitrackData data
-
-M = 7;
+%{
+M = 6;
 optiData = repmat(OptitrackData(2,8),[1,M]);
-path = 'DECANTER\Blueberry\Data\10-26\00';
+path = 'DECANTER\Blueberry\Data\10-29\';
 
 for i = 1:M
     optiData(i) = optiData(i).readOptitrackData(path,i);
+    optiData(i).plotMarkersXYZ();
+    optiData(i).plot3Markers();
 end
-
+%}
