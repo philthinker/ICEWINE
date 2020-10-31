@@ -103,7 +103,7 @@ end
 MTD.qPolicy = qpolicy;
 %}
 
-%% DOF assignment
+%% Panda data generation
 
 % Data init. 
 %{
@@ -158,5 +158,49 @@ t = [exeData.query,1];
 for j = 1:4
     subplot(4,1,j);
     plot(t, tmpData(j,:), 'Color', Morandi_popsicle(2), 'LineWidth', 2.0);
+end
+%}
+
+%% Parallel data generation
+
+% Position
+%{
+paraData.taskRot_m = eye(3);
+paraData.pM = paraData.taskRot_m * exeData.panda_p;
+%}
+
+% Orientation
+%{
+paraData.q = exeData.panda_q;
+paraData.SO3 = quat2rotm(paraData.q');
+for i  = 1:size(paraData.SO3,3)
+    paraData.SO3(:,:,i) = paraData.taskRot_m * paraData.SO3(:,:,i);
+end
+paraData.eul = rotm2eul(paraData.SO3)';
+
+paraData.eulM = zeros(size(paraData.eul));
+paraData.eulS = paraData.eul;
+paraData.eulM(2,:) = paraData.eul(2,:)/2;
+paraData.eulS(2,:) = -paraData.eul(2,:)/2;
+%}
+% Show
+%{
+figure;
+tmpData = paraData.pM;
+plot3(tmpData(1,:), tmpData(2,:), tmpData(3,:));
+grid on; axis equal;
+view(3);
+%}
+%{
+figure;
+t = exeData.query;
+ylabels = {'z', 'y', 'x'};
+for i = 1:3
+    subplot(3,1,i);
+    plot(t, paraData.eul(i,:), 'Color', Morandi_popsicle(1));
+    hold on;
+    plot(t, paraData.eulM(i,:), 'Color', Morandi_popsicle(2));
+    plot(t, paraData.eulS(i,:), 'Color', Morandi_popsicle(3));
+    grid on; ylabel(ylabels{i})
 end
 %}
