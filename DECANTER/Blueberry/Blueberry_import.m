@@ -1,7 +1,7 @@
 %Blueberry_import
 
 %% Import OTEE data
-
+%{
 pathName = 'DECANTER\Blueberry\Data\10-30\';
 M = 9;
 
@@ -26,14 +26,19 @@ view(3);
 %}
 
 %% Import OptitrackData data
-%{
-M = 6;
+
+M = 21;
 optiData = repmat(OptitrackData(2,8),[1,M]);
-path = 'DECANTER\Blueberry\Data\10-29\';
+path = 'DECANTER\Blueberry\Data\11-05\';
 
 for i = 1:M
     optiData(i) = optiData(i).readOptitrackData(path,i);
-    optiData(i).plotMarkersXYZ();
+%     optiData(i).plotMarkersXYZ();
     optiData(i).plot3Markers();
+end
+
+r = zeros(M,2+8);
+for i = 1:M
+    r(i,:) = optiData(i).getPointLossRate();
 end
 %}

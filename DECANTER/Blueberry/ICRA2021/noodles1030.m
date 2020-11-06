@@ -6,7 +6,7 @@
 % frankaData = MTD.frankaDataFormulate(frankaData);
 
 %% Show raw data
-%{
+%
 figure;
 for i = 1:M
     tmpData = frankaData(i).p;
@@ -18,6 +18,7 @@ xlabel('x(m)'); ylabel('y(m)'); zlabel('z(m)');
 view(3);
 
 figure;
+ylabels = {'v', 'u_{x}', 'u_{y}', 'u_{z}'};
 for i = 1:M
     tmpq = frankaData(i).q;
     tmpt = frankaData(i).time;
@@ -25,6 +26,7 @@ for i = 1:M
         subplot(4,1,j);
         plot(tmpt,tmpq(j,:),'Color',Morandi_popsicle(i));
         hold on; grid on;
+        ylabel(ylabels{j});
     end
 end
 %}
@@ -184,14 +186,14 @@ paraData.eulM(2,:) = paraData.eul(2,:)/2;
 paraData.eulS(2,:) = -paraData.eul(2,:)/2;
 %}
 % Show
-%{
+%
 figure;
 tmpData = paraData.pM;
 plot3(tmpData(1,:), tmpData(2,:), tmpData(3,:));
-grid on; axis equal;
+grid on; axis equal; xlabel('x'); ylabel('y'); zlabel('z');
 view(3);
 %}
-%{
+%
 figure;
 t = exeData.query;
 ylabels = {'z', 'y', 'x'};
