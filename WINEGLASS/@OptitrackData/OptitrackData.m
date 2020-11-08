@@ -298,6 +298,7 @@ classdef OptitrackData
         end
         % Data pre-process
         [flag, order] = orderCheck(obj, distances, epsilon);
+        [timeOut,dataOut] = dataCurtail(obj,range,mod);
         function [obj] = markerReorder(obj,order)
             %markerReorder Reorder the marker's data with a new order
             %   order:  1 x Nm integer, new order
@@ -335,6 +336,12 @@ classdef OptitrackData
                 tmpQuat  = zeros(size(tmpData,1),4);
                 tmpQuat(:,1) = tmpData(:,4);
                 tmpQuat(:,2:4) = tmpData(:,1:3);
+                %%%%%%%%%%%%%%%%%%%%%
+                % Standardize the unit quat data
+                %   Once w < 0, q = -q
+                tmpLIndices = tmpQuat(:,1) < 0;
+                tmpQuat(tmpLIndices,:) = -tmpQuat(tmpLIndices,:);
+                %%%%%%%%%%%%%%%%%%%%%
                 tmpData(:,1:4) = tmpQuat;
                 obj.body{i} = tmpData;
             end
