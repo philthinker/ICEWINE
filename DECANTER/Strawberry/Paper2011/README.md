@@ -8,7 +8,7 @@
 -->
 # Paper2011
 
-A project for Z. Cao's master thesis.
+A project for Z. Cao's and Z. Zhao's master thesis.
 
 Haopeng Hu
 
@@ -32,3 +32,8 @@ Haopeng Hu
 
 - MCA_dataPreprocess： Optitrack data, mouse case assembly, for Z. Cao and Z. Zhao's thesis
 
+- MCA_DualArmTraj： Panda lead data, for the asymmetric dual-arm parallel
+
+## Files
+
+Refer to the comments therein

@@ -6,7 +6,7 @@
 % frankaData = MTD.frankaDataFormulate(frankaData);
 
 %% Show raw data
-%
+%{
 figure;
 for i = 1:M
     tmpData = frankaData(i).p;
@@ -186,14 +186,14 @@ paraData.eulM(2,:) = paraData.eul(2,:)/2;
 paraData.eulS(2,:) = -paraData.eul(2,:)/2;
 %}
 % Show
-%
+%{
 figure;
 tmpData = paraData.pM;
 plot3(tmpData(1,:), tmpData(2,:), tmpData(3,:));
 grid on; axis equal; xlabel('x'); ylabel('y'); zlabel('z');
 view(3);
 %}
-%
+%{
 figure;
 t = exeData.query;
 ylabels = {'z', 'y', 'x'};
