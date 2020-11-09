@@ -132,7 +132,7 @@ classdef QGMMZero < GMMOne
             points = zeros(3,N);
             tmpQ = zeros(4,N);
             for i = 1:N
-                tmpQ(:,i) = quatProduct( quatProduct(q(:,i),[0.0, 0.0, 0.0, 1.0]'), quatConjugate(q(:,i)) );
+                tmpQ(:,i) = obj.quatProduct( obj.quatProduct(q(:,i),[0.0, 0.0, 0.0, 1.0]'), obj.conjugateQuat(q(:,i)) );
                 points(:,i) = tmpQ(2:4,i);
             end
         end
