@@ -27,9 +27,9 @@ view(3);
 
 %% Import OptitrackData data
 
-M = 21;
-optiData = repmat(OptitrackData(2,8),[1,M]);
-path = 'DECANTER\Blueberry\Data\11-05\';
+% M = 21;
+% optiData = repmat(OptitrackData(2,8),[1,M]);
+% path = 'DECANTER\Blueberry\Data\11-21-2\';
 
 for i = 1:M
     optiData(i) = optiData(i).readOptitrackData(path,i);

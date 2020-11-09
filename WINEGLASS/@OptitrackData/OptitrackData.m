@@ -19,6 +19,7 @@ classdef OptitrackData
         time;            % N x 1, time series
         body;           % 1 x Nb cell, data of rigid bodies
         marker;        % 1 x Nm cell, data of markers
+        tag;              % string, the data tag
     end
     
     methods
@@ -28,6 +29,7 @@ classdef OptitrackData
             %   |   frame, time, qx, qy, qz, x, y, z, ..., x, y, z
             %   Nb: integer, num. of rigid bodies
             %   Nm: integer, num. of markers
+            obj.tag = ' ';
             if nargin < 3
                 % Just for memory allocation
                 %  But you must assign Nb and Nm.

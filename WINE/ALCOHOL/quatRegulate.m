@@ -2,6 +2,7 @@ function [qOut] = quatRegulate(qIn,mod)
 %quatRegulate Regulate the unit quaternion to positive scalar mod
 %   qIn: 4 x N, quat, [qw qx qy qz]
 %   mod: boolean, true for row quat (default:false)
+%   -------------------------------------------------
 %   qOut: 4 x N, quat
 
 if nargin < 2

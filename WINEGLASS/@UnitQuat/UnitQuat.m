@@ -59,6 +59,9 @@ classdef UnitQuat
         function obj = setQa(obj,qa)
             %setQa Set the auxiliary quaternion
             %   qa: 4 x 1, unit quat, [w x y z]'
+            if nargin < 2
+                qa = obj.q(:,end);
+            end
             obj.qa = qa(1:4,1);
             obj.bar_qa = obj.qa;
             obj.bar_qa(2:4) = -obj.qa(2:4);
