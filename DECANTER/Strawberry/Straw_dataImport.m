@@ -3,15 +3,16 @@
 
 %% Import OptitrackData data
 
-M = 6;  % Number
-Nb = 1;
-Nm = 4;
+M = 9;  % Number
+Nb = 2;
+Nm = 8;
 optiData = repmat(OptitrackData(Nb,Nm),[1,M]);    % Type
-path = 'DECANTER\Strawberry\Data\11-05\';   % Path
+path = 'DECANTER\WATER\11-10\';                        % Path
 
 for i = 1:M
     optiData(i) = optiData(i).readOptitrackData(path,i);
     optiData(i) = optiData(i).quatWXYZ();
+    optiData(i).tag = strcat('BB_dualarm_',int2str(i));    % Tag
 %     optiData(i).plotMarkersXYZ();
     optiData(i).plot3Markers();
 end

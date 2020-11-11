@@ -58,6 +58,7 @@ classdef UnitQuat
         % Basic operations
         function obj = setQa(obj,qa)
             %setQa Set the auxiliary quaternion
+            %   Once no qa assigned, the last quat of q will the set as qa
             %   qa: 4 x 1, unit quat, [w x y z]'
             if nargin < 2
                 qa = obj.q(:,end);
@@ -107,12 +108,11 @@ classdef UnitQuat
         end
         
         function qOut = expMap(obj, etaIn)
-            %logMap The logrithmic map to the tangent space given the
-            %auxiliary quat qa.
-            %   qIn: 4 x N, quat data
-            %   qa: 4 x 1, auxiliary quat (optional)
+            %expMap The exponential map from the tangent space to the
+            %sphere space with the object's qa
+            %   etaIn: 3 x N, quat data
             %   -----------------------------------------
-            %   etaOut: 3 x N, eta data
+            %   qOut: 4 x N, eta data
             N = size(etaIn,2);
             exp_eta = repmat([1,0,0,0]',[1,N]);
             for i = 1:N

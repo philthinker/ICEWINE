@@ -34,6 +34,8 @@ Haopeng Hu
 
 - MCA_DualArmTraj： Panda lead data, for the asymmetric dual-arm parallel
 
+- BB_dualarmMotionGen：Optitrack data, BB assembly for Z. Zhao's thesis
+
 ## Files
 
 Refer to the comments therein

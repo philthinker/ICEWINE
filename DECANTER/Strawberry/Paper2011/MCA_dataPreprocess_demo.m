@@ -31,10 +31,10 @@ labels = {'q_w','q_x','q_y','q_z','x(m)','y(m)','z(m)'};
 figure;
 for i = 1:M
     tmpData = dataShow(i).body1raw;
-    plot3(tmpData(:,5),tmpData(:,6),tmpData(:,7),'Color',Morandi_hydrangea(i),'LineWidth',1.0);
+    plot3(tmpData(:,5),tmpData(:,6),tmpData(:,7),'Color',Morandi_carnation(i),'LineWidth',1.0);
     hold on;
     tmpData = dataShow(i).body2raw;
-    plot3(tmpData(:,5),tmpData(:,6),tmpData(:,7),'Color',Morandi_hydrangea(i),'LineWidth',1.0);
+    plot3(tmpData(:,5),tmpData(:,6),tmpData(:,7),'Color',Morandi_carnation(i),'LineWidth',1.0);
 end
 grid on; axis equal; xlabel(labels{5}); ylabel(labels{6}); zlabel(labels{7});
 view(3);
@@ -42,13 +42,14 @@ view(3);
 
 % Plot
 %{
-for i = 6:6
+% typical: 6
+for i = 7:M
     figure(i);
     t = dataShow(i).t;
     tmpData = dataShow(i).body1raw;
     for j = 1:7
         subplot(7,1,j);
-        plot(t,tmpData(:,j),'Color',Morandi_hydrangea(i),'LineWidth',1.5);
+        plot(t,tmpData(:,j),'Color',Morandi_carnation(i),'LineWidth',1.5);
         grid on;
         ylabel(labels{j});
     end
@@ -131,6 +132,122 @@ for m = 6:6
         if i == 1
 %             title('sigma = 1e-1; W = 1e-1;');
         end
+    end
+    xlabel('t(s)');
+end
+%}
+
+%% Outlier detection
+
+% Raw Data show
+%{
+% Typical: 12
+for i = 12:12
+    figure;
+    t = dataShow(i).t;
+    tmpData = dataShow(i).body1raw;
+    for j = 1:3
+        subplot(3,1,j);
+        plot(t,tmpData(:,j+4),'Color',Morandi_carnation(2),'LineWidth',1.5);
+        grid on;
+        ylabel(labels{j+4});
+    end
+    xlabel('t(s)');
+end
+%}
+
+% Data noise
+%{
+for i = 12:12
+    dataShow(i).body1rawNoisy = dataShow(i).body1raw(:,5:7);
+    dataShow(i).body1rawNoisy(553,1) = -0.055;
+    dataShow(i).body1rawNoisy(553,2) = 0.132;
+    dataShow(i).body1rawNoisy(553,3) = -0.063;
+    % Show
+    figure;
+    t = dataShow(i).t;
+    tmpData = dataShow(i).body1rawNoisy;
+    for j = 1:3
+        subplot(3,1,j);
+        plot(t,tmpData(:,j),'Color',Morandi_carnation(2),'LineWidth',1.5);
+        grid on;
+        ylabel(labels{j+4});
+    end
+    xlabel('t(s)');
+end
+%}
+
+% Compute vel.
+%{
+for i = 12:12
+    dataShow(i).body1rawNoisyVel = finiteDiff(dataShow(i).body1rawNoisy, 1/120);
+    % Show
+    figure;
+    ylabels = {'v_{x}(m/s)', 'v_{y}(m/s)', 'v_{z}(m/s)'};
+    t = dataShow(i).t;
+    tmpData = dataShow(i).body1rawNoisyVel;
+    for j = 1:3
+        subplot(3,1,j);
+        plot(t,tmpData(:,j),'Color',Morandi_carnation(3),'LineWidth',1.5);
+        grid on;
+        ylabel(ylabels{j});
+    end
+    xlabel('t(s)');
+end
+%}
+
+% Outlier detection
+%{
+for i = 12:12
+    dataShow(i).body1rawNoisyOutlier = [553];
+    % Show
+    figure;
+    t = dataShow(i).t;
+    tmpData = dataShow(i).body1rawNoisy;
+    outlier = dataShow(i).body1rawNoisyOutlier;
+    for j = 1:3
+        subplot(3,1,j);
+        plot(t,tmpData(:,j),'Color',Morandi_carnation(2),'LineWidth',1.5);
+        grid on; hold on;
+        ylabel(labels{j+4});
+        scatter(t(outlier),tmpData(outlier,j),120,Morandi_carnation(1),'LineWidth',1.5);
+        axis([-Inf, Inf, -Inf, Inf]);
+    end
+    xlabel('t(s)');
+    
+    figure;
+    ylabels = {'v_{x}(m/s)', 'v_{y}(m/s)', 'v_{z}(m/s)'};
+    t = dataShow(i).t;
+    tmpData = dataShow(i).body1rawNoisyVel;
+    for j = 1:3
+        subplot(3,1,j);
+        plot(t,tmpData(:,j),'Color',Morandi_carnation(3),'LineWidth',1.5);
+        grid on; hold on;
+        ylabel(ylabels{j});
+        scatter(t(outlier),tmpData(outlier,j),120,Morandi_carnation(1),'LineWidth',1.5);
+        axis([-Inf, Inf, -Inf, Inf]);
+    end
+    xlabel('t(s)');
+end
+%}
+
+% Get rid of the outlier
+%{
+for i = 12:12
+    dataShow(i).body1rawNoisyFree = dataShow(i).body1rawNoisy;
+    outlier = dataShow(i).body1rawNoisyOutlier;
+    dataShow(i).body1rawNoisyFree(outlier,:) =...
+        (dataShow(i).body1rawNoisy(outlier-1,:) + dataShow(i).body1rawNoisy(outlier+1,:))/2;
+    % Show
+    figure;
+    t = dataShow(i).t;
+    tmpData = dataShow(i).body1rawNoisyFree;
+    for j = 1:3
+        subplot(3,1,j);
+        plot(t,tmpData(:,j),'Color',Morandi_carnation(2),'LineWidth',1.5);
+        grid on; hold on;
+        ylabel(labels{j+4});
+        axis([-Inf, Inf, -Inf, Inf]);
     end
     xlabel('t(s)');
 end

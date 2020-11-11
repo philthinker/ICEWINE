@@ -10,6 +10,7 @@ addpath('WINEGLASS');
 addpath('WINE\ALCOHOL');
 addpath('WINE\BERRY');
 addpath('WINE\ANTHOCYANIN');
+addpath('WINE\FRUIT');
 
 addpath('DECANTER');
 

@@ -48,8 +48,8 @@ plot3(exp_pPanda(1,:), exp_pPanda(2,:), exp_pPanda(3,:),'Color', Morandi_popsicl
 grid on; axis equal;
 xlabel('x(m)'); ylabel('y(m)'); zlabel('z(m)');
 criticalID = [1,100,200,300,305,400,1000];
-scatter3(exp_pPanda(1,criticalID), exp_pPanda(2,criticalID), exp_pPanda(3,criticalID),...
-    100,[1.0,0.0,0.0],'filled');
+% scatter3(exp_pPanda(1,criticalID), exp_pPanda(2,criticalID), exp_pPanda(3,criticalID),...
+%     100,[1.0,0.0,0.0],'filled');
 %}
 
 %% QGMR for Panda
@@ -74,8 +74,8 @@ for j = 1:4
     end
     plot(query, exp_qPanda(j,:),'Color',Morandi_popsicle(2),'LineWidth',3.0);
     ylabel(ylabels{j}); grid on;
-    scatter(query(criticalID), exp_qPanda(j,criticalID),...
-    100,[1.0,0.0,0.0],'filled');
+%     scatter(query(criticalID), exp_qPanda(j,criticalID),...
+%     100,[1.0,0.0,0.0],'filled');
 end
 xlabel('Phase');
 %}
