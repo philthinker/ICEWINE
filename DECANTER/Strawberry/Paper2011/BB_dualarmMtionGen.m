@@ -245,7 +245,7 @@ end
 %% Motion assignment
 
 % Data init.
-%
+%{
 exp = [];
 exp.position = expData(4:6,:);
 exp.quat = expQuat;
@@ -309,5 +309,122 @@ xlabel('Phase');
 %}
 
 %% Critical points
+
+%% Reflex
+
+% GMR data show
+%{
+figure;
+for i = 1:M
+    tmpData = dataShow(i).body1Rel;
+    plot3(tmpData(:,5), tmpData(:,6), tmpData(:,7),'Color', Morandi_popsicle(1),'LineWidth',1.0);
+    hold on;
+end
+tmpData = expData(4:6,:);
+plot3(tmpData(1,:), tmpData(2,:), tmpData(3,:),'Color', Morandi_popsicle(2),'LineWidth',2.0);
+grid on; axis equal;
+xlabel('x(m)'); ylabel('y(m)'); zlabel('z(m)');
+view(40,20);
+
+figure;
+ylabels = {'v', 'u_{x}', 'u_{y}', 'u_{z}'};
+for i = 1:M
+    tmpq = dataShow(i).body1Rel;
+    tmpq = tmpq(:,1:4);
+    tmpt = linspace(0,10,size(dataShow(i).t,2));
+    for j = 1:4
+        subplot(4,1,j);
+        plot(tmpt,tmpq(:,j),'Color',Morandi_popsicle(1),'LineWidth',1.0);
+        hold on; grid on;
+        ylabel(ylabels{j});
+    end
+    xlabel('Phase');
+end
+tmpData = expQuat;
+tmpt = query;
+for j = 1:4
+    subplot(4,1,j);
+    plot(tmpt,tmpData(j,:),'Color',Morandi_popsicle(2),'LineWidth',2.0);
+    grid on;
+end
+%}
+
+% Reflex data
+%{
+% Upper position
+cutPoint = 200;
+dataReflex.upperP = expData(4:6,cutPoint:end);
+figure;
+tmpData = dataReflex.upperP*1000+[16.26, 1.7654e+02,-1.2315e+02-398]';
+plot3(tmpData(1,:), tmpData(2,:), tmpData(3,:),'Color', Morandi_carnation(2),'LineWidth',2.0);
+grid on; axis equal;
+xlabel('x(mm)'); ylabel('y(mm)'); zlabel('z(mm)');
+view(40,20);
+%}
+
+% Upper-Lower orientation
+%{
+% Upper orientation
+% dataReflex.upperQ = tmpQuat2';
+figure;
+ylabels = {'v', 'u_{x}', 'u_{y}', 'u_{z}'};
+tmpData = dataReflex.upperQ;
+tmpt = query;
+for j = 1:4
+    subplot(4,1,j);
+    plot(tmpt,tmpData(j,:),'Color',Morandi_carnation(2),'LineWidth',2.0);
+    grid on;ylabel(ylabels{j});
+    if j == 1
+        axis([-Inf, Inf, 0.6,1]);
+    else
+        axis([-Inf,Inf,-0.2,0.2]);
+    end
+end
+xlabel('Phase');
+% Lower orientation - eul
+% dataReflex.lowerQ = tmpQuat';
+figure;
+ylabels = {'v', 'u_{x}', 'u_{y}', 'u_{z}'};
+tmpData = dataReflex.lowerQ;
+tmpt = query;
+for j = 1:4
+    subplot(4,1,j);
+    plot(tmpt,tmpData(j,:),'Color',Morandi_carnation(2),'LineWidth',2.0);
+    grid on;ylabel(ylabels{j});
+    if j == 1
+        axis([-Inf, Inf, 0.6,1]);
+    else
+        axis([-Inf,Inf,-0.2,0.2]);
+    end
+end
+xlabel('Phase');
+
+tmpTest = quat2eul(dataReflex.lowerQ');
+tmpTest(:,1) = tmpTest(:,1)/50;
+tmpTest(:,2) = tmpTest(:,2)/2;
+tmpTest(:,3) = tmpTest(:,3)/50;
+tmpQuat = eul2quat(tmpTest);
+tmpTest2 = tmpTest;
+tmpTest2(:,1) = 0;
+tmpTest2(:,3) = 0;
+tmpTest2(:,2) = - tmpTest2(:,2);
+tmpQuat2 = eul2quat(tmpTest2);
+%}
+
+% critical points
+%{
+tmpIndices = round(linspace(1,size(dataReflex.upperP,2),15));
+dataReflex.upperPCritical = dataReflex.upperP(:,tmpIndices);
+dataReflex.upperQCritical = dataReflex.upperQ(:,tmpIndices);
+dataReflex.lowerQCritical = dataReflex.lowerQ(:,tmpIndices);
+dataReflex.points = zeros(15,7);
+dataReflex.points(:,1:3) = dataReflex.upperPCritical'*1000 + [16.26, 1.7654e+02,-1.2315e+02-398];      % x y z
+tmpData = quat2eul(dataReflex.upperQCritical');
+tmpData = rad2deg(tmpData);
+dataReflex.points(:,4) = tmpData(:,2);                              % alpha
+dataReflex.points(:,5:7) = rad2deg(quat2eul(dataReflex.lowerQCritical'));       % alpha beta gamma
+%
+writematrix(dataReflex.points,'BB_dualarmMotionGen_reflex.txt','Delimiter','space');
+%}
 
 

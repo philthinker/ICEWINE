@@ -27,14 +27,16 @@ view(3);
 
 %% Import OptitrackData data
 
-% M = 21;
-% optiData = repmat(OptitrackData(2,8),[1,M]);
-% path = 'DECANTER\Blueberry\Data\11-21-2\';
+M = 7;
+optiData = repmat(OptitrackData(2,8),[1,M]);
+path = 'DECANTER\Blueberry\Data\10-26\00';
 
 for i = 1:M
     optiData(i) = optiData(i).readOptitrackData(path,i);
 %     optiData(i).plotMarkersXYZ();
-    optiData(i).plot3Markers();
+%     optiData(i).plotBodiesXYZ();
+    optiData(i).plot3Bodies();
+%     optiData(i).plot3Markers();
 end
 
 r = zeros(M,2+8);

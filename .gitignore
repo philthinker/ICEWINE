@@ -5,3 +5,5 @@ pbdlib\*
 *.m~
 *.csv
 .DS_Store
+*.eps
+
