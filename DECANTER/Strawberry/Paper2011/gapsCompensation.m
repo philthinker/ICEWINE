@@ -106,6 +106,7 @@ dataGPCompen.DataTQuatPosi = [dataGPCompen.Data(1,:);...
     dataGPCompen.Data(5:7,:)];
 %}
 % Show
+%{
 ylabels = {'qw','qx','qy','qz','x(m)','y(m)','z(m)'};
 figure;
 for i = 1:7

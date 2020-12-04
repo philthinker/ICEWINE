@@ -78,6 +78,17 @@ for j = 1:4
 %     100,[1.0,0.0,0.0],'filled');
 end
 xlabel('Phase');
+
+ylabels = {'\eta_x','\eta_y','\eta_z'};
+figure;
+for j = 1:3
+    subplot(3,1,j);
+    plot(query, exp_etaPanda(j,:),'Color',Morandi_popsicle(2),'LineWidth',3.0);
+    ylabel(ylabels{j}); grid on;
+%     scatter(query(criticalID), exp_qPanda(j,criticalID),...
+%     100,[1.0,0.0,0.0],'filled');
+end
+xlabel('Phase');
 %}
 
 

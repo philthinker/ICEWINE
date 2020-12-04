@@ -11,6 +11,11 @@ classdef OptitrackData
     %   |   Nc:	num. of columns in raw data
     %   |   Nb:	num. of rigid bodies
     %   |   Nm:	num. of markers
+    %
+    %   It is recommended to use the following work flow:
+    %   |   1. obj = OpittrackData(Nb,Nm);
+    %   |   2. obj = obj.readOptitrackData(dataPath,M);
+    %   |   3. [obj, Data] = obj.regulateRawData();
     
     properties
         N;                % integer, num. of data
@@ -98,6 +103,22 @@ classdef OptitrackData
                 Data = tmpData(j:end,:);
             end
             obj = OptitrackData(obj.Nb,obj.Nm,Data);
+        end
+        
+        function [obj, r] = regulateRawData(obj)
+            %regulateRawData Regulate the raw optitrack data for easy usage
+            %   Never call it twice!
+            %   |   1. Bodies', markers' data are regulated to [qw qx qy qz x y z]
+            %   |   2. The 'qw's are set to be positive
+            %   -----------------------------------------
+            %   r: 1 x Nb+Nm, point loss rate
+            r = zeros(1, obj.Nb+obj.Nm);
+            if obj.Nb > 0
+                for i = 1:obj.Nb
+                    obj.body{i} = obj.dataRegulate(obj.body{i});
+                end
+            end
+            r = obj.getPointLossRate();
         end
         
         function [Data] = getBodyData(obj,index)
@@ -299,8 +320,11 @@ classdef OptitrackData
             DataOut = DataOut';
         end
         % Data pre-process
+        %%%%%%%%%%%%%%%%%%%%%%%%
         [flag, order] = orderCheck(obj, distances, epsilon);
         [timeOut,dataOut] = dataCurtail(obj,range,mod);
+        [Data,r,gap] = dataRegulate(obj,rawData);
+        %%%%%%%%%%%%%%%%%%%%%%%%
         function [obj] = markerReorder(obj,order)
             %markerReorder Reorder the marker's data with a new order
             %   order:  1 x Nm integer, new order
