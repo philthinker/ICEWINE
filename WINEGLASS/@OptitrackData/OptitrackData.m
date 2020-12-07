@@ -31,7 +31,7 @@ classdef OptitrackData
         function obj = OptitrackData(Nb,Nm,Data)
             %OptitrackData Initialize the data storation
             %   Data: N x Nc, raw data
-            %   |   frame, time, qx, qy, qz, x, y, z, ..., x, y, z
+            %   |   frame, time, qx, qy, qz, qw, x, y, z, ..., x, y, z
             %   Nb: integer, num. of rigid bodies
             %   Nm: integer, num. of markers
             obj.tag = ' ';
