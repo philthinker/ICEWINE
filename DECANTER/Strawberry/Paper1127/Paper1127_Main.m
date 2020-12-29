@@ -23,3 +23,8 @@ for i = 1:M
     optiData(i) = optiData(i).CSVRead(strcat(dataPath,int2str(i)));
 end
 
+% Raw data show
+
+
+
+
