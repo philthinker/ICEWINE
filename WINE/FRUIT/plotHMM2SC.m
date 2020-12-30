@@ -29,7 +29,7 @@ for i=1:nbStates
 		[cos(nodeAngle(i)+pi/3); sin(nodeAngle(i)+pi/3)] * nodeRadius*2;
 	dirTmp = nodePos(:,i) - posTmp;
 	dirTmp = (norm(dirTmp)-nodeRadius) * dirTmp/norm(dirTmp);
-	plot2DArrow(posTmp, dirTmp, max([.8 .8 .8]-StatePrior(i)*.8,0)); 
+	plot2DArrowSC(posTmp, dirTmp, max([.8 .8 .8]-StatePrior(i)*.8,0)); 
 	
 	%Plot self-transitions
 	d = nodeRadius*1.2;
@@ -40,7 +40,7 @@ for i=1:nbStates
 	a = linspace(nodeAngle(i)+pi-aTmp, nodeAngle(i)-pi+aTmp, nodePts);
 	meshTmp = [cos(a); sin(a)] * r + repmat(posTmp,1,nodePts);
 	plot(meshTmp(1,:), meshTmp(2,:), 'linewidth', 2, 'color', max([.8 .8 .8]-Trans(i,i)*ff,0)); 
-	plot2DArrow(meshTmp(:,end-10), meshTmp(:,end)-meshTmp(:,end-10), max([.8 .8 .8]-Trans(i,i)*ff,0)); 
+	plot2DArrowSC(meshTmp(:,end-10), meshTmp(:,end)-meshTmp(:,end-10), max([.8 .8 .8]-Trans(i,i)*ff,0)); 
 
 	for j=i+1:nbStates
 		%Plot Trans
@@ -48,7 +48,7 @@ for i=1:nbStates
 		dirTmp = (norm(dirTmp)-2*nodeRadius) * dirTmp/norm(dirTmp);
 		offTmp = [dirTmp(2); -dirTmp(1)] / norm(dirTmp);
 		posTmp = nodePos(:,i) + nodeRadius * dirTmp/norm(dirTmp) + offTmp*0.05;
-		plot2DArrow(posTmp, dirTmp, max([.8 .8 .8]-Trans(i,j)*ff,0)); 
+		plot2DArrowSC(posTmp, dirTmp, max([.8 .8 .8]-Trans(i,j)*ff,0)); 
 	end
 	for j=1:i
 		%Plot Trans
@@ -56,7 +56,7 @@ for i=1:nbStates
 		dirTmp = (norm(dirTmp)-2*nodeRadius) * dirTmp/norm(dirTmp);
 		offTmp = [dirTmp(2); -dirTmp(1)] / norm(dirTmp);
 		posTmp = nodePos(:,i) + nodeRadius * dirTmp/norm(dirTmp) + offTmp*0.05;
-		plot2DArrow(posTmp, dirTmp, max([.8 .8 .8]-Trans(i,j)*ff,0)); 
+		plot2DArrowSC(posTmp, dirTmp, max([.8 .8 .8]-Trans(i,j)*ff,0)); 
 	end
 end
 

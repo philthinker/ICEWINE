@@ -1,7 +1,7 @@
 <!--
  * @Author: Haopeng Hu
  * @Date: 2019-08-06 14:04:36
- * @LastEditTime: 2020-12-29 22:10:31
+ * @LastEditTime: 2020-12-29 22:11:48
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: \undefinedc:\Users\philt\Documents\GitHub\ICEWINE\README.md
@@ -14,7 +14,7 @@ Haopeng Hu
 
 2019.08.06
 
-![heytea](https://github.com/philthinker/ICEWINE/blob/master/CELLAR/yaoyao.jpg)
+![yaoyao](https://github.com/philthinker/ICEWINE/blob/master/CELLAR/yaoyao.jpg)
 
 - CELLAR: Classic and personal collections.
 - DECANTER: Tasting wine.
