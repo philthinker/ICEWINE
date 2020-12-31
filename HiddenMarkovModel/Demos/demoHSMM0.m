@@ -1,40 +1,13 @@
-function demo_HMM02
+%demoHSMM0
+
 % Emulation of HSMM with a standard HMM 
-%
-% If this code is useful for your research, please cite the related publication:
-% @incollection{Calinon19chapter,
-% 	author="Calinon, S. and Lee, D.",
-% 	title="Learning Control",
-% 	booktitle="Humanoid Robotics: a Reference",
-% 	publisher="Springer",
-% 	editor="Vadakkepat, P. and Goswami, A.", 
-% 	year="2019",
-% 	doi="10.1007/978-94-007-7194-9_68-1",
-% 	pages="1--52"
-% }
-% 
-% Copyright (c) 2019 Idiap Research Institute, http://idiap.ch/
-% Written by Sylvain Calinon, http://calinon.ch/
-% 
-% This file is part of PbDlib, http://www.idiap.ch/software/pbdlib/
-% 
-% PbDlib is free software: you can redistribute it and/or modify
-% it under the terms of the GNU General Public License version 3 as
-% published by the Free Software Foundation.
-% 
-% PbDlib is distributed in the hope that it will be useful,
-% but WITHOUT ANY WARRANTY; without even the implied warranty of
-% MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-% GNU General Public License for more details.
-% 
-% You should have received a copy of the GNU General Public License
-% along with PbDlib. If not, see <http://www.gnu.org/licenses/>.
 
 addpath('./CELLAR/pbdlib-matlab-master/demos/m_fcts/');
 
 
 %% Parameters
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+model = [];
 model.nbStates = 5;
 nbData = 100;
 nbSamples = 5;
@@ -164,5 +137,3 @@ ylabel('$P^d_i$','interpreter','latex','fontsize',16);
 %axis square;
 
 %print('-dpng','graphs/demo_HMM02.png');
-pause;
-close all;

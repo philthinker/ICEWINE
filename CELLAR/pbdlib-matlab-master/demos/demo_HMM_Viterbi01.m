@@ -30,7 +30,7 @@ function demo_HMM_Viterbi01
 % You should have received a copy of the GNU General Public License
 % along with PbDlib. If not, see <http://www.gnu.org/licenses/>.
 
-addpath('./m_fcts/');
+addpath('./CELLAR/pbdlib-matlab-master/demos/m_fcts/');
 
 
 %% Parameters
@@ -43,7 +43,7 @@ nbSamples = 1;
 %% Load handwriting data
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 demos=[];
-load('data/2Dletters/C.mat');
+load('./CELLAR/pbdlib-matlab-master/demos/data/2Dletters/C.mat');
 %nbSamples = length(demos);
 Data=[];
 for n=1:nbSamples

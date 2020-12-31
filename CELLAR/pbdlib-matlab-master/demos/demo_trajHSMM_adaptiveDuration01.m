@@ -56,7 +56,7 @@ function demo_trajHSMM_adaptiveDuration01
 % You should have received a copy of the GNU General Public License
 % along with PbDlib. If not, see <http://www.gnu.org/licenses/>.
 
-addpath('./m_fcts/');
+addpath('./CELLAR/pbdlib-matlab-master/demos/m_fcts/');
 
 
 %% Parameters
@@ -85,7 +85,8 @@ u = zeros(nbData,1); %No perturbation signal
 
 %% Load handwriting dataset
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-load('data/2Dletters/S.mat');
+demos = [];
+load('./CELLAR/pbdlib-matlab-master/demos/data/2Dletters/S.mat');
 Data = [];
 for n=1:nbSamples
 	% Resampling

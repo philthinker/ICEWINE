@@ -30,8 +30,7 @@ function demo_HSMM_MPC01
 % You should have received a copy of the GNU General Public License
 % along with PbDlib. If not, see <http://www.gnu.org/licenses/>.
 
-addpath('./m_fcts/');
-
+addpath('./CELLAR/pbdlib-matlab-master/demos/m_fcts/');
 
 %% Parameters
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -48,8 +47,8 @@ nbD = round(2.5*nbData/model.nbStates); %Number of maximum duration step to cons
 
 %% Load handwriting data
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-demos=[];
-load('data/2Dletters/G.mat');
+demos = [];
+load('./CELLAR/pbdlib-matlab-master/demos/data/2Dletters/G.mat');
 Data=[];
 for n=1:nbSamples
 	s(n).Data = spline(1:size(demos{n}.pos,2), demos{n}.pos, linspace(1,size(demos{n}.pos,2),nbData)); %Resampling
