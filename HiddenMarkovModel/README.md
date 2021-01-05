@@ -18,6 +18,7 @@ All rights reserved.
 ## Classes
 
 - HMMZero: Zero version of typical hidden markov model.
+- HSMMZero: Zero version of typical hidden semi-markov model.
 
 ## Demos
 

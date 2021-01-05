@@ -29,6 +29,7 @@ classdef HSMMZero
         Trans;        % K x K, Transition of states
         MuPd;       % 1 x K, Temporal centers of each state
         SigmaPd;   % 1 x 1 x K, Temporal variances of each state
+        dt;             % scalar, Time difference
     end
     
     properties (Access = protected)
@@ -53,6 +54,7 @@ classdef HSMMZero
             obj.Prior = ones(1,obj.K);
             obj.StatePrior = zeros(1, obj.K); obj.StatePrior(1) = 1;
             obj.Trans = eye(obj.K);
+            obj.dt = 1e-3;
         end
         %% Model initialization and learning
         obj = initHMMKmeans(obj,Demos);
@@ -96,15 +98,8 @@ classdef HSMMZero
         end
         
         %% HSMM Inference
-        function [s, d, h] = reconstructStSeq(obj, N)
-            %reconstructStSeq Reconstrunct the state sequence
-            %   N: Integer, num. of state data required
-            %   -----------------------------------------
-            %   s: 1 x N, state sequence
-            %   d: K x N, state duration distributions
-        end
-        [s,d,h] = reconstructStSeq_FastFW(obj,N);
-        [s,d,h] = reconstructStSeq_ExplicitFW(obj,N);
+        [h,s] = reconstructStSeq_StandardFW(obj, N);
+        [h,s] = reconstructStSeq_FastFW(obj,N);
     end
     
     methods (Access = protected)
@@ -114,6 +109,7 @@ classdef HSMMZero
         [prob] = GaussPDF(obj,Data, Mu, Sigma);
         %% HSMM functions
         [obj,GAMMA2,LL] = EMHMMZero(obj,Demos);
+        [Pd, NGen] = durationAssign_Uniform(obj,N,c);
     end
 end
 
