@@ -38,7 +38,7 @@ function demo_trajMFA01
 % You should have received a copy of the GNU General Public License
 % along with PbDlib. If not, see <http://www.gnu.org/licenses/>.
 
-addpath('./m_fcts/');
+addpath('./CELLAR/pbdlib-matlab-master/demos/m_fcts/');
 
 
 %% Parameters
@@ -58,12 +58,14 @@ nbSamples = 5; %Number of trajectory samples
 %% Load handwriting data
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 demos=[];
-load('data/2Dletters/G.mat'); %Load x1,x2 variables
+%Load x1,x2 variables
+load('./CELLAR/pbdlib-matlab-master/demos/data/2Dletters/G.mat');
 for n=1:nbSamples
 	s(n).Data = spline(1:size(demos{n}.pos,2), demos{n}.pos, linspace(1,size(demos{n}.pos,2),nbData)); %Resampling
 end
 demos=[];
-load('data/2Dletters/C.mat'); %Load x3,x4 variables
+%Load x3,x4 variables
+load('./CELLAR/pbdlib-matlab-master/demos/data/2Dletters/C.mat');
 Data=[];
 for n=1:nbSamples
 	s(n).Data = [s(n).Data; spline(1:size(demos{n}.pos,2), demos{n}.pos, linspace(1,size(demos{n}.pos,2),nbData))]; %Resampling
