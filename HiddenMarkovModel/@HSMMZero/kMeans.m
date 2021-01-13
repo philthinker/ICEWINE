@@ -17,7 +17,7 @@ maxIter = 100;
 % Initialization of the parameters
 [~, nbData] = size(Data);
 
-nbStates = obj.nKernel;
+nbStates = obj.K;
 
 cumdist_old = -realmax;
 nbStep = 0;

@@ -1,7 +1,7 @@
 <!--
  * @Author: Haopeng Hu
  * @Date: 2020-12-30 10:02:10
- * @LastEditTime: 2021-01-06 17:50:39
+ * @LastEditTime: 2021-01-13 22:35:30
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: \undefinedc:\Users\philt\Documents\GitHub\ICEWINE\HiddenMarkovModel\README.md
@@ -20,6 +20,7 @@ All rights reserved.
 - HMMZero: Zero version of typical hidden markov model.
 - HSMMZero: Zero version of typical hidden semi-markov model.
 - TrajHSMMZero < HSMMZero: Zero version of traj-HSMM.
+- LfDHSMMZero < HSMMZero: Zero version of HSMM used for LfD. It shares the same demo with HSMMZero.
 
 ## Demos
 
