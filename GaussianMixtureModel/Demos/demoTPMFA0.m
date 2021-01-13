@@ -1,5 +1,5 @@
-function demo_TPMPPCA01
-% Task-parameterized mixture of probabilistic principal component analyzers (TP-MPPCA). 
+%demoTPMFA0
+% Task-parameterized mixture of factor analyzers (TP-MFA).
 %
 % Writing code takes time. Polishing it and making it available to others takes longer! 
 % If some parts of the code were useful for your research of for a better understanding 
@@ -43,7 +43,7 @@ addpath('./CELLAR/pbdlib-matlab-master/demos/m_fcts/');
 model.nbStates = 3; %Number of Gaussians in the GMM
 model.nbFrames = 2; %Number of candidate frames of reference
 model.nbVar = 2; %Dimension of the datapoints in the dataset (here: x1,x2)
-model.nbFA = 1; %Dimension of the subspace (number of principal components)
+model.nbFA = 1; %Dimension of the subspace (number of factor analyzers)
 
 
 %% Load 3rd order tensor data
@@ -58,11 +58,11 @@ disp('Load 3rd order tensor data...');
 load('./CELLAR/pbdlib-matlab-master/demos/data/Data01.mat');
 
 
-%% TP-MPPCA learning
+%% TP-MFA learning
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-fprintf('Parameters estimation of TP-MPPCA with EM:');
+fprintf('Parameters estimation of TP-MFA with EM:');
 model = init_tensorGMM_kmeans(Data, model); 
-model = EM_tensorMPPCA(Data, model);
+model = EM_tensorMFA(Data, model);
 
 %Reconstruct GMM for each demonstration
 for n=1:nbSamples
@@ -108,7 +108,7 @@ for m=1:model.nbFrames
 	axis square; set(gca,'xtick',[0],'ytick',[0]);
 end
 
-%print('-dpng','graphs/demo_TPMPPCA01.png');
+%print('-dpng','graphs/demo_TPMFA01.png');
 %pause;
 %close all;
 

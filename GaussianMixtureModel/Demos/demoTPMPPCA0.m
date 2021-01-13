@@ -1,4 +1,4 @@
-function demo_TPMPPCA01
+%demoTPMPPCA0
 % Task-parameterized mixture of probabilistic principal component analyzers (TP-MPPCA). 
 %
 % Writing code takes time. Polishing it and making it available to others takes longer! 

@@ -32,7 +32,7 @@ function benchmark_DS_TP_MFA01
 % You should have received a copy of the GNU General Public License
 % along with PbDlib. If not, see <http://www.gnu.org/licenses/>.
 
-addpath('./../m_fcts/');
+addpath('CELLAR/pbdlib-matlab-master/demos/m_fcts/');
 
 
 %% Parameters
@@ -57,8 +57,7 @@ disp('Load 3rd order tensor data...');
 % in the different frames. It is a 3rd order tensor of dimension D x P x N, with D=3 the dimension of a
 % datapoint, P=2 the number of candidate frames, and N=200x4 the number of datapoints in a trajectory (200)
 % multiplied by the number of demonstrations (5).
-load('./../data/DataLQR01.mat');
-
+load('CELLAR/pbdlib-matlab-master/demos/data/DataLQR01.mat'); 
 
 %% Transformation of 'Data' to learn the path of the spring-damper system
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
