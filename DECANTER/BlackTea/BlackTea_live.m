@@ -49,3 +49,20 @@ for i = 1:9
     DataXZAppGen(M+i).SO20 = GeneralizedPoseApp(i).init_se3([1,3],[1,3],1);
 end
 %}
+
+%% Initial state determination
+%
+DP = 2;
+K = 1;
+currP = [0,0]';
+c = 1;
+dState2 = zeros(1, K);
+Mu = [1,1]';
+Sigma = 2*repmat(eye(2),[1,1,1]);
+for i = 1:K
+    Xi = currP - Mu(1:DP,i);
+    Sigmai = Sigma(1:DP, 1:DP, i);
+    dState2(i) = c * (Xi' * (Sigmai \ Xi));
+end
+[~, StateID] = min(dState2);
+%}

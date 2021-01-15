@@ -29,7 +29,8 @@ classdef HSMMZero
         Trans;        % K x K, Transition of states
         MuPd;       % 1 x K, Temporal centers of each state
         SigmaPd;   % 1 x 1 x K, Temporal variances of each state
-        dt;             % scalar, Time difference
+        dt;             % Scalar, Time difference
+        logFlag;     % Boolean, true for using log normal duration distribution
     end
     
     properties (Access = protected)
@@ -43,12 +44,18 @@ classdef HSMMZero
     end
     
     methods
-        function obj = HSMMZero(D,K)
+        function obj = HSMMZero(D,K,logFlag)
             %HSMMZero Initialization with dim. and num. of kernels
             %   D: Integer, dim. of states
             %   K: Integer, num. of Gaussian states
+            %   logFlag: Boolean, true for using log normal duration
+            %   distribution. (default: false)
             obj.D = ceil(D(1,1));
             obj.K = ceil(K(1,1));
+            if nargin < 3
+                logFlag = false;
+            end
+            obj.logFlag = logFlag;
             obj.Mu = zeros(obj.D, obj.K);
             obj.Sigma = zeros(obj.D, obj.D, obj.K);
             obj.Prior = ones(1,obj.K);
@@ -79,17 +86,33 @@ classdef HSMMZero
             st = repmat(st,[1,obj.K]);
             [~,hmax] = max(H);
             currState = hmax(1);
-            cnt = 1;
-            for t=1:length(hmax)
-                if (hmax(t)==currState)
-                    cnt = cnt+1;
-                else
-                    st(currState).d = [st(currState).d cnt];
-                    cnt = 1;
-                    currState = hmax(t);
+            if obj.logFlag
+                % Log normal distribution
+                cnt = 1;
+                for t=1:length(hmax)
+                    if (hmax(t)==currState)
+                        cnt = cnt+1;
+                    else
+                        st(currState).d = [st(currState).d log(cnt)];
+                        cnt = 1;
+                        currState = hmax(t);
+                    end
                 end
+                st(currState).d = [st(currState).d log(cnt)];
+            else
+                % Normal distribution
+                cnt = 1;
+                for t=1:length(hmax)
+                    if (hmax(t)==currState)
+                        cnt = cnt+1;
+                    else
+                        st(currState).d = [st(currState).d cnt];
+                        cnt = 1;
+                        currState = hmax(t);
+                    end
+                end
+                st(currState).d = [st(currState).d cnt];
             end
-            st(currState).d = [st(currState).d cnt];
             % Compute state duration as Gaussian distribution
             for i=1:obj.K
                 obj.MuPd(1,i) = mean(st(i).d);

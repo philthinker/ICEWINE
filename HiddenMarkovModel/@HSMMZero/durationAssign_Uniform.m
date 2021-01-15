@@ -19,10 +19,20 @@ end
 
 %Precomputation of duration probabilities 
 Pd = zeros(obj.K, NGen);
-for i=1:obj.K
-	Pd(i,:) = obj.GaussPDF( (1:NGen), obj.MuPd(:,i), obj.SigmaPd(:,:,i) ); 
-	%The rescaling formula below can be used to guarantee that the cumulated sum is one (to avoid the numerical issues)
-	Pd(i,:) = Pd(i,:) / sum(Pd(i,:));
+if obj.logFlag
+    % Log normal distribution
+    for i=1:obj.K
+        Pd(i,:) = obj.GaussPDF( log((1:NGen)), obj.MuPd(:,i), obj.SigmaPd(:,:,i) );
+        %The rescaling formula below can be used to guarantee that the cumulated sum is one (to avoid the numerical issues)
+        Pd(i,:) = Pd(i,:) / sum(Pd(i,:));
+    end
+else
+    % Normal distribution
+    for i=1:obj.K
+        Pd(i,:) = obj.GaussPDF( (1:NGen), obj.MuPd(:,i), obj.SigmaPd(:,:,i) );
+        %The rescaling formula below can be used to guarantee that the cumulated sum is one (to avoid the numerical issues)
+        Pd(i,:) = Pd(i,:) / sum(Pd(i,:));
+    end
 end
 
 end

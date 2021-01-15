@@ -55,14 +55,14 @@ DemosPApp = extractDataFieldAsCell(DataXZAppResam,'xi');
 policyApp = LfDHSMMZero(2,DD,7,0.1);
 policyApp = policyApp.initHMMKmeans(DemosPApp);
 
-figure;
-hold on;
-for i = 1:M
-    tmpData = DemosPApp{i};
-    plot(tmpData(1,:), tmpData(2,:),'Color',[0.5,0.5,0.5]);
-end
-plotGMM2SC(policyApp.Mu(1:2,:),policyApp.Sigma(1:2,1:2,:),[0, 0.5, 0.5], 0.6);
-axis equal; grid on; xlabel('x(m)'); ylabel('z(m)');
+% figure;
+% hold on;
+% for i = 1:M
+%     tmpData = DemosPApp{i};
+%     plot(tmpData(1,:), tmpData(2,:),'Color',[0.5,0.5,0.5]);
+% end
+% plotGMM2SC(policyApp.Mu(1:2,:),policyApp.Sigma(1:2,1:2,:),[0, 0.5, 0.5], 0.6);
+% axis equal; grid on; xlabel('x(m)'); ylabel('z(m)');
 
 policyApp = policyApp.initTransUniform();
 policyApp = policyApp.leanHMM(DemosPApp);
@@ -83,17 +83,27 @@ axis equal; grid on; xlabel('x(m)'); ylabel('z(m)');
 %
 N = 100;
 
+[traj, trajSigma, ht, seq] = policyApp.constructTraj_AdaptInit0([0.4,0.1]', N);
+% [traj, trajSigma] = policyApp.constructTraj_lscov(seq,dt);
 
-
-[traj, trajSigma] = policyApp.constructTraj_lscov(seq,dt);
-
+% Cartesian plot
 figure;
 hold on;
-for i =1:M
-    plot(DataXZAppResam(i).xi(1,:), DataXZAppResam(i).xi(2,:),'Color',[0.8,0.8,0.8]);
+for i =1:1
+    plot(DataXZAppResam(i).xi(1,:), DataXZAppResam(i).xi(2,:),'Color',[0.5,0.5,0.5]);
 end
-plot(traj(1,:), traj(2,:), 'Color', Morandi_carnation(2),'LineWidth',2.5);
+plot(traj(1,:), traj(2,:), 'Color', Morandi_carnation(2),'LineWidth',2.0);
 grid on; axis equal; xlabel('x(m)'); ylabel('z(m)');
+
+% Timeline plot
+figure;
+ylabels = {'x(m)', 'z(m)'};
+for i = 1:2
+    t = (1:N)*dt - dt;
+    subplot(2,1,i);
+    plot(t, traj(i,:));
+    grid on; xlabel('t(s)'); ylabel(ylabels{i});
+end
 
 %Timeline plot of the state sequence probabilities
 figure; 

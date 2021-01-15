@@ -1,5 +1,5 @@
-function [traj,trajSigma,h,seq] = constructTraj_AdaptInit(obj, currP, N)
-%constructTraj_AdaptInit Construct a trajectory with adaptive initial state
+function [traj,trajSigma,h,seq] = constructTraj_TP0(obj, initP, goalP, dt);
+%constructTraj_TP0 Construct the trajectory in a TP manner.
 %   currP: DP x 1, the initial position
 %   N: Integer, num. of states
 %   -------------------------------------------------
@@ -12,7 +12,7 @@ function [traj,trajSigma,h,seq] = constructTraj_AdaptInit(obj, currP, N)
 K = obj.K;
 
 % Initial state
-s0 = obj.initialState(currP,2);
+s0 = obj.initialState(currP);
 obj.StatePrior = zeros(1,K);
 obj.StatePrior(s0) = 1;
 
@@ -36,6 +36,8 @@ for t=1:N
 end
 h = h ./ repmat(sum(h,1),K,1);
 [~, seq] = max(h);
+
+[traj, trajSigma] = obj.constructTraj_lscov(seq, obj.dt);
 
 end
 

@@ -42,10 +42,11 @@ classdef LfDHSMMZero < TrajHSMMZero
         
         %% Sequence generation related functions
         [StateID] = initialState(obj, currP,c);
-        [traj,trajSigma,h,seq] = constructTraj_AdaptInit(obj, currP);
+        [traj,trajSigma,h,seq] = constructTraj_AdaptInit0(obj, currP,N);
+        [traj,trajSigma,h,seq] = constructTraj_TP0(obj, initP, goalP, dt);
     end
     
-    methods
+    methods (Access = protected)
         % Auxiliary functions
     end
 end
