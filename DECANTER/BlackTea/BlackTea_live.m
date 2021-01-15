@@ -32,3 +32,20 @@ axis equal; grid on;
 xlabel('x(m)');  ylabel('z(m)');
 %}
 
+%% XZ data generalization
+%{
+DataXZAppGen = [];
+DataXZAppGen.p0 = zeros(2,1);
+DataXZAppGen.SO20 = eye(3);
+DataXZAppGen = repmat(DataXZAppGen,[1,18]);
+% For retrieval
+for i = 1:9
+    DataXZAppGen(i).p0 = DataXZApp(i).p(:,1);
+    DataXZAppGen(i).SO20 = DataXZApp(i).SO2(:,:,1);
+end
+% For generalization
+for i = 1:9
+    DataXZAppGen(M+i).p0 = GeneralizedPoseApp(i).init_p([1,3],1);
+    DataXZAppGen(M+i).SO20 = GeneralizedPoseApp(i).init_se3([1,3],[1,3],1);
+end
+%}

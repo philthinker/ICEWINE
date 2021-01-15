@@ -1,14 +1,16 @@
-classdef LfDHSMMZero < HSMMZero
+classdef LfDHSMMZero < TrajHSMMZero
     %LfDHSMMZero HSMM for LfD studies
     %   Initialization with dim. and num. of states. and time difference
     %   States of the HSMM is assumed to be Gaussian
     %
     %   Haopeng Hu
-    %   2021.01.01 Happy New Year!
+    %   2021.01.14
     %   All rights reserved.
     %
     %   Notations:
     %   |   D:  Dim. of data
+    %   |   DP: Dim. of position
+    %   |   DD: Order of derivation
     %   |   N:  Num. of data
     %   |   K:  Num. of kernels
     %   |   M: Num. of demos
@@ -18,23 +20,29 @@ classdef LfDHSMMZero < HSMMZero
     %   2   obj = obj.initHMM...
     %   3   obj = obj.initTrans...
     %   4   obj = obj.leanHMM...
+    %   5   [...] = obj.reconstructStSeq_...
+    %   6   [...] = obj.constructTraj...
     
     properties
         
     end
     
     methods
-        function obj = LfDHSMMZero(D,K,dt)
+        function obj = LfDHSMMZero(DP, DD, K,dt)
             %LfDHSMMZero Initialization with dim. and num. of states. and
             %time difference
-            %   D: Integer, dim. of states
+            %   DP: Integer, DP, dim. of position
+            %   DD: Integer, DD, order of derivation
             %   K: Integer, num. of Gaussian states
             %   dt: Scalar, the time difference
-            obj = obj@HSMMZero(D,K);
-            dt = max(1e-3,dt);
+            obj = obj@TrajHSMMZero(DP,DD,K);
+            dt = max(1e-3,dt);  % 1ms
             obj.dt = dt;
         end
-        %% Sequence generation
+        
+        %% Sequence generation related functions
+        [StateID] = initialState(obj, currP,c);
+        [traj,trajSigma,h,seq] = constructTraj_AdaptInit(obj, currP);
     end
     
     methods

@@ -2,3 +2,4 @@
 
 addpath('GaussianMixtureModel');
 addpath('HiddenMarkovModel');
+addpath('GaussianProcess');
