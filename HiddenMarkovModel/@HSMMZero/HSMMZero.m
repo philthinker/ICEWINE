@@ -123,6 +123,7 @@ classdef HSMMZero
         %% HSMM Inference
         [h,s] = reconstructStSeq_StandardFW(obj, N);
         [h,s] = reconstructStSeq_FastFW(obj,N);
+        [h,s] = reconstructStSeq_StochasticSamp(obj, N);
     end
     
     methods (Access = protected)

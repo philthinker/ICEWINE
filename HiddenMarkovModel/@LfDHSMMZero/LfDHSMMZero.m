@@ -48,6 +48,7 @@ classdef LfDHSMMZero < TrajHSMMZero
         %% Sequence generation related functions
         [StateID] = initialState(obj, currP,c);
         [traj,h,seq] = constructTraj_LQR1(obj,currP,N);
+        [traj,h,seq] = constructTraj_LQR1Itera(obj,currP,N);
     end
     
     methods (Access = protected)
