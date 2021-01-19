@@ -4,8 +4,7 @@
 %   Orientation does not enter into account.
 %   - Adaptive initial state distribution.
 %   - TrajHSMM formulation
-%   - Accessible num. of data points in trajectories.
-%   - Accessible goal distribution.
+%   Failed.
 %
 %   Haopeng Hu
 %   2021.01.15
@@ -15,7 +14,7 @@
 
 %% Data resample
 %
-DD = 2;
+DD = 3;
 DataXZAppResam = DataXZApp;
 for i = 1:M
     tmpData = DataXZApp(i).p;
@@ -53,7 +52,7 @@ end
 %
 DemosPApp = extractDataFieldAsCell(DataXZAppResam,'xi');
 
-policyApp = LfDHSMMZero(2,DD,7,0.1);
+policyApp = LfDHSMMZero(2,DD,7,0.1,false);
 policyApp = policyApp.initHMMKmeans(DemosPApp);
 
 % figure;
@@ -82,7 +81,7 @@ axis equal; grid on; xlabel('x(m)'); ylabel('z(m)');
 
 %% Demonstration retrieve
 %
-N = 100;
+N = 120;
 
 [traj, trajSigma, ht, seq] = policyApp.constructTraj_AdaptInit0([0.4,0.1]', N);
 % [traj, trajSigma] = policyApp.constructTraj_lscov(seq,dt);

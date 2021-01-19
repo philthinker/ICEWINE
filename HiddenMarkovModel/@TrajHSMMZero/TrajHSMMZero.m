@@ -29,14 +29,19 @@ classdef TrajHSMMZero < HSMMZero
     end
     
     methods
-        function obj = TrajHSMMZero(DP,DD,K)
+        function obj = TrajHSMMZero(DP,DD,K,logFlag)
             %TrajHSMMZero Initialization with dim. of position, order of derivation and num. of states.
             %   DP: Integer, DP
             %   DD: Integer, DD
             %   K: Integer, K
+            %   logFlag: Boolean, true for log normal duration distribution
+            %   (default: false)
+            if nargin < 4
+                logFlag = false;
+            end
             DP = round(max([1, DP(1,1)]));
             DD = round(max([1, DD(1,1)]));
-            obj = obj@HSMMZero(DP*DD,K);
+            obj = obj@HSMMZero(DP*DD,K,logFlag);
             obj.DP = DP;
             obj.DD = DD;
         end

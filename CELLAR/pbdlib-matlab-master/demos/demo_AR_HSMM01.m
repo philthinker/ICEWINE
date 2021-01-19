@@ -22,7 +22,7 @@ function demo_AR_HSMM01
 % along with PbDlib. If not, see <http://www.gnu.org/licenses/>.
 
 
-addpath('./m_fcts/');
+addpath('./CELLAR/pbdlib-matlab-master/demos/m_fcts/');
 
 
 %% Parameters
@@ -63,7 +63,7 @@ nbHist = 2; %Length of time window
 %% Generate continuous data from handwriting data
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 demos = [];
-load('data/2Dletters/C.mat');
+load('./CELLAR/pbdlib-matlab-master/demos/data/2Dletters/C.mat');
 for n=1:nbSamples
 	stmp(n).x = spline(1:size(demos{n}.pos,2), demos{n}.pos, linspace(1,size(demos{n}.pos,2),nbData)); %Resampling
 	stmp(n).x = [(rand(1)-.5) .* 2 .* stmp(n).x(2,:); -stmp(n).x(1,:)];

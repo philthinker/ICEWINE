@@ -31,7 +31,7 @@ function demo_HSMM_online01
 % You should have received a copy of the GNU General Public License
 % along with PbDlib. If not, see <http://www.gnu.org/licenses/>.
 
-addpath('./m_fcts/');
+addpath('./CELLAR/pbdlib-matlab-master/demos/m_fcts/');
 disp('Draw path with the left mouse button, and exit with the right mouse button.');
 
 

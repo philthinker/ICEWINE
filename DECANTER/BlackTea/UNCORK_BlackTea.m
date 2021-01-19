@@ -3,3 +3,4 @@
 addpath('GaussianMixtureModel');
 addpath('HiddenMarkovModel');
 addpath('GaussianProcess');
+addpath('DynamicSystems');

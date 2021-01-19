@@ -16,34 +16,38 @@ classdef LfDHSMMZero < TrajHSMMZero
     %   |   M: Num. of demos
     %
     %   Recommendation:
-    %   1   obj = LfDHSMMZero(D,K);
+    %   1   obj = LfDHSMMZero(DP,DD,K,dt,logFlag);
     %   2   obj = obj.initHMM...
     %   3   obj = obj.initTrans...
     %   4   obj = obj.leanHMM...
-    %   5   [...] = obj.reconstructStSeq_...
-    %   6   [...] = obj.constructTraj...
+    %   5   [...] = obj.constructTraj...
     
     properties
-        
+        r;      % scalar, LQT/LQR factor.
     end
     
     methods
-        function obj = LfDHSMMZero(DP, DD, K,dt)
+        function obj = LfDHSMMZero(DP, DD, K, dt, logFlag)
             %LfDHSMMZero Initialization with dim. and num. of states. and
             %time difference
             %   DP: Integer, DP, dim. of position
             %   DD: Integer, DD, order of derivation
             %   K: Integer, num. of Gaussian states
-            %   dt: Scalar, the time difference
-            obj = obj@TrajHSMMZero(DP,DD,K);
+            %   dt: Scalar, the time difference of the demo data
+            %   logFlag: Boolean, true for log normal duration distribution
+            %   (default: false)
+            if nargin < 5
+                logFlag = false;
+            end
+            obj = obj@TrajHSMMZero(DP,DD,K, logFlag);
             dt = max(1e-3,dt);  % 1ms
             obj.dt = dt;
+            obj.r = 1e-5;
         end
         
         %% Sequence generation related functions
         [StateID] = initialState(obj, currP,c);
-        [traj,trajSigma,h,seq] = constructTraj_AdaptInit0(obj, currP,N);
-        [traj,trajSigma,h,seq] = constructTraj_TP0(obj, initP, goalP, dt);
+        [traj,h,seq] = constructTraj_LQR1(obj,currP,N);
     end
     
     methods (Access = protected)
