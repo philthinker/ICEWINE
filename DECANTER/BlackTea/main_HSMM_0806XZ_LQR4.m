@@ -1,11 +1,7 @@
-%main_HSMM_0806XZ_LQR3
+%main_HSMM_0806XZ_LQR4
 %   HSMM LfD
 %   HSMM (@LfDHSMMZero) with resampled & computed data.
 %   Orientation does not enter into account.
-%   - Adaptive initial state distribution.
-%   - Iterative LQR formulation.
-%   - We erase the state of little probability during trajectory
-%   construction.
 %   Good Luck!
 %
 %   Haopeng Hu
@@ -15,7 +11,7 @@
 %   Exp. with 'Data\pcb_lead0806XZV.mat'
 
 %% Data resample
-%
+%{
 DD = 3;
 DataXZAppResam = DataXZApp;
 for i = 1:M
@@ -51,7 +47,7 @@ end
 %}
 
 %% Learn a HSMM model with raw p data
-%
+%{
 DemosPApp = extractDataFieldAsCell(DataXZAppResam,'p');
 
 policyApp = LfDHSMMZero(2,1,7,0.01,false);
@@ -85,12 +81,15 @@ axis equal; grid on; xlabel('x(m)'); ylabel('z(m)');
 %
 N = 120;
 
+policyApp.r = 2e-3;
+
 tmpID = 9;
 traj = cell(1,M);
 h = cell(1,M);
 seq = cell(1,M);
 for i = 1:M
-    [traj{i}, h{i}, seq{i}] = policyApp.constructTraj_LQR1Itera(DataXZAppResam(i).p(:,1),N);
+%     [traj{i}] = policyApp.SampleHSMMLQR_SC(DataXZAppResam(i).p(:,1),N);
+    [traj{i}, h{i}, seq{i}] = policyApp.constructTraj_LQR1Itera(DataXZAppResam(i).p(:,1), N);
 end
 
 % Cartesian plot
@@ -136,6 +135,7 @@ trajGen = cell(1,MG);
 hGen = cell(1,MG);
 seqGen = cell(1,MG);
 for i = 1:MG
+%     [trajGen{i}] = policyApp.SampleHSMMLQR_SC(DataXZAppGen(i+M).p0,N);
     [trajGen{i}, hGen{i}, seqGen{i}] = policyApp.constructTraj_LQR1Itera(DataXZAppGen(i+M).p0,N);
 end
 
