@@ -144,8 +144,10 @@ figure;
 hold on;
 for i =1:M
     plot(DataXZAppResam(i).p(1,:), DataXZAppResam(i).p(2,:),'Color',[0.5,0.5,0.5]);
+end
+for i = 10:MG
     tmpTraj = trajGen{i};
-plot(tmpTraj(1,:), tmpTraj(2,:), 'Color', Morandi_carnation(i),'LineWidth',2.0);
+    plot(tmpTraj(1,:), tmpTraj(2,:), 'Color', Morandi_carnation(i),'LineWidth',2.0);
 end
 grid on; axis equal; xlabel('x(m)'); ylabel('z(m)');
 %}
