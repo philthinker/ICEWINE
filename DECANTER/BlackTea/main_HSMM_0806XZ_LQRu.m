@@ -1,4 +1,4 @@
-%main_HSMM_0806XZ_Comparison
+%main_HSMM_0806XZ_LQRu
 %   HSMM LfD
 %   HSMM (@LfDHSMMZero) with resampled & computed data.
 %   Orientation does not enter into account.

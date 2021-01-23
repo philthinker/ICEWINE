@@ -50,6 +50,8 @@ classdef LfDHSMMZero < TrajHSMMZero
         [traj,h,seq] = constructTraj_LQR1(obj,currP,N);
         [traj,h,seq] = constructTraj_LQR1Itera(obj,currP,N);
         [traj] = SampleHSMMLQR_SC(obj, N, currP);
+        
+        [traj,h,seq,u] = trajLQRItera_N(obj,initP,N);
     end
     
     methods (Access = protected)
