@@ -48,12 +48,12 @@ for i = 1:9
     DataXZAppGen(M+i).p0 = GeneralizedPoseApp(i).init_p([1,3],1);
     DataXZAppGen(M+i).SO20 = GeneralizedPoseApp(i).init_se3([1,3],[1,3],1);
 end
-%
+%}
 % More practical generalization
 MG = 18;
 for i = 1:18
     DataXZAppGen(MG+i).p0 = [0.7-i*0.08, 0.015]';
-    DataXZAppGen(MG+i).SO20 = eye(2);
+    DataXZAppGen(MG+i).SO20 = DataXZ(1).SO2(:,:,end);
 end
 %}
 

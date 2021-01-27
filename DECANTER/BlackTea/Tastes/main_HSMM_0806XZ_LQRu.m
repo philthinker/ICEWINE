@@ -11,7 +11,7 @@
 %   Exp. with 'Data\pcb_lead0806XZV.mat'
 
 %% Data resample
-%{
+%
 DD = 3;
 DataXZAppResam = DataXZApp;
 for i = 1:M
@@ -47,7 +47,7 @@ end
 %}
 
 %% Learn a HSMM model with raw p data
-%{
+%
 DemosPApp = extractDataFieldAsCell(DataXZAppResam,'p');
 
 policyApp = LfDHSMMZero(2,1,7,0.01,false);

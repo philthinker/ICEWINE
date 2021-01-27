@@ -200,6 +200,7 @@ classdef TPGMMOne < GMMOne
         % Auxiliary func.
         [Data] = dataFlattening(obj,TPDemos,mode);
         [Demo] = TPDemoConstruct(obj,Data,A,b,tmpTime);
+        [TPGMRData] = TPGMRDataConstruct(obj, query, A, b);
     end
     
     methods (Access = protected)
