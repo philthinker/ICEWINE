@@ -71,8 +71,8 @@ classdef HSMMZero
         obj = initTransLeftRight(obj,N);
         
         %% Param. estimation
-        function [obj] = leanHMM(obj, Demos)
-            %leanHMM Learn the HMM with EM algorithm
+        function [obj] = learnHMM(obj, Demos)
+            %learnHMM Learn the HMM with EM algorithm
             %   Demos: 1 x M cells of D x N data, demos
             
             % EM algorithm
