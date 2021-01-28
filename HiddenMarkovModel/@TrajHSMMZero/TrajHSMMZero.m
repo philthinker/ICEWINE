@@ -46,6 +46,7 @@ classdef TrajHSMMZero < HSMMZero
             obj.DD = DD;
         end
         
+        %% Trajectory generation
         function [DataOut, SigmaOut] = constructTraj_lscov(obj,Seq,dt)
             %constructTraj_lscov Construct the trajectory
             %   Seq: 1 x N, state sequence

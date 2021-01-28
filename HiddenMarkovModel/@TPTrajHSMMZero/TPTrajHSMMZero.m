@@ -79,6 +79,15 @@ classdef TPTrajHSMMZero < TrajHSMMZero
             end
         end
         
+        function [obj] = initHMMKmeansPosition(obj,TPDemos)
+            %initHMMKmeansPosition Init. the param. of HMM by KMeans agorithm.
+            %   TPDemos: 1 x M TPDemo struct array
+            Data = obj.dataFlattening(TPDemos);
+            [tmpMu, tmpSigma] = obj.init_tensor_kmeans(Data(1:obj.DP,:,:));
+            obj.Mus(1:obj.DP, :, :) = tmpMu;
+            obj.Sigmas(1:obj.DP, 1:obj.DP, :, :) = tmpSigma;
+        end
+        
         function obj = learnHMM(obj,Demos)
             %learnHMM	Learn the TP-HMM by EM algorithm
             %   TPDemos: 1 x M TPDemo struct array, demo data
@@ -132,50 +141,9 @@ classdef TPTrajHSMMZero < TrajHSMMZero
             end
         end
         
-        function [DataOut, SigmaOut] = constructTraj_lscov(obj,Seq,dt)
-            %constructTraj_lscov Construct the trajectory
-            %   Seq: 1 x N, state sequence
-            %   dt: scalar, time difference (optional)
-            %   -----------------------------------------
-            %   DataOutput: DP x N, expected position data
-            %   SigmaOut: DP x DP x N, expected position covariance
-            if nargin < 3
-                dt = obj.dt;
-            end
-            dt = max([1e-3, dt]);
-            N = length(Seq);
-            MuQ = reshape(obj.Mu(:,Seq), obj.D * N, 1);
-            SigmaQ = ( kron(ones(N,1), eye(obj.D)) * reshape(obj.Sigma(:,:,Seq), obj.D, obj.D*N))...
-                .* kron(eye(N), ones(obj.D));
-            % % Or
-            % SigmaQ = zeros(obj.N*D);
-            % for t=1:N
-            % 	id = (t-1)*obj.D+1:t*obj.D;
-            % 	%MuQ(id) = obj.Mu(:,Seq(t));
-            % 	SigmaQ(id,id) = obj.Sigma(:,:,Seq(t));
-            % end
-            PHI1 = obj.constructPhi1(N,dt);
-            % % Least squares via lscov Matlab function
-            [xhat,~,~,S] = lscov(PHI1, MuQ, SigmaQ, 'chol'); % Retrieval of data with weighted least squares solution
-            DataOut = reshape(xhat, obj.DP, N); % Reshape data for plotting
-            % % Least squares computation method 2 (most readable but not optimized)
-            % PHIinvSigmaQ = PHI1' / SigmaQ;
-            % Rq = PHIinvSigmaQ * PHI1;
-            % rq = PHIinvSigmaQ * MuQ;
-            % xhat = Rq \ rq; % Can also be computed with c = lscov(Rq, rq)
-            % size(zeta)
-            % DataOut = reshape(xhat, obj.DP, N); % Reshape data for plotting
-            % % Covariance Matrix computation of ordinary least squares estimate
-            % mse =  (MuQ'*inv(SigmaQ)*MuQ - rq'*inv(Rq)*rq) ./ ((obj.D-obj.DP)*N);
-            % S = inv(Rq) * mse;
-            
-            SigmaOut = repmat(eye(obj.DP),[1,1,N]);
-            for t=1:N
-                id = (t-1)*obj.DP+1:t*obj.DP;
-                SigmaOut(:,:,t) = S(id,id) * N;
-            end
-            
-        end
+        %% Trajectory generation
+        [DataOut, SigmaOut, obj] = constructTraj(obj,seq,frames);
+        [DataOut, SigmaOut, obj] = constructTraj_lscov(obj,seq,frames);
     end
     
     methods (Access = protected)
@@ -183,6 +151,8 @@ classdef TPTrajHSMMZero < TrajHSMMZero
         [Data] = dataFlattening(obj,TPDemos,mode);
         [obj, GAMMA, GAMMA2] = EM_tensorHMM(obj, s);
         [Lik, GAMMA, GAMMA0] = computeGamma(obj, Data);
+        [Mu,Sigma,obj] = prodLinearTransformedGauss(obj,frames);
+        [Mu, Sigma] = init_tensor_kmeans(obj, Data);
     end
     
     methods (Access = public, Hidden = true)

@@ -24,7 +24,7 @@ classdef HSMMZero
         K;              % Integer, Num. of states
         Mu;           % D x K, Centers of Gaussians
         Sigma;       % D x D x K, Covariances of Gaussians
-        Prior;         % 1 x K, Priors of GMM
+        Prior;         % 1 x K, Priors of GMM (unusable)
         StatePrior; % 1 x K, State priors
         Trans;        % K x K, Transition of states
         MuPd;       % 1 x K, Temporal centers of each state

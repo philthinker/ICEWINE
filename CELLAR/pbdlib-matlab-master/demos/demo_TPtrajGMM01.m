@@ -31,7 +31,7 @@ function demo_TPtrajGMM01
 % You should have received a copy of the GNU General Public License
 % along with PbDlib. If not, see <http://www.gnu.org/licenses/>.
 
-addpath('./m_fcts/');
+addpath('./CELLAR/pbdlib-matlab-master/demos/m_fcts/');
 
 
 %% Parameters
@@ -55,7 +55,7 @@ disp('Load 3rd order tensor data...');
 % in the different frames. It is a 3rd order tensor of dimension DC x P x N, with D=2 the dimension of a
 % datapoint, C=2 the number of derivatives (incl. position), P=2 the number of candidate frames, and N=TM 
 % the number of datapoints in a trajectory (T=200) multiplied by the number of demonstrations (M=5).
-load('data/DataWithDeriv02.mat');
+load('./CELLAR/pbdlib-matlab-master/demos/data/DataWithDeriv02.mat');
 
 % %Convert position data to position+velocity data
 % load('data/Data01.mat');
