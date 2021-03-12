@@ -1,7 +1,7 @@
 <!--
  * @Author: your name
  * @Date: 2020-06-09 09:41:31
- * @LastEditTime: 2020-12-06 22:33:05
+ * @LastEditTime: 2021-02-28 19:56:18
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: \undefinedc:\Users\philt\Documents\GitHub\ICEWINE\WINEGLASS\README.md
@@ -25,7 +25,3 @@ Haopeng Hu
 ## Special data types
 
 - UnitQuat: Unit quaternion class
-
-- OptitrackData: Data imported from Optitrack MoCap system
-
-- OptitrackDataOne < OptitrackData: v1.0 verison of OptitrackData

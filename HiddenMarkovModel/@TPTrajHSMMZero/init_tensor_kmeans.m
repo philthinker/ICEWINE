@@ -33,7 +33,7 @@ obj.Prior = obj.Prior / sum(obj.Prior);
 
 %Reshape GMM parameters into tensor data
 MuOut = zeros(nbVar,obj.F, obj.K);
-SigmaOut = zeros(nbVar, nbVar, obj.K, obj.K);
+SigmaOut = zeros(nbVar, nbVar, obj.F, obj.K);
 
 for m=1:obj.F
 	for i=1:obj.K

@@ -67,7 +67,9 @@ classdef OptitrackDataTwo < OptitrackDataOne
                     obj.bodyMarker(i).body = obj.body{i};
                     counter = counter + 8;
                     % Body marker data
-                    for j = 1:obj.Nm/2
+                    % We always assume that the bodies share the same
+                    % number of markers.
+                    for j = 1:obj.Nm/obj.Nb
                         obj.bodyMarker(i).marker{j} = Data(:, counter:counter+2);
                         counter = counter + 4;
                     end

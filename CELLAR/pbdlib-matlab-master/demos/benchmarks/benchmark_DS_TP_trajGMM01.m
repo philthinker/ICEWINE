@@ -32,7 +32,7 @@ function benchmark_DS_TP_trajGMM01
 % You should have received a copy of the GNU General Public License
 % along with PbDlib. If not, see <http://www.gnu.org/licenses/>.
 
-addpath('./../m_fcts/');
+addpath('./CELLAR/pbdlib-matlab-master/demos/m_fcts/');
 
 
 %% Parameters
@@ -57,7 +57,7 @@ disp('Load 3rd order tensor data...');
 % in the different frames. It is a 3rd order tensor of dimension D x P x N, with D=3 the dimension of a
 % datapoint, P=2 the number of candidate frames, and N=TM the number of datapoints in a trajectory (T=200)
 % multiplied by the number of demonstrations (M=5).
-load('./../data/DataLQR01.mat');
+load('./CELLAR/pbdlib-matlab-master/demos/data/DataLQR01.mat');
 
 
 %% Transformation of Data to learn the path of the spring-damper system instead of the raw data
@@ -171,7 +171,7 @@ end
 %% Reproduction for new task parameters
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 disp('New reproductions...');
-load('./../data/taskParams.mat'); %Load new task parameters (new situation)
+load('./CELLAR/pbdlib-matlab-master/demos/data/taskParams.mat');
 for n=1:nbRepros
 	%Adapt task parameters to trajectory GMM
 	for m=1:model.nbFrames

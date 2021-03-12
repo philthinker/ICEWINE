@@ -273,6 +273,75 @@ end
 grid on; axis equal; xlabel('x(m)'); ylabel('z(m)');
 %}
 
-%% TP-trajHSMM formulation
-%
+%% TP-trajHSMM formulation (Fail)
+%{
+F = 2;
+policyAppTPTrajHSMM = TPTrajHSMMZero(2,3,7,2);
+policyAppTPTrajHSMM.dt = dt;
+
+% Construct dynamic TP data
+DemosPAppDyna = repmat(policyAppTPTrajHSMM.TPDemoConstruct_Dynamic(), [1,M]);
+for i = 1:M
+    DemosPAppDyna(i) = policyAppTPTrajHSMM.TPDemoConstruct_Dynamic(...
+                                        DemosPApp{i},...
+                                        DemosPAppDTW(i).A(2:end,2:end,:),...
+                                        DemosPAppDTW(i).b(2:end,:));
+end
+
+% Learn TPTrajHSMM
+policyAppTPTrajHSMM = policyAppTPTrajHSMM.initHMMKmeans(DemosPAppDyna);
+policyAppTPTrajHSMM = policyAppTPTrajHSMM.initTransUniform();
+policyAppTPTrajHSMM = policyAppTPTrajHSMM.learnHMM(DemosPAppDyna);
+
+[~,seq] = policyAppTPTrajHSMM.reconstructStSeq_StandardFW(1000);
+
+% Demonstration retrieval
+
+trajTPTraj =[];
+trajTPTraj.data = [];
+trajTPTraj.Sigma = [];
+tmpFrame = [];
+tmpFrame.A = [];
+tmpFrame.b = [];
+trajTPTraj.frames = repmat(tmpFrame,[1,2]);
+trajTPTraj = repmat(trajTPTraj,[1,M]);
+for i = 1:M
+    for j = 1:policyAppTPTrajHSMM.F
+        trajTPTraj(i).frames(j).A = DemosPAppDyna(i).A(:,:,j);
+        trajTPTraj(i).frames(j).b = DemosPAppDyna(i).b(:,j);
+    end
+    [trajTPTraj(i).data, trajTPTraj(i).Sigma] = policyAppTPTrajHSMM.constructTraj_lscov(seq, trajTPTraj(i).frames);
+end
+
+% Cartesian plot
+figure;
+hold on;
+for i =1:M
+    plot(DemosPAppDyna(i).data(1,:), DemosPAppDyna(i).data(2,:),'Color',[0.5,0.5,0.5]);
+    tmpTraj = trajTPTraj(i).data;
+    plot(tmpTraj(1,:), tmpTraj(2,:), 'Color', Morandi_carnation(i),'LineWidth',2.0);
+end
+grid on; axis equal; xlabel('x(m)'); ylabel('z(m)');
+
+% Initial position generalization
+
+% MG = length(DataXZAppGen);
+
+% % Cartesian plot
+% figure;
+% hold on;
+% for i =1:M
+%     plot(DemosPAppDyna(i).data(1,:), DemosPAppDyna(i).data(2,:),'Color',[0.5,0.5,0.5]);
+% end
+% for i = 19:MG
+%     tmpTraj = trajTraj_Gen(i).data;
+%     plot(tmpTraj(1,:), tmpTraj(2,:), 'Color', Morandi_carnation(i),'LineWidth',2.0);
+% end
+% grid on; axis equal; xlabel('x(m)'); ylabel('z(m)');
+%}
+
+%% TP-LQT (iteratively)
+
+policyAppTPLQT = TPTrajHSMMZero(2,1,7,2);
+
 

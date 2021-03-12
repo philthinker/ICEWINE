@@ -86,6 +86,9 @@ classdef TPTrajHSMMZero < TrajHSMMZero
             [tmpMu, tmpSigma] = obj.init_tensor_kmeans(Data(1:obj.DP,:,:));
             obj.Mus(1:obj.DP, :, :) = tmpMu;
             obj.Sigmas(1:obj.DP, 1:obj.DP, :, :) = tmpSigma;
+            obj.Sigmas(obj.DP+1:obj.D, obj.DP+1:obj.D, :, :) = ...
+                obj.params_diagRegFact_KMeans*...
+                repmat(eye(obj.D - obj.DP), [1,1,obj.F,obj.K]);
         end
         
         function obj = learnHMM(obj,Demos)
@@ -144,6 +147,11 @@ classdef TPTrajHSMMZero < TrajHSMMZero
         %% Trajectory generation
         [DataOut, SigmaOut, obj] = constructTraj(obj,seq,frames);
         [DataOut, SigmaOut, obj] = constructTraj_lscov(obj,seq,frames);
+        %% LQT
+        [trajOut,u] = TPLQTIterative(obj, frames, seq);
+        %% Demos regulation
+        [Demo, frames] = TPDemoConstruct(obj,data,A,b);
+        [Demo, frames] = TPDemoConstruct_Dynamic(obj,data,A,b);
     end
     
     methods (Access = protected)
