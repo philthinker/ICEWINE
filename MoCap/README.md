@@ -1,7 +1,7 @@
 <!--
  * @Author: Haopeng Hu
  * @Date: 2021-02-28 19:56:48
- * @LastEditTime: 2021-02-28 20:00:20
+ * @LastEditTime: 2021-03-12 09:46:03
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: \undefinedc:\Users\philt\Documents\GitHub\ICEWINE\MoCap\README.md
@@ -21,4 +21,4 @@ Haopeng Hu
 
 - OptitrackDataOne < OptitrackData: v1.0 verison of OptitrackData
 
-- OptitrackDataTwo < OptitrackDataOne: v2.0 version of OptitrackData
+- OptitrackDataTwo < OptitrackDataOne: v2.0+ version of OptitrackData
