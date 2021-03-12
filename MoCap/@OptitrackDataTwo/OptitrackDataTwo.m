@@ -1,9 +1,13 @@
 classdef OptitrackDataTwo < OptitrackDataOne
-    %OptitrackDataTwo Data from Optitrack MoCap system
+    %OptitrackDataTwo Data from Optitrack MoCap system v2.1
     %   Use it for data storation and pre-process.
-    %   Raw data format: frame, time, qx, qy, qz, qw, x, y, z, ..., x, y, z
-    %   We always assume that each body consists of the same num. of
+    %   - Raw data format: frame, time, qx, qy, qz, qw, x, y, z, ..., x, y, z
+    %   - We always assume that each body consists of the same num. of
     %   markers.
+    %   - Using the property 'bodyMarker' rather than 'body' and 'marker' if
+    %   available. It is an 1 x Nb struct array whose fields are
+    %   |   body: N x 7, body data [qw qx qy qz x y z]
+    %   |   marker: 1 x Nbm cell, marker data of this body [x y z]
     %
     %   Haopeng Hu
     %   2021.01.22
@@ -15,13 +19,14 @@ classdef OptitrackDataTwo < OptitrackDataOne
     %   |   Nb:	num. of rigid bodies
     %   |   Nm:	num. of markers
     %   |   Nl:	num. of lost data points
+    %   |   Nbm: num. of markers on each body
     %
     %   Recommended usage:
     %   |   obj = OptitrackDataOne(Nb, Nm);
     %   |   obj = obj.CSVRead('PATH');
     
     properties
-        bodyMarker;
+        bodyMarker;         % 1 x Nb struct array, body and related markers
     end
     
     methods
@@ -82,7 +87,11 @@ classdef OptitrackDataTwo < OptitrackDataOne
             end
             % Point loss rate
             [obj.LossRate, obj.LossID] = obj.getPointLossRate();
+            obj.N = length(obj.time);
         end
+    end
+    
+    methods (Access = public)
     end
 end
 

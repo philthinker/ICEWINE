@@ -22,4 +22,10 @@ end
 %}
 
 %% Raw data show
+%
+for i = 1:M
+    Data(i).plot3Bodies();
+    Data(i).plotBodiesXYZ();
+end
+%}
 
