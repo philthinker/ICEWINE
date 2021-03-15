@@ -7,7 +7,7 @@ function [dataOut, gapOut, IDOut] = simpleGPRCompen(dataIn,quatFlag, query, gprP
 %   quatFlag: Boolean, true for quat data 
 %   query: N x 1, the query sequence (time) which is optional. If it is not
 %   assigned, the indices will be the alternative.
-%   gprParam: 1 x 3, the hyper-parameters of Gaussian process (default:[1e0,1e1,1e-2])
+%   gprParam: 1 x 3, the hyper-parameters of Gaussian process (default:[1e0,1e0,1e-2])
 %   -------------------------------------------------
 %   dataOut: N x 3, N x 4 or N x 7 ..., MoCap data in the form of dataIn.
 %   gapOut: Nl x 3, Nl x 4 or Nl x 7 ..., the compensated MoCap data
@@ -21,7 +21,7 @@ if nargin < 3
 end
 if nargin < 4
     % Default GP hyper-param.
-    gprParam = [1e0,1e1,1e-2];
+    gprParam = [1e0,1e0,1e-2];
 end
 D = size(dataIn, 2);
 dataOut = [];
@@ -29,10 +29,16 @@ gapOut = [];
 
 %% Find the lost IDs
 tmpID = (1:N);
-IDOut = tmpID(isnan(dataIn(:,1)));
+LIDOut = isnan(dataIn(:,1));
+if any(LIDOut)
+    % There are lost points
+    IDOut = tmpID(LIDOut);
+else
+    % No lost point
+    IDOut = [];
+end
 dataRest = dataIn(~isnan(dataIn(:,1)),:)';      % D x N-Nl
 queryRest = query(~isnan(dataIn(:,1)))';       % 1 x N-Nl
-queryID = query(IDOut)';                            % 1 x Nl
 
 %% Regualte the data
 if quatFlag
@@ -53,9 +59,10 @@ if quatFlag
     elseif D == 7
         % [qw qx qy qz x y z]
         qa = dataIn(tmpID,1:4)';
-        tmpData = dataRest(:,1:4)';
+        tmpData = dataRest(1:4,:);
         dataRestEta = quatLogMap(tmpData,qa);
-        dataRest = [dataRestEta; dataRest(5:7,:)];  % [etax; etay; etaz; x; y; z]
+        tmpData = dataRest(5:7,:);
+        dataRest = [dataRestEta; tmpData];  % [etax; etay; etaz; x; y; z]
     else
         return;
     end
@@ -86,7 +93,11 @@ if quatFlag
     end
 end
 dataOut = dataOut';
-gapOut = dataOut(IDOut,:);
+if isempty(IDOut)
+    gapOut = [];
+else
+    gapOut = dataOut(IDOut,:);
+end
 
 end
 

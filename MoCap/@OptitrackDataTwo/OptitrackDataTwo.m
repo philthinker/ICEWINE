@@ -92,6 +92,57 @@ classdef OptitrackDataTwo < OptitrackDataOne
     end
     
     methods (Access = public)
+        % Auxiliary functions for efficiency
+        function obj = simpleGPRCompensation_bodyMarker(obj, replaceFlag, gprParam)
+            %simpleGPCompensation_bodyMarker Replace the body and marker
+            %properties with the data in the bodyMarker property
+            %pre-processed by GPR.
+            %   replaceFlag: Boolean, true for replace all the data with
+            %   the estimated ones.
+            %   gprParam: 1 x 3, the hyper-param. of Gaussian process
+            %   (optional)
+            %   -----------------------------------------
+            %   obj: the object reference
+            if nargin < 3
+                gprParam = [1e0,1e-1,1e-2];
+            end
+            % Time as query
+            query = obj.time;
+            % Body data
+            for i = 1:obj.Nb
+                [tmpData, ~, tmpID] = simpleGPRCompen(obj.bodyMarker(i).body, true, query, gprParam);
+                if replaceFlag
+                    obj.body{i} = tmpData;
+                else
+                    tmpBody = obj.bodyMarker(i).body;
+                    if ~isempty(tmpID)
+                        tmpBody(tmpID,:) = tmpData(tmpID,:);
+                    end
+                    obj.body{i} = tmpBody;
+                end
+            end
+            % Marker data
+            % Recall that we always assume that the bodies share the same
+            % num. of markers on it.
+            tmpCnt = 1;
+            for i = 1:obj.Nb
+                for j = 1:length(obj.bodyMarker(i).marker)
+                    [tmpData, ~, tmpID] = simpleGPRCompen(obj.bodyMarker(i).marker{j}, false, query, gprParam);
+                    if replaceFlag
+                        obj.marker{tmpCnt} = tmpData;
+                    else
+                        tmpMarker = obj.bodyMarker(i).marker{j};
+                        if ~isempty(tmpID)
+                            tmpMarker(tmpID,:) = tmpData(tmpID,:);
+                        end
+                        obj.marker{tmpCnt} = tmpMarker;
+                    end
+                    tmpCnt = tmpCnt + 1;
+                end
+            end
+        end
+        
     end
+    
 end
 

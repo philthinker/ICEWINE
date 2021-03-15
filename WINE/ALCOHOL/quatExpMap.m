@@ -17,7 +17,7 @@ end
 
 for i = 1:N
     normEta = norm(eta(:,i));
-    if normEtra == 0
+    if normEta == 0
         tmpQ(:,i) = [1 0 0 0]';
     else
         tmpQ(:,i) = [cos(normEta); sin(normEta)*eta(:,i)/normEta];
