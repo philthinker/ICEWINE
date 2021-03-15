@@ -56,7 +56,7 @@ end
 % Run the following codes at once.
 % Results are stored in 'Data\compen_mocap0315.mat'.
 %% Build the data struct for simplicity
-%
+%{
 MC = 4;
 
 DataTest = [];
@@ -98,18 +98,54 @@ for i = 1:length(DataTest)
         tmpCnt = tmpCnt + 1;
     end
 end
+%
 %% Compensation via GPR
 for i = 1:length(DataTest)
+    x = DataTest(i).time;
+    y = DataTest(i).bodyOrigin;
+    y(~DataTest(i).cutLogiIDs,:) = NaN;
+    [~, DataTest(i).compenGPR, ~] = simpleGPRCompen(y,true,x,[1e1,1e0,1e-3]);
 end
 %% Compensation via spline, makima, pchip
+%
 for i = 1:length(DataTest)
     x = DataTest(i).time(DataTest(i).cutLogiIDs)';
     y = DataTest(i).bodyOriginEtaP(DataTest(i).cutLogiIDs,:)';
     xq = DataTest(i).time(~DataTest(i).cutLogiIDs)';
-    DataTest(i).compenSpline = spline(x,y,xq)';
-    DataTest(i).compenPchip = pchip(x,y,xq)';
-    DataTest(i).compenMakima = makima(x,y,xq)';
+    tmpQuat = DataTest(i).bodyOrigin(:,1:4)';
+    tmpQa = tmpQuat(:,end);
+    tmpData = spline(x,y,xq);
+    DataTest(i).compenSpline = [quatExpMap(tmpData(1:3,:),tmpQa)', tmpData(4:6,:)'];
+    tmpData = pchip(x,y,xq);
+    DataTest(i).compenPchip = [quatExpMap(tmpData(1:3,:),tmpQa)', tmpData(4:6,:)'];
+    tmpData = makima(x,y,xq);
+    DataTest(i).compenMakima = [quatExpMap(tmpData(1:3,:),tmpQa)', tmpData(4:6,:)'];
 end
+%}
 %% Compensation via our method
+%
 for i = 1:length(DataTest)
+end
+%
+%% Comparison
+%
+for i = 1:MC
+    figure;
+    x = DataTest(i).time;
+    y = DataTest(i).bodyOrigin;
+    xq = x(~DataTest(i).cutLogiIDs);
+    yqGPR = DataTest(i).compenGPR;
+    yqSpline = DataTest(i).compenSpline;
+    yqPchip = DataTest(i).compenPchip;
+    yqMakima = DataTest(i).compenMakima;
+    for j = 1:7
+        subplot(7,1,j);
+        plot(x,y(:,j),'k');
+        hold on;
+        plot(xq,yqGPR(:,j),'b');
+        plot(xq,yqSpline(:,j),'r');
+        plot(xq,yqPchip(:,j),'g');
+        plot(xq,yqMakima(:,j),'y');
+    end
+    
 end
